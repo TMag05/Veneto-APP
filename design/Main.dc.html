@@ -1,0 +1,117 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Instrument+Sans:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #3B4A3E; text-decoration: none; }
+    a:hover { color: #2C3830; }
+    .tema {
+      --calce:#F7F4EE; --istria:#FCFAF6; --intonaco:#EFEAE1; --pietra:#E0D9CD; --pietra-forte:#CFC6B6;
+      --inchiostro:#1E1B18; --inchiostro-medio:#6B6459; --inchiostro-chiaro:#736B5D;
+      --verde:#3B4A3E; --rosso:#8A4034;
+    }
+    .tema.escuro {
+      --calce:#15171B; --istria:#1E2126; --intonaco:#1A1D21; --pietra:#2E3339; --pietra-forte:#3D434A;
+      --inchiostro:#EDE8E0; --inchiostro-medio:#A8A196; --inchiostro-chiaro:#9A9287;
+      --verde:#9DB39A; --rosso:#D08C7E;
+    }
+  </style>
+</helmet>
+
+<div class="{{cls}}" style="width:390px;height:844px;background:var(--calce);font-family:'Instrument Sans',system-ui,sans-serif;color:var(--inchiostro);display:flex;flex-direction:column;overflow:hidden">
+
+  <!-- cabeçalho: 52px, sem linha, um só gesto -->
+  <div style="height:52px;flex:none;display:flex;align-items:center;justify-content:flex-end;padding:0 12px">
+    <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:var(--inchiostro)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><path d="M12 3v12"></path><path d="M8 7l4-4 4 4"></path><path d="M5 13v7h14v-7"></path></svg>
+    </span>
+  </div>
+
+  <!-- a fotografia ocupa o ecrã. o texto vive dentro dela. -->
+  <div style="position:relative;flex:1;min-height:0">
+    <svg viewBox="0 0 390 620" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%">
+      <defs>
+        <linearGradient id="ceuA" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#2C3550"></stop>
+          <stop offset="0.5" stop-color="#7A6379"></stop>
+          <stop offset="1" stop-color="#D79A80"></stop>
+        </linearGradient>
+        <linearGradient id="longeA" x1="0" y1="0.28" x2="0" y2="1">
+          <stop offset="0" stop-color="#F0A183"></stop>
+          <stop offset="0.3" stop-color="#B77E78"></stop>
+          <stop offset="1" stop-color="#6B5A63"></stop>
+        </linearGradient>
+        <linearGradient id="pertoA" x1="0" y1="0.5" x2="0" y2="1">
+          <stop offset="0" stop-color="#5B4C58"></stop>
+          <stop offset="1" stop-color="#2E2A33"></stop>
+        </linearGradient>
+        <linearGradient id="veuA" x1="0" y1="0.42" x2="0" y2="1">
+          <stop offset="0" stop-color="#15171B" stop-opacity="0"></stop>
+          <stop offset="0.62" stop-color="#15171B" stop-opacity="0.55"></stop>
+          <stop offset="1" stop-color="#15171B" stop-opacity="0.92"></stop>
+        </linearGradient>
+      </defs>
+      <rect width="390" height="620" fill="url(#ceuA)"></rect>
+      <path d="M-10 620 L-10 322 L28 232 L52 252 L76 246 L112 198 L138 220 L162 214 L208 270 L240 224 L266 246 L290 240 L332 276 L364 252 L400 264 L400 620 Z" fill="url(#longeA)"></path>
+      <path d="M-10 620 L-10 424 L36 346 L64 372 L94 364 L142 320 L174 350 L206 342 L254 394 L294 350 L332 382 L400 404 L400 620 Z" fill="url(#pertoA)"></path>
+      <path d="M-10 620 L-10 470 Q 100 448 195 462 Q 300 476 400 456 L400 620 Z" fill="#23262A"></path>
+      <rect width="390" height="620" fill="url(#veuA)"></rect>
+    </svg>
+
+    <div style="position:absolute;left:0;right:0;bottom:0;padding:0 20px 32px;display:flex;flex-direction:column;gap:10px">
+      <span style="font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:rgba(237,232,224,0.78)">Agora</span>
+      <span style="font-family:'EB Garamond',Georgia,serif;font-size:40px;line-height:1.08;color:#EDE8E0">Café no Falzarego</span>
+      <span style="font-size:14px;color:rgba(237,232,224,0.8);font-variant-numeric:tabular-nums">09:30–10:00 · 2105 m</span>
+    </div>
+  </div>
+
+  <!-- tudo o resto reduzido a uma linha -->
+  <div style="flex:none;padding:20px 20px 0;display:flex;align-items:baseline;justify-content:space-between;gap:16px">
+    <span style="font-family:'EB Garamond',Georgia,serif;font-style:italic;font-size:19px;color:var(--inchiostro-medio)">A seguir, o Pordoi</span>
+    <span style="font-size:13px;font-weight:500;color:var(--verde)">O resto do dia</span>
+  </div>
+
+  <div style="flex:none;height:32px"></div>
+
+  <!-- navegação: a mesma da app -->
+  <div style="flex:none;display:grid;grid-template-columns:repeat(5,1fr);box-shadow:0 -1px 0 var(--pietra);background:var(--calce)">
+    <div style="min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--verde)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><path d="M4 6h16v14H4z"></path><path d="M4 10h16"></path><path d="M8 3v4M16 3v4"></path></svg>
+      <span style="font-size:12px;font-weight:500;line-height:1">Hoje</span>
+    </div>
+    <div style="min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--inchiostro-chiaro)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><path d="M4 4h7v16H4z"></path><path d="M13 4h7v16h-7z"></path></svg>
+      <span style="font-size:12px;font-weight:500;line-height:1">Roadbook</span>
+    </div>
+    <div style="min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--inchiostro-chiaro)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"></path><path d="M9 4v14M15 6v14"></path></svg>
+      <span style="font-size:12px;font-weight:500;line-height:1">Mapa</span>
+    </div>
+    <div style="min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--inchiostro-chiaro)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><path d="M3 7h4l1.5-2h7L17 7h4v13H3z"></path><path d="M12 17a4 4 0 100-8 4 4 0 000 8z"></path></svg>
+      <span style="font-size:12px;font-weight:500;line-height:1">Galeria</span>
+    </div>
+    <div style="min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--inchiostro-chiaro)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>
+      <span style="font-size:12px;font-weight:500;line-height:1">Mais</span>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":390,"height":844},"escuro":{"editor":"boolean","default":false,"section":"Tema"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { cls: this.props.escuro ? 'tema escuro' : 'tema' };
+  }
+}
+</script>
+</body>
+</html>

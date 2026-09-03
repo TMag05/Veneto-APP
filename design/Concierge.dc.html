@@ -1,0 +1,155 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Instrument+Sans:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #3B4A3E; text-decoration: none; }
+    a:hover { color: #2C3830; }
+    .tema {
+      --calce:#F7F4EE; --istria:#FCFAF6; --intonaco:#EFEAE1; --pietra:#E0D9CD; --pietra-forte:#CFC6B6;
+      --inchiostro:#1E1B18; --inchiostro-medio:#6B6459; --inchiostro-chiaro:#736B5D;
+      --verde:#3B4A3E; --rosso:#8A4034; --sobre:#FCFAF6;
+    }
+    .tema.escuro {
+      --calce:#15171B; --istria:#1E2126; --intonaco:#1A1D21; --pietra:#2E3339; --pietra-forte:#3D434A;
+      --inchiostro:#EDE8E0; --inchiostro-medio:#A8A196; --inchiostro-chiaro:#9A9287;
+      --verde:#9DB39A; --rosso:#D08C7E; --sobre:#15171B;
+    }
+  </style>
+</helmet>
+
+<div class="{{cls}}" style="width:390px;height:844px;background:var(--calce);font-family:'Instrument Sans',system-ui,sans-serif;color:var(--inchiostro);display:flex;flex-direction:column;overflow:hidden">
+
+  <!-- a pessoa está no topo de tudo. é a primeira coisa que se lê. -->
+  <div style="flex:none;padding:16px 20px;display:flex;align-items:center;gap:12px;background:var(--intonaco)">
+    <span style="width:44px;height:44px;flex:none;border-radius:4px;background:var(--pietra);display:flex;align-items:center;justify-content:center;overflow:hidden">
+      <svg width="44" height="44" viewBox="0 0 44 44">
+        <rect width="44" height="44" fill="#C9BFB0"></rect>
+        <circle cx="22" cy="17" r="8" fill="#8C8072"></circle>
+        <path d="M4 44c0-10 8-15 18-15s18 5 18 15z" fill="#8C8072"></path>
+      </svg>
+    </span>
+    <span style="display:flex;flex-direction:column;gap:1px;min-width:0">
+      <span style="font-family:'EB Garamond',Georgia,serif;font-size:21px;line-height:1.15">Sara Duarte</span>
+      <span style="font-size:12px;color:var(--inchiostro-chiaro)">Está a acompanhar o grupo · responde em 10 min</span>
+    </span>
+  </div>
+
+  <div style="flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column">
+
+    <div style="padding:24px 20px 0;display:flex;flex-direction:column;gap:4px">
+      <span style="font-family:'EB Garamond',Georgia,serif;font-size:19px;font-variant-numeric:oldstyle-nums;color:var(--inchiostro-medio)">sexta-feira, 18 de setembro</span>
+      <span style="font-family:'EB Garamond',Georgia,serif;font-size:28px;line-height:1.25">A Sellaronda</span>
+    </div>
+
+    <!-- o próximo momento como cartão de estado: hora grande, lugar, o que falta -->
+    <div style="margin:24px 20px 0;border:1px solid var(--pietra);border-radius:12px;background:var(--istria);overflow:hidden">
+      <div style="height:132px;position:relative">
+        <svg viewBox="0 0 350 132" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%">
+          <defs>
+            <linearGradient id="ceuB" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#8FA7BE"></stop><stop offset="1" stop-color="#DCE0DF"></stop>
+            </linearGradient>
+          </defs>
+          <rect width="350" height="132" fill="url(#ceuB)"></rect>
+          <path d="M-10 132 L-10 82 L24 44 L44 58 L64 54 L102 28 L126 44 L148 40 L192 72 L228 42 L252 58 L274 54 L316 80 L346 62 L360 70 L360 132 Z" fill="#A9AFB6"></path>
+          <path d="M-10 132 L-10 104 L30 74 L56 92 L82 86 L124 62 L154 84 L184 78 L228 108 L268 76 L306 98 L360 110 L360 132 Z" fill="#7E848E"></path>
+          <path d="M-10 132 L-10 116 Q 90 106 180 114 Q 270 122 360 112 L360 132 Z" fill="#5A6A55"></path>
+        </svg>
+      </div>
+      <div style="padding:16px 20px 20px;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
+          <span style="font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--verde)">Agora</span>
+          <span style="font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--inchiostro-medio)">09:30–10:00</span>
+        </div>
+        <span style="font-family:'EB Garamond',Georgia,serif;font-size:28px;line-height:1.2">Café no Falzarego</span>
+        <div style="display:flex;align-items:center;gap:16px;margin-top:2px">
+          <span style="font-size:13px;color:var(--inchiostro-chiaro);font-variant-numeric:tabular-nums">2105 m</span>
+          <span style="font-size:13px;color:var(--inchiostro-chiaro);font-variant-numeric:tabular-nums">21 km · 37 min</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- confiança é saber onde está toda a gente -->
+    <div style="margin:24px 20px 0;padding-top:16px;border-top:1px solid var(--pietra);display:flex;flex-direction:column;gap:12px">
+      <span style="font-family:'EB Garamond',Georgia,serif;font-size:22px;line-height:1.25">Sete carros já no Falzarego.</span>
+      <div style="display:flex;gap:6px;align-items:center">
+        <svg width="52" height="18" viewBox="0 0 400 140"><path d="M16 110 C 12 102 14 94 24 90 C 44 84 60 80 76 76 C 108 66 140 60 166 57 C 184 40 208 29 238 28 C 266 27 288 33 304 45 C 326 61 348 74 368 81 C 382 86 389 95 387 106 L 384 112 L 338 112 A 32 32 0 0 0 274 112 L 136 112 A 32 32 0 0 0 72 112 L 20 112 Z" fill="#1D3A2C"></path></svg>
+        <svg width="52" height="18" viewBox="0 0 400 140"><path d="M16 110 C 12 102 14 94 24 90 C 44 84 60 80 76 76 C 108 66 140 60 166 57 C 184 40 208 29 238 28 C 266 27 288 33 304 45 C 326 61 348 74 368 81 C 382 86 389 95 387 106 L 384 112 L 338 112 A 32 32 0 0 0 274 112 L 136 112 A 32 32 0 0 0 72 112 L 20 112 Z" fill="#17181A"></path></svg>
+        <svg width="52" height="18" viewBox="0 0 400 140"><path d="M14 90 C 10 78 18 70 32 67 L 78 56 C 100 48 122 44 144 42 C 156 21 174 9 202 8 L 268 8 C 294 9 312 17 324 33 L 352 47 C 374 55 388 63 389 79 L 388 99 L 384 108 L 346 108 A 38 38 0 0 0 270 108 L 132 108 A 38 38 0 0 0 56 108 L 18 108 Z" fill="#8E1319"></path></svg>
+        <svg width="52" height="18" viewBox="0 0 400 140"><path d="M16 110 C 12 102 14 94 24 90 C 44 84 60 80 76 76 C 108 66 140 60 166 57 C 184 40 208 29 238 28 C 266 27 288 33 304 45 C 326 61 348 74 368 81 C 382 86 389 95 387 106 L 384 112 L 338 112 A 32 32 0 0 0 274 112 L 136 112 A 32 32 0 0 0 72 112 L 20 112 Z" fill="#A9AEB2"></path></svg>
+        <span style="font-size:12px;color:var(--inchiostro-chiaro);font-variant-numeric:tabular-nums">+3</span>
+      </div>
+    </div>
+
+    <div style="margin:24px 20px 0;display:flex;flex-direction:column">
+      <div style="display:grid;grid-template-columns:56px 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--pietra)">
+        <span style="font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--inchiostro-medio)">13:00</span>
+        <span style="display:flex;flex-direction:column;gap:1px">
+          <span style="font-family:'EB Garamond',Georgia,serif;font-size:20px;line-height:1.2">Almoço</span>
+          <span style="font-size:12px;color:var(--inchiostro-chiaro)">Rifugio, Passo Pordoi</span>
+        </span>
+      </div>
+      <div style="display:grid;grid-template-columns:56px 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--pietra)">
+        <span style="font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--inchiostro-medio)">18:00</span>
+        <span style="display:flex;flex-direction:column;gap:1px">
+          <span style="font-family:'EB Garamond',Georgia,serif;font-size:20px;line-height:1.2">Regresso</span>
+          <span style="font-size:12px;color:var(--inchiostro-chiaro)">Cortina</span>
+        </span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- a acção de serviço está sempre à mão, e é a única a cheio -->
+  <div style="flex:none;padding:16px 20px;display:flex;gap:8px;background:var(--calce);box-shadow:0 -1px 0 var(--pietra)">
+    <span style="flex:1;min-height:48px;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:8px;background:var(--verde);color:var(--sobre);font-size:16px;font-weight:500">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><path d="M4 5h16v11H9l-5 4z"></path></svg>
+      Falar com a Sara
+    </span>
+    <span style="flex:0 0 auto;min-width:48px;min-height:48px;display:flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid var(--pietra-forte);color:var(--rosso)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><path d="M12 3l9 17H3z"></path><path d="M12 9v5"></path><path d="M12 17.2v.1"></path></svg>
+    </span>
+  </div>
+
+  <div style="flex:none;display:grid;grid-template-columns:repeat(5,1fr);box-shadow:0 -1px 0 var(--pietra);background:var(--calce)">
+    <div style="min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--verde)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><path d="M4 6h16v14H4z"></path><path d="M4 10h16"></path><path d="M8 3v4M16 3v4"></path></svg>
+      <span style="font-size:12px;font-weight:500;line-height:1">Hoje</span>
+    </div>
+    <div style="min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--inchiostro-chiaro)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><path d="M4 4h7v16H4z"></path><path d="M13 4h7v16h-7z"></path></svg>
+      <span style="font-size:12px;font-weight:500;line-height:1">Roadbook</span>
+    </div>
+    <div style="min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--inchiostro-chiaro)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"></path><path d="M9 4v14M15 6v14"></path></svg>
+      <span style="font-size:12px;font-weight:500;line-height:1">Mapa</span>
+    </div>
+    <div style="min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--inchiostro-chiaro)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><path d="M3 7h4l1.5-2h7L17 7h4v13H3z"></path><path d="M12 17a4 4 0 100-8 4 4 0 000 8z"></path></svg>
+      <span style="font-size:12px;font-weight:500;line-height:1">Galeria</span>
+    </div>
+    <div style="min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--inchiostro-chiaro)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>
+      <span style="font-size:12px;font-weight:500;line-height:1">Mais</span>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":390,"height":844},"escuro":{"editor":"boolean","default":false,"section":"Tema"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { cls: this.props.escuro ? 'tema escuro' : 'tema' };
+  }
+}
+</script>
+</body>
+</html>

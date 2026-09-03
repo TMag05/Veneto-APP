@@ -1,0 +1,973 @@
+<title>O Luxo é Atmosfera</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Archivo:wght@300;400;500;600&display=swap">
+
+<style>
+/* =========================================================
+   Enrosadira — o rosa que a dolomia apanha ao poente.
+   Escuro por defeito: a hora azul em altitude.
+   ========================================================= */
+
+:root {
+  --pedra:        #0E1219;
+  --pedra-alta:   #161C25;
+  --pedra-funda:  #0A0D13;
+  --linha:        #232C38;
+  --linha-forte:  #35404F;
+
+  --neve:         #EDEBE6;
+  --neve-media:   #A3ADBA;
+  --neve-baixa:   #7C8794;
+
+  --enrosadira:   #E0917A;
+  --glaciar:      #7FAAB5;
+
+  --ceu-alto:     #0B0F16;
+  --ceu-baixo:    #1B2532;
+  --cume:         #2A3442;
+  --cume-frente:  #161D27;
+
+  --serif: "Bodoni Moda", "Didot", "Bodoni MT", Georgia, serif;
+  --sans: "Archivo", "Helvetica Neue", Arial, sans-serif;
+
+  --medida: 68ch;
+  --gutter: clamp(1.25rem, 5vw, 2.5rem);
+  --salto: clamp(4rem, 11vw, 7.5rem);
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --pedra:        #F1F2F4;
+    --pedra-alta:   #FAFAFB;
+    --pedra-funda:  #E7E9EC;
+    --linha:        #DBDEE3;
+    --linha-forte:  #C2C8D0;
+
+    --neve:         #14181E;
+    --neve-media:   #545F6B;
+    --neve-baixa:   #6B7681;
+
+    --enrosadira:   #B4573C;
+    --glaciar:      #3D707C;
+
+    --ceu-alto:     #DDE3EA;
+    --ceu-baixo:    #F3F1EE;
+    --cume:         #AFB9C4;
+    --cume-frente:  #7E8A97;
+  }
+}
+
+:root[data-theme="light"] {
+  --pedra:        #F1F2F4;
+  --pedra-alta:   #FAFAFB;
+  --pedra-funda:  #E7E9EC;
+  --linha:        #DBDEE3;
+  --linha-forte:  #C2C8D0;
+
+  --neve:         #14181E;
+  --neve-media:   #545F6B;
+  --neve-baixa:   #6B7681;
+
+  --enrosadira:   #B4573C;
+  --glaciar:      #3D707C;
+
+  --ceu-alto:     #DDE3EA;
+  --ceu-baixo:    #F3F1EE;
+  --cume:         #AFB9C4;
+  --cume-frente:  #7E8A97;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--pedra);
+  color: var(--neve);
+  font-family: var(--sans);
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 1.72;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+:focus-visible { outline: 2px solid var(--enrosadira); outline-offset: 3px; }
+
+/* ---------- Estrutura ---------- */
+
+.faixa { padding: 0 var(--gutter); }
+
+.coluna {
+  max-width: var(--medida);
+  margin: 0 auto;
+}
+
+.larga { max-width: 1180px; margin: 0 auto; }
+
+section { padding-block: var(--salto); }
+section + section { border-top: 1px solid var(--linha); }
+
+/* ---------- Tipografia ---------- */
+
+.olho {
+  font-family: var(--sans);
+  font-size: .75rem;
+  font-weight: 500;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--neve-baixa);
+  margin: 0;
+}
+
+.olho--acento { color: var(--enrosadira); }
+
+h1, h2, h3 { font-family: var(--serif); font-weight: 400; margin: 0; text-wrap: balance; }
+
+h1 {
+  font-size: clamp(3rem, 9.5vw, 6.5rem);
+  line-height: .94;
+  letter-spacing: -.025em;
+}
+
+h2 {
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  line-height: 1.04;
+  letter-spacing: -.02em;
+}
+
+h3 {
+  font-size: clamp(1.35rem, 2.6vw, 1.75rem);
+  line-height: 1.2;
+  letter-spacing: -.01em;
+}
+
+p { margin: 0; }
+.pilha > * + * { margin-top: 1.15rem; }
+.pilha-larga > * + * { margin-top: 2rem; }
+
+.lead {
+  font-size: clamp(1.1rem, 2.1vw, 1.375rem);
+  line-height: 1.6;
+  font-weight: 300;
+  color: var(--neve-media);
+}
+
+.nota { font-size: .8125rem; line-height: 1.55; color: var(--neve-baixa); }
+
+em, .italico { font-family: var(--serif); font-style: italic; }
+
+strong { font-weight: 500; color: var(--neve); }
+
+a { color: var(--enrosadira); text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--enrosadira) 35%, transparent); }
+a:hover { border-bottom-color: var(--enrosadira); }
+
+.num { font-variant-numeric: tabular-nums; }
+
+/* ---------- Abertura ---------- */
+
+.abertura {
+  position: relative;
+  min-height: min(94svh, 860px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-block: 0 clamp(3rem, 8vw, 6rem);
+  border-top: 0;
+  overflow: hidden;
+}
+
+#cume {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.abertura__texto { position: relative; }
+
+.abertura h1 { margin-top: 1.5rem; }
+
+.abertura .lead {
+  margin-top: 1.75rem;
+  max-width: 44ch;
+  color: var(--neve-media);
+}
+
+.carimbo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  align-items: baseline;
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--linha-forte);
+  max-width: 44ch;
+}
+
+/* ---------- Diagnóstico ---------- */
+
+.sintomas {
+  display: grid;
+  gap: 1px;
+  background: var(--linha);
+  border-block: 1px solid var(--linha);
+  margin-top: 3rem;
+}
+
+@media (min-width: 720px) { .sintomas { grid-template-columns: 1fr 1fr; } }
+
+.sintoma {
+  background: var(--pedra);
+  padding: 1.75rem clamp(1.25rem, 3vw, 2rem);
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+}
+
+.sintoma__t {
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  line-height: 1.25;
+  letter-spacing: -.01em;
+}
+
+.sintoma p { font-size: .95rem; line-height: 1.65; color: var(--neve-media); }
+
+/* ---------- Achados ---------- */
+
+.achado {
+  display: grid;
+  gap: clamp(1.25rem, 3vw, 3rem);
+  padding-block: clamp(2.25rem, 5vw, 3.5rem);
+  border-top: 1px solid var(--linha);
+}
+.achado:first-of-type { border-top: 0; }
+
+@media (min-width: 900px) { .achado { grid-template-columns: 15rem 1fr; } }
+
+.achado__marca { display: flex; flex-direction: column; gap: .5rem; }
+
+.achado__figura {
+  font-family: var(--serif);
+  font-size: clamp(2.5rem, 6vw, 3.75rem);
+  line-height: .95;
+  letter-spacing: -.03em;
+  color: var(--enrosadira);
+  font-variant-numeric: tabular-nums;
+}
+
+.achado__corpo { display: flex; flex-direction: column; gap: 1rem; max-width: 62ch; }
+
+.achado__corpo p { color: var(--neve-media); }
+.achado__corpo p.tese { color: var(--neve); font-size: 1.0625rem; }
+
+.implica {
+  display: flex;
+  gap: .9rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--linha);
+  align-items: baseline;
+}
+
+.implica__rot {
+  font-size: .6875rem;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--glaciar);
+  flex: none;
+  padding-top: .28rem;
+}
+
+.implica p { color: var(--neve); font-size: .975rem; }
+
+/* ---------- Confronto ---------- */
+
+.confronto {
+  display: grid;
+  gap: 1px;
+  background: var(--linha);
+  border: 1px solid var(--linha);
+  margin-top: 2.5rem;
+}
+
+@media (min-width: 760px) { .confronto { grid-template-columns: 1fr 1fr; } }
+
+.lado { background: var(--pedra); padding: clamp(1.5rem, 3vw, 2.25rem); }
+.lado--nos { background: var(--pedra-alta); }
+
+.lado__rot {
+  font-size: .6875rem;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  margin-bottom: 1.25rem;
+}
+.lado--eles .lado__rot { color: var(--glaciar); }
+.lado--nos .lado__rot { color: var(--enrosadira); }
+
+.lado ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: .85rem; }
+.lado li { font-size: .95rem; line-height: 1.6; color: var(--neve-media); padding-left: 1.1rem; position: relative; }
+.lado li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: .62rem;
+  width: 5px; height: 5px;
+  background: currentColor;
+  opacity: .5;
+}
+
+/* ---------- Movimentos (ordenados: a ordem é a prioridade) ---------- */
+
+.movimento {
+  display: grid;
+  gap: 1rem clamp(1.5rem, 4vw, 3rem);
+  padding-block: clamp(2rem, 4vw, 3rem);
+  border-top: 1px solid var(--linha);
+}
+
+@media (min-width: 820px) { .movimento { grid-template-columns: 4.5rem 1fr 16rem; } }
+
+.movimento__n {
+  font-family: var(--serif);
+  font-size: 2.25rem;
+  line-height: 1;
+  color: var(--neve-baixa);
+  font-variant-numeric: tabular-nums;
+}
+
+.movimento__corpo { display: flex; flex-direction: column; gap: .85rem; max-width: 56ch; }
+.movimento__corpo p { color: var(--neve-media); font-size: 1rem; }
+
+.movimento__onde {
+  font-size: .8125rem;
+  line-height: 1.6;
+  color: var(--neve-baixa);
+  border-left: 1px solid var(--linha-forte);
+  padding-left: 1rem;
+  align-self: start;
+}
+
+.movimento__onde code {
+  font-family: var(--sans);
+  font-weight: 500;
+  color: var(--glaciar);
+  font-size: .8125rem;
+}
+
+.esforco {
+  display: inline-block;
+  margin-top: .5rem;
+  font-size: .6875rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--neve-baixa);
+}
+
+/* ---------- Armadilhas ---------- */
+
+.armadilhas { display: flex; flex-wrap: wrap; gap: .625rem; margin-top: 2.25rem; }
+
+.armadilha {
+  font-size: .875rem;
+  padding: .5rem .9rem;
+  border: 1px solid var(--linha-forte);
+  color: var(--neve-media);
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--enrosadira) 70%, transparent);
+  text-decoration-thickness: 1px;
+}
+
+/* ---------- Citação ---------- */
+
+.citacao {
+  font-family: var(--serif);
+  font-size: clamp(1.5rem, 3.4vw, 2.25rem);
+  line-height: 1.3;
+  letter-spacing: -.015em;
+  color: var(--neve);
+  text-wrap: balance;
+}
+
+.citacao__fonte {
+  display: block;
+  margin-top: 1.25rem;
+  font-family: var(--sans);
+  font-size: .75rem;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--neve-baixa);
+}
+
+/* ---------- Fontes ---------- */
+
+.fontes { display: flex; flex-direction: column; gap: .9rem; margin-top: 2rem; }
+.fontes p { font-size: .875rem; line-height: 1.55; color: var(--neve-baixa); }
+.fontes a { color: var(--neve-media); border-bottom-color: var(--linha-forte); }
+.fontes a:hover { color: var(--enrosadira); border-bottom-color: var(--enrosadira); }
+
+/* ---------- Rodapé ---------- */
+
+.rodape { padding-block: clamp(3rem, 7vw, 5rem); }
+.rodape p { font-size: .8125rem; color: var(--neve-baixa); }
+
+/* ---------- Revelação ---------- */
+
+.revela { opacity: 0; transform: translateY(14px); transition: opacity .7s ease, transform .7s ease; }
+.revela.vista { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .revela { opacity: 1; transform: none; transition: none; }
+}
+</style>
+
+<header class="abertura faixa">
+  <canvas id="cume" aria-hidden="true"></canvas>
+  <div class="abertura__texto larga">
+    <p class="olho">Pesquisa · Agosto de 2026 · Passeio Dolomitas</p>
+    <h1>O luxo<br>é atmosfera.</h1>
+    <p class="lead">A app faz tudo o que tem de fazer. Não faz nada que alguém queira <em>sentir</em>. Isto é o que as marcas que os nossos clientes já usam fazem de diferente — e o que isso obriga a mudar.</p>
+    <div class="carimbo">
+      <p class="nota">Louis&nbsp;Vuitton · Rolex · Four&nbsp;Seasons · Soho&nbsp;House · Cartier · Aston&nbsp;Martin</p>
+    </div>
+  </div>
+</header>
+
+<section class="faixa">
+  <div class="larga">
+    <p class="olho olho--acento">O diagnóstico</p>
+    <h2 style="margin-top:1.25rem;max-width:20ch">Contenção sem atmosfera é só vazio.</h2>
+    <div class="coluna pilha" style="margin-left:0;margin-top:2rem">
+      <p class="lead">O crítico tem razão, e vale a pena ser exato sobre o porquê. A app não está mal construída — está <strong>meio construída</strong>. Tem a arquitetura de informação certa, a tipografia certa, os contrastes certos. Falta-lhe tudo o que faz alguém abrir uma app sem precisar.</p>
+      <p>A disciplina que aplicámos veio dos guidelines: sem sombras, sem gradientes, sem ruído, espaço a mais. Essa disciplina é a metade certa da equação do luxo. A outra metade — a emoção, a matéria, a hora do dia — não foi feita. E sem ela a contenção não lê como sofisticação: lê como um backoffice bem penteado.</p>
+    </div>
+
+    <div class="sintomas revela">
+      <div class="sintoma">
+        <span class="sintoma__t">Tudo é uma lista</span>
+        <p>Onze dos catorze ecrãs são linhas com um título, uma legenda e um <span class="italico">chevron</span>. É a gramática de uma ferramenta de gestão, não a de um objeto que se guarda.</p>
+      </div>
+      <div class="sintoma">
+        <span class="sintoma__t">Não há fotografia</span>
+        <p>As imagens são colinas geradas em SVG. Funcionam como andaime; lidas por um cliente, dizem que ninguém se deu ao trabalho. É a falha isolada mais cara da app.</p>
+      </div>
+      <div class="sintoma">
+        <span class="sintoma__t">Não há ninguém do outro lado</span>
+        <p>O concierge é uma caixa de texto que responde sozinha ao fim de seis segundos. Não tem nome, não tem cara, não promete nada.</p>
+      </div>
+      <div class="sintoma">
+        <span class="sintoma__t">Nada acontece</span>
+        <p>Abrir a app pela primeira vez é igual a abri-la pela vigésima. Não há chegada, não há sequência, não há um único momento com encenação.</p>
+      </div>
+      <div class="sintoma">
+        <span class="sintoma__t">O carro é pequeno</span>
+        <p>A silhueta é a melhor ideia da identidade e aparece a 56&nbsp;px numa grelha. O objeto que custou trezentos mil euros está tratado como um ícone de lista.</p>
+      </div>
+      <div class="sintoma">
+        <span class="sintoma__t">A história está num cadeado</span>
+        <p>O conteúdo editorial — o melhor que a app tem — esconde-se atrás de uma caixa cinzenta com um ícone de fechadura. Lê-se como uma barreira de pagamento, não como uma cerimónia.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faixa">
+  <div class="larga">
+    <p class="olho olho--acento">O que as marcas fazem</p>
+    <h2 style="margin-top:1.25rem;max-width:22ch">Sete coisas que se repetem em todas elas.</h2>
+    <p class="lead" style="margin-top:1.5rem;max-width:60ch">Cada uma destas está documentada. Ao lado de cada uma está o que implica para nós — sem generalidades.</p>
+
+    <div style="margin-top:3.5rem">
+
+      <article class="achado revela">
+        <div class="achado__marca">
+          <p class="olho">Smashing Magazine</p>
+          <span class="achado__figura">40s</span>
+          <p class="nota">O tempo de entrada que reteve clientes, contra dois minutos que os perdeu.</p>
+        </div>
+        <div class="achado__corpo">
+          <h3>O tempo é a moeda</h3>
+          <p class="tese">Para o cliente afluente, o tempo é o bem mais escasso. A investigação de UX de luxo chama-lhe <span class="italico">the one-button approach</span>: uma ação, uma confirmação, sem estados intermédios.</p>
+          <p>No teste citado, mostrar o processo — <span class="italico">marcado → processado → confirmado</span> — afastou clientes. Eles não querem ver a máquina a trabalhar. Querem o resultado, e querem-no imediatamente.</p>
+          <div class="implica">
+            <span class="implica__rot">Implica</span>
+            <p>A nossa fila de sincronização já esconde a máquina — está certo. Mas a entrada pede nome, email <em>e</em> seis dígitos. São três ecrãs para alguém que a organização já conhece pelo nome.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="achado revela">
+        <div class="achado__marca">
+          <p class="olho">Four Seasons</p>
+          <span class="achado__figura">90s</span>
+          <p class="nota">Tempo médio de resposta no chat. Cinco milhões e setecentas mil mensagens trocadas.</p>
+        </div>
+        <div class="achado__corpo">
+          <h3>Há sempre uma pessoa</h3>
+          <p class="tese">O chat do Four Seasons é <strong>cem por cento operado por pessoas</strong>, em mais de cem línguas, antes, durante e depois da estadia. Nenhuma automatização. É a decisão deliberada mais cara que tomaram, e é a que sustenta a diferença.</p>
+          <p>A investigação de UX de luxo é categórica no mesmo ponto: a interação humana dentro da experiência digital não é uma opção, é a ferramenta que constrói lealdade.</p>
+          <div class="implica">
+            <span class="implica__rot">Implica</span>
+            <p>O nosso concierge tem de ter o nome e a cara da Sara, e uma promessa de tempo à vista. Uma resposta automática de seis segundos é pior do que nenhuma.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="achado revela">
+        <div class="achado__marca">
+          <p class="olho">Investigação em turismo</p>
+          <span class="achado__figura">Antes</span>
+          <p class="nota">A fase de antecipação produz afeto positivo mais sustentado do que o próprio acontecimento.</p>
+        </div>
+        <div class="achado__corpo">
+          <h3>A antecipação é metade do produto</h3>
+          <p class="tese">Décadas de investigação mostram que a parte mais feliz de uma viagem é, estatisticamente, a espera. O erro comum é tratar a contagem decrescente como um número a renderizar, em vez de a tratar como superfície de produto.</p>
+          <p>O que funciona: uma âncora sensorial (uma fotografia), um gesto de agência (uma lista que se prepara) e um ritmo de notificação calibrado — um aviso por tarefa, sinal e não ruído.</p>
+          <div class="implica">
+            <span class="implica__rot">Implica</span>
+            <p>Reduzimos os dias anteriores a um briefing de três linhas. É o momento de maior apetite do cliente e demos-lhe o mínimo. Não é preciso trazer de volta o checkup — é preciso trazer de volta o <em>desejo</em>: uma paragem revelada por dia, a estrada de amanhã, o tempo que vai estar no Giau.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="achado revela">
+        <div class="achado__marca">
+          <p class="olho">Soho House</p>
+          <span class="achado__figura">90%</span>
+          <p class="nota">Proporção de sócios que usa a app. O produto é quem lá está.</p>
+        </div>
+        <div class="achado__corpo">
+          <h3>O clube é as outras pessoas</h3>
+          <p class="tese">A app do Soho House é usada por mais de nove em cada dez sócios, e o que a sustenta não é a reserva de mesa: é ver quem está, onde, e poder falar com essa pessoa. Personalização, exclusividade, ligação e lealdade — por esta ordem.</p>
+          <p>Ao redesenhá-la, trouxeram para dentro os materiais e as fotografias das casas físicas, para que o digital tivesse o mesmo ambiente do sítio.</p>
+          <div class="implica">
+            <span class="implica__rot">Implica</span>
+            <p>Já temos a melhor versão disto e escondemo-la: os carros do grupo no mapa. Está numa secção chamada "onde está o grupo", com silhuetas de 56&nbsp;px, a meio de um <span class="italico">scroll</span>. Sete Aston Martin já no Falzarego é uma manchete, não uma linha de lista.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="achado revela">
+        <div class="achado__marca">
+          <p class="olho">Aura Consortium · Rolex</p>
+          <span class="achado__figura">50M</span>
+          <p class="nota">Produtos com passaporte digital no consórcio da LVMH, Prada, Cartier e Mercedes-Benz.</p>
+        </div>
+        <div class="achado__corpo">
+          <h3>O objeto tem certidão</h3>
+          <p class="tese">A obsessão do luxo digital nesta década é a proveniência. Cinquenta milhões de produtos já têm registo imutável de origem e histórico. A Rolex desenvolve um chip de identidade que guarda número de série, fabrico e histórico de serviço.</p>
+          <p>O padrão é sempre o mesmo: o objeto físico ganha um duplo digital que prova o que viveu. Não é tecnologia por tecnologia — é a materialização de uma promessa.</p>
+          <div class="implica">
+            <span class="implica__rot">Implica</span>
+            <p>O nosso álbum é isso e ainda não sabe que é. Não deve ser uma grelha de fotografias: deve ser uma <strong>certidão do percurso</strong> — os quilómetros feitos, os passos subidos, a data, os nomes de quem ia no carro, o número da edição. Assinada. Descarregável. Permanente.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="achado revela">
+        <div class="achado__marca">
+          <p class="olho">Rolex</p>
+          <span class="achado__figura">0</span>
+          <p class="nota">Apps de consumo. A lista de espera é parte da experiência, não uma falha dela.</p>
+        </div>
+        <div class="achado__corpo">
+          <h3>A escassez é desenho</h3>
+          <p class="tese">A Rolex não tem app de consumo, e isso é uma posição, não um atraso. A espera passou a fazer parte do que se compra: molda o desejo e reforça o valor simbólico. A marca comunica por instituições, objetos e presença calibrada.</p>
+          <p>A lição não é "não façam app". É que <strong>o que se retém tem tanto peso como o que se dá</strong>, e que reter só funciona quando a revelação, quando chega, é encenada.</p>
+          <div class="implica">
+            <span class="implica__rot">Implica</span>
+            <p>O nosso mecanismo de desbloquear a história à chegada está certo no instinto e errado na execução. Um cadeado cinzento diz "não podes". Uma linha em itálico a dizer <em>a história deste sítio abre-se quando lá chegar</em>, sobre a fotografia do sítio, diz "vale a pena ir".</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="achado revela">
+        <div class="achado__marca">
+          <p class="olho">Dior · Rolex · editorial</p>
+          <span class="achado__figura">65ch</span>
+          <p class="nota">A medida de leitura. A tipografia é a assinatura silenciosa.</p>
+        </div>
+        <div class="achado__corpo">
+          <h3>Menos por ecrã, e maior</h3>
+          <p class="tese">O vocabulário é consistente entre marcas: serifas de alto contraste — Didot, Bodoni — para títulos; margens largas; menos produtos por ecrã; fotografia a toda a largura. O espaço em branco não é vazio, é sinal de confiança.</p>
+          <p>E o ritmo é de exposição, não de catálogo: revela-se devagar, convida-se a demorar, não se corre para a conversão.</p>
+          <div class="implica">
+            <span class="implica__rot">Implica</span>
+            <p>Temos a tipografia e o espaço. Falta-nos a fotografia a toda a largura e falta-nos densidade a menos: o ecrã "Hoje" mostra oito momentos seguidos quando devia mostrar um — o próximo — em grande, e os outros por baixo.</p>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section class="faixa">
+  <div class="larga">
+    <p class="olho olho--acento">O confronto</p>
+    <h2 style="margin-top:1.25rem;max-width:18ch">A mesma disciplina, resultados opostos.</h2>
+    <p class="lead" style="margin-top:1.5rem;max-width:58ch">A diferença não está nas regras. Está no que se faz com o espaço que as regras deixam livre.</p>
+
+    <div class="confronto revela">
+      <div class="lado lado--eles">
+        <p class="lado__rot">O que elas fazem com o vazio</p>
+        <ul>
+          <li>Enchem-no de fotografia — a toda a largura, sem texto por cima, sem filtro.</li>
+          <li>Põem lá uma pessoa com nome, e um tempo de resposta que cumprem.</li>
+          <li>Encenam a chegada: a app abre-se uma primeira vez, e essa vez é diferente.</li>
+          <li>Deixam o objeto respirar. Um produto por ecrã, grande.</li>
+          <li>Guardam alguma coisa para depois, e revelam-na com cerimónia.</li>
+          <li>Dão uma certidão: o que aconteceu, quando, com quem, numerado.</li>
+        </ul>
+      </div>
+      <div class="lado lado--nos">
+        <p class="lado__rot">O que nós fazemos com o vazio</p>
+        <ul>
+          <li>Deixamo-lo vazio, ou pomos lá colinas geradas por código.</li>
+          <li>Uma caixa de texto e uma resposta automática ao fim de seis segundos.</li>
+          <li>A primeira abertura é igual à vigésima: um formulário de nome e email.</li>
+          <li>A silhueta do carro a 56&nbsp;px, quatro por linha.</li>
+          <li>Guardamos — mas mostramos o cadeado, não a promessa.</li>
+          <li>Uma grelha de três colunas com um botão a dizer "descarregar".</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faixa">
+  <div class="coluna" style="text-align:left">
+    <blockquote class="citacao" style="margin:0">
+      “O luxo digital não é complexidade. É clareza, refinamento e contenção — e contenção só se lê como qualidade quando há alguma coisa a ser contida.”
+      <span class="citacao__fonte">Síntese da pesquisa</span>
+    </blockquote>
+  </div>
+</section>
+
+<section class="faixa">
+  <div class="larga">
+    <p class="olho olho--acento">O que muda</p>
+    <h2 style="margin-top:1.25rem;max-width:20ch">Oito movimentos, por ordem de efeito.</h2>
+    <p class="lead" style="margin-top:1.5rem;max-width:58ch">A ordem importa: os três primeiros mudam a perceção da app inteira. Os restantes aprofundam-na.</p>
+
+    <div style="margin-top:3rem">
+
+      <article class="movimento revela">
+        <span class="movimento__n num">1</span>
+        <div class="movimento__corpo">
+          <h3>Fotografia a sério, a toda a largura</h3>
+          <p>Nada mais nesta lista importa enquanto as capas forem desenhos gerados. Uma sessão nas Dolomitas — luz de manhã cedo e de fim de tarde, paisagem, arquitetura, mesa, detalhe, e os carros sem pose de catálogo — resolve mais do que qualquer alteração de código.</p>
+          <p>Enquanto não houver sessão: comprar arquivo licenciado das Dolomitas. É a diferença entre um protótipo e um produto.</p>
+          <span class="esforco">Esforço: conteúdo, não código</span>
+        </div>
+        <p class="movimento__onde">Substitui <code>imagens.js</code> por <code>&lt;img&gt;</code> reais. A estrutura já está preparada: cada paragem e cada etapa já têm campo de imagem.</p>
+      </article>
+
+      <article class="movimento revela">
+        <span class="movimento__n num">2</span>
+        <div class="movimento__corpo">
+          <h3>Uma chegada</h3>
+          <p>A primeira abertura da app tem de ser um acontecimento. Fotografia a ecrã inteiro, o nome do convidado em Garamond, a data, e o carro dele — grande, a sério, não a 56&nbsp;px. Três segundos, uma sequência, uma vez só.</p>
+          <p>É o equivalente digital de abrir a caixa. Custa pouco e é a primeira coisa de que se fala.</p>
+          <span class="esforco">Esforço: um ecrã novo</span>
+        </div>
+        <p class="movimento__onde">Depois de <code>entrada.js</code>, antes de <code>#/hoje</code>. Uma vez por instalação.</p>
+      </article>
+
+      <article class="movimento revela">
+        <span class="movimento__n num">3</span>
+        <div class="movimento__corpo">
+          <h3>Um momento de cada vez</h3>
+          <p>O ecrã "Hoje" mostra a lista inteira do dia. Devia mostrar <strong>o que vem a seguir</strong>, em grande, sobre a fotografia do sítio, com a distância e o tempo até lá — e só depois, mais abaixo e mais pequeno, o resto do dia.</p>
+          <p>É a diferença entre uma agenda e um acompanhante.</p>
+          <span class="esforco">Esforço: reorganizar um ecrã</span>
+        </div>
+        <p class="movimento__onde"><code>views/hoje.js</code> — a função <code>programa()</code> já sabe qual é o momento em curso.</p>
+      </article>
+
+      <article class="movimento revela">
+        <span class="movimento__n num">4</span>
+        <div class="movimento__corpo">
+          <h3>O concierge com cara</h3>
+          <p>Retrato, nome, função e uma promessa explícita: <em>respondemos em menos de dez minutos, sempre uma pessoa</em>. Sem resposta automática. Se ninguém puder responder de imediato, dizer isso é melhor do que fingir.</p>
+          <span class="esforco">Esforço: pequeno · decisão operacional</span>
+        </div>
+        <p class="movimento__onde"><code>views/concierge.js</code> e uma fotografia da equipa na área da organização.</p>
+      </article>
+
+      <article class="movimento revela">
+        <span class="movimento__n num">5</span>
+        <div class="movimento__corpo">
+          <h3>Devolver a antecipação</h3>
+          <p>Nos dias anteriores, uma revelação por dia: hoje o hotel, amanhã a estrada de sábado, depois a adega. Uma fotografia, três linhas, e nada mais. A app abre-se todos os dias antes de partir porque há sempre uma coisa nova — e é isso que garante que está instalada no dia um.</p>
+          <span class="esforco">Esforço: médio · exige conteúdo escalonado</span>
+        </div>
+        <p class="movimento__onde">Campo de data de revelação em cada paragem; <code>conteudo.js</code> já é editável pela organização.</p>
+      </article>
+
+      <article class="movimento revela">
+        <span class="movimento__n num">6</span>
+        <div class="movimento__corpo">
+          <h3>O grupo em manchete</h3>
+          <p>Quando sete carros marcam chegada ao mesmo passo, isso é notícia. Uma linha em Garamond por cima do mapa — <em>sete carros já no Falzarego</em> — vale mais do que a secção inteira que temos hoje.</p>
+          <span class="esforco">Esforço: pequeno</span>
+        </div>
+        <p class="movimento__onde"><code>views/mapa.js</code> — os dados já existem em <code>UI.carrosEm()</code>.</p>
+      </article>
+
+      <article class="movimento revela">
+        <span class="movimento__n num">7</span>
+        <div class="movimento__corpo">
+          <h3>A história como recompensa</h3>
+          <p>Trocar a caixa cinzenta com cadeado pela fotografia do sítio, esbatida, e uma linha em itálico. O gesto de marcar chegada passa a revelar o texto com uma transição lenta — os 600&nbsp;ms que os guidelines já autorizam para o álbum.</p>
+          <span class="esforco">Esforço: pequeno</span>
+        </div>
+        <p class="movimento__onde"><code>views/poi.js</code> — o bloco <code>.selado</code>.</p>
+      </article>
+
+      <article class="movimento revela">
+        <span class="movimento__n num">8</span>
+        <div class="movimento__corpo">
+          <h3>O álbum como certidão</h3>
+          <p>Não uma galeria: um registo. Quilómetros percorridos, passos subidos com a altitude de cada um, as datas, os nomes de quem ia no carro, a matrícula, o número da edição. Depois, as fotografias. É o objeto que justifica a app continuar instalada — e é o que o resto do luxo anda a construir com <span class="italico">blockchain</span> e nós podemos fazer com uma boa página.</p>
+          <span class="esforco">Esforço: médio</span>
+        </div>
+        <p class="movimento__onde"><code>views/album.js</code> — os dados de percurso e presença já estão todos guardados.</p>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section class="faixa">
+  <div class="larga">
+    <p class="olho olho--acento">Estado</p>
+    <h2 style="margin-top:1.25rem;max-width:20ch">Sete dos oito estão feitos.</h2>
+    <div class="coluna pilha" style="margin-left:0;margin-top:2rem">
+      <p class="lead">Os movimentos 2 a 8 foram implementados na app. O primeiro — fotografia a sério — não se resolve com código, e continua a ser o que falta.</p>
+      <p>A chegada existe e acontece uma vez por instalação. O ecrã "Hoje" lidera com um momento de cada vez, sobre a imagem do sítio, com a distância e o tempo até lá. O concierge tem nome, cara e uma promessa de resposta, e a resposta automática foi retirada — um pedido fica <em>entregue</em> até uma pessoa responder. A revelação diária está no briefing. A manchete do grupo está por cima do mapa. A história de cada paragem passou de cadeado a promessa. E o álbum abre com a certidão do percurso: quilómetros, etapas, ponto mais alto com altitude, viatura, matrícula, número de edição.</p>
+      <p>Entretanto, as imagens de reserva foram refeitas: deixaram de ser colinas arredondadas e passaram a ser dolomia — torres, ombros, paredes a pique — em quatro horas do dia, com a enrosadira ao poente. Continuam a ser desenho. <strong>A organização já pode carregar fotografias reais em cada etapa e em cada paragem</strong>, e no momento em que o faz, o desenho desaparece.</p>
+    </div>
+  </div>
+</section>
+
+<section class="faixa">
+  <div class="larga">
+    <p class="olho olho--acento">Armadilhas</p>
+    <h2 style="margin-top:1.25rem;max-width:24ch">O que não fazer, por muito que a tentação exista.</h2>
+    <div class="coluna pilha" style="margin-left:0;margin-top:2rem">
+      <p class="lead">Nenhuma marca desta pesquisa faz nada disto. A tentação de "aumentar o envolvimento" com mecânicas de jogo é exatamente o que separa uma app de fidelização de retalho de um objeto de luxo.</p>
+    </div>
+    <div class="armadilhas revela">
+      <span class="armadilha">Pontos e níveis</span>
+      <span class="armadilha">Medalhas</span>
+      <span class="armadilha">Sequências diárias</span>
+      <span class="armadilha">Gostos e contagens</span>
+      <span class="armadilha">Confetti</span>
+      <span class="armadilha">Notificações de reativação</span>
+      <span class="armadilha">Barras de progresso do perfil</span>
+      <span class="armadilha">Emoji na interface</span>
+      <span class="armadilha">Chatbot a fingir-se de concierge</span>
+      <span class="armadilha">Tabelas de classificação</span>
+    </div>
+    <div class="coluna pilha" style="margin-left:0;margin-top:2.5rem">
+      <p>Há uma segunda armadilha, mais subtil, e é aquela em que já caímos: <strong>confundir limpo com luxuoso</strong>. Uma interface limpa é o ponto de partida de qualquer produto competente em 2026. O que distingue é o que se põe dentro dessa limpeza — matéria, luz, pessoas, tempo.</p>
+    </div>
+  </div>
+</section>
+
+<section class="faixa">
+  <div class="larga">
+    <p class="olho">Fontes</p>
+    <div class="fontes">
+      <p><a href="https://www.smashingmagazine.com/2017/02/realities-ux-design-luxury-industry/">The Realities Of User Experience Design Within The Luxury Industry</a> — Smashing Magazine. Estudo de campo com plataformas de concierge de luxo; origem do <span class="italico">one-button approach</span>, dos 40 segundos de entrada e da regra sobre interação humana.</p>
+      <p><a href="https://www.hospitalitynet.org/news/4099105.html">Four Seasons Chat App</a> e <a href="https://elitetraveler.com/travel/news/four-seasons-chat-app-luxury-hotel-service">Is the Four Seasons Chat App the Future of Luxury Hotel Service?</a> — números de mensagens, cobertura em cem línguas e a decisão de manter o serviço cem por cento humano.</p>
+      <p><a href="https://privateclubmarketing.com/sohohouse-krisshaw/">Soho House: Digital Practices That Every Club Should Learn From</a> e <a href="https://www.elsewhen.com/work/customer-centric-app/">Redesigning Soho House's App</a> — adesão dos sócios, princípios de personalização e a decisão de trazer os materiais das casas físicas para o digital.</p>
+      <p><a href="https://wwd.com/business-news/technology/aura-blockchain-crosses-50-million-products-lvmh-prada-otb-1236606994/">Aura Blockchain Crosses 50 Million Product Mark</a> — WWD; e <a href="https://auraconsortium.com/">Aura Blockchain Consortium</a> — passaportes digitais de produto na LVMH, Prada, Cartier e Mercedes-Benz.</p>
+      <p><a href="https://www.trendhunter.com/trends/rolex-identity-chip">Rolex Identity Chip</a> e <a href="https://watchesbysjx.com/2025/12/rolex-marketing-history.html">Shaping the Rolex Identity with a Century of Strategic Positioning</a> — proveniência digital e a lista de espera como parte da experiência.</p>
+      <p><a href="https://lagerland-apps.github.io/journal/countdown-psychology-why-anticipation-beats-reminders/">The Psychology of Anticipation</a> — a fase antecipatória como produtora de afeto positivo sustentado, e os componentes de uma contagem decrescente bem desenhada.</p>
+      <p><a href="https://studio.techelix.co/the-art-of-editorial-ui-leveraging-typography-and-whitespace-for-luxury-brands-ui/">The Art of Editorial UI</a> e <a href="https://www.iiad.edu.in/the-circle/why-some-websites-just-feel-expensive/">Why Some Websites Just Feel Expensive</a> — vocabulário tipográfico, espaço em branco e ritmo de exposição.</p>
+      <p><a href="https://media.astonmartin.com/aston-martin-launches-new-season-of-luxury-lifestyle-art-of-living-events/">Art of Living by Aston Martin</a> — o programa da própria marca em que este passeio se inscreve: viagem, gastronomia, desporto e cultura, com acesso direto à equipa.</p>
+      <p><a href="https://digitaldefynd.com/IQ/ways-louis-vuitton-use-ai/">Ways Louis Vuitton Uses AI</a> e <a href="https://www.pymnts.com/artificial-intelligence-2/2025/verizon-louis-vuitton-adobe-drive-customer-experience-with-strategic-ai-initiatives/">Louis Vuitton Wants AI to Give Staff More Time With Clients</a> — personalização e, sobretudo, a orientação de usar automatização para libertar tempo das pessoas, não para as substituir.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="faixa rodape">
+  <div class="larga">
+    <p>Documento de trabalho · TMag Solutions · agosto de 2026<br>
+    Companheiro de <span class="italico">Manifesto</span>, <span class="italico">Brand Guidelines</span> e <span class="italico">Enquadramento</span>.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  /* ---------------------------------------------------------
+     Enrosadira — a rocha das Dolomitas apanha o rosa do poente.
+     Cumes gerados, não desenhados: dentes, não colinas.
+     --------------------------------------------------------- */
+  const tela = document.getElementById('cume');
+  const ctx = tela.getContext('2d');
+  const reduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let L = 0, A = 0, cristas = [], inicio = null, pronto = false;
+
+  function cor(nome) {
+    return getComputedStyle(document.documentElement).getPropertyValue(nome).trim();
+  }
+
+  function rnd(semente) {
+    let h = semente;
+    return function () {
+      h = (h * 1664525 + 1013904223) % 4294967296;
+      return h / 4294967296;
+    };
+  }
+
+  /* Uma crista dolomítica: torres largas, paredes quase verticais,
+     ombros planos. Não são colinas — são dentes de pedra. */
+  function crista(semente, base, altura, torres) {
+    const r = rnd(semente);
+    const pts = [[-0.08, base]];
+    let x = -0.08;
+    while (x < 1.10) {
+      const largura = (0.55 + r() * 0.9) / torres;
+      const pico = base - altura * (0.30 + r() * 0.70);
+      const ombro = pico + altura * (0.04 + r() * 0.10);
+      /* subida quase a pique, ombro plano, descida em degrau */
+      pts.push([x + largura * 0.16, pico]);
+      pts.push([x + largura * 0.30, ombro]);
+      pts.push([x + largura * 0.44, pico + altura * (0.01 + r() * 0.05)]);
+      pts.push([x + largura * 0.66, ombro + altura * (0.08 + r() * 0.12)]);
+      pts.push([x + largura * 0.90, base - altura * (0.02 + r() * 0.10)]);
+      x += largura;
+    }
+    pts.push([1.10, base]);
+    return pts;
+  }
+
+  function medir() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    L = tela.clientWidth; A = tela.clientHeight;
+    tela.width = Math.round(L * dpr);
+    tela.height = Math.round(A * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function construir() {
+    cristas = [
+      { pts: crista(7, 0.62, 0.32, 3.2), glow: 0.92, prof: 0 },
+      { pts: crista(23, 0.70, 0.30, 2.2), glow: 0.50, prof: 1 },
+      { pts: crista(91, 0.78, 0.26, 1.5), glow: 0.20, prof: 2 }
+    ];
+  }
+
+  function hexParaRgb(h) {
+    const s = h.replace('#', '');
+    return [parseInt(s.slice(0, 2), 16), parseInt(s.slice(2, 4), 16), parseInt(s.slice(4, 6), 16)];
+  }
+
+  /* Uma cor de fundo com opacidade, sem depender do formato do token. */
+  function color(hex, alfa) {
+    const c = hexParaRgb(hex);
+    return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + alfa + ')';
+  }
+
+  function entre(a, b, t) {
+    return 'rgb(' + a.map(function (v, i) { return Math.round(v + (b[i] - v) * t); }).join(',') + ')';
+  }
+
+  function pintar(t) {
+    const ceuAlto = cor('--ceu-alto') || '#0B0F16';
+    const ceuBaixo = cor('--ceu-baixo') || '#1B2532';
+    const rochaFria = hexParaRgb(cor('--cume') || '#2A3442');
+    const rochaFrente = hexParaRgb(cor('--cume-frente') || '#161D27');
+    const rosa = hexParaRgb(cor('--enrosadira') || '#E0917A');
+    const fundo = cor('--pedra') || '#0E1219';
+
+    ctx.clearRect(0, 0, L, A);
+
+    const g = ctx.createLinearGradient(0, 0, 0, A);
+    g.addColorStop(0, ceuAlto);
+    g.addColorStop(0.55, ceuBaixo);
+    g.addColorStop(1, fundo);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, L, A);
+
+    cristas.forEach(function (c) {
+      /* O poente pega nos cumes; a base fica em sombra fria. */
+      const topo = c.pts.reduce(function (m, p) { return Math.min(m, p[1]); }, 1) * A;
+      const base = cor('--pedra') ? rochaFrente : rochaFrente;
+      const claro = c.prof === 2 ? rochaFrente : rochaFria;
+      const gr = ctx.createLinearGradient(0, topo, 0, A);
+      gr.addColorStop(0, entre(claro, rosa, Math.min(1, t * c.glow)));
+      gr.addColorStop(0.22, entre(claro, rosa, Math.min(1, t * c.glow * 0.45)));
+      gr.addColorStop(0.6, entre(base, rosa, Math.min(1, t * c.glow * 0.10)));
+      gr.addColorStop(1, entre(base, rosa, 0));
+      ctx.fillStyle = gr;
+      ctx.beginPath();
+      ctx.moveTo(-20, A + 20);
+      c.pts.forEach(function (p) { ctx.lineTo(p[0] * L, p[1] * A); });
+      ctx.lineTo(L + 20, A + 20);
+      ctx.closePath();
+      ctx.fill();
+    });
+
+    /* Véu que funde os cumes no fundo, para o texto respirar. */
+    /* Névoa de vale: come a base dos cumes e devolve chão limpo ao texto. */
+    const v = ctx.createLinearGradient(0, A * 0.44, 0, A * 0.68);
+    v.addColorStop(0, color(fundo, 0));
+    v.addColorStop(0.6, color(fundo, 0.92));
+    v.addColorStop(1, fundo);
+    ctx.fillStyle = v;
+    ctx.fillRect(0, A * 0.44, L, A * 0.56);
+  }
+
+  function animar(agora) {
+    if (inicio === null) inicio = agora;
+    const t = Math.min((agora - inicio) / 2200, 1);
+    pintar(t * t * (3 - 2 * t));
+    if (t < 1) requestAnimationFrame(animar);
+    else pronto = true;
+  }
+
+  function arrancar() {
+    medir();
+    construir();
+    if (reduzido) { pintar(1); pronto = true; return; }
+    inicio = null;
+    requestAnimationFrame(animar);
+  }
+
+  arrancar();
+
+  let temporizador;
+  window.addEventListener('resize', function () {
+    clearTimeout(temporizador);
+    temporizador = setTimeout(function () { medir(); construir(); pintar(1); }, 150);
+  });
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+    setTimeout(function () { pintar(pronto ? 1 : 0); }, 60);
+  });
+
+  /* ---------------------------------------------------------
+     Revelação ao entrar no ecrã. Um efeito só, não espalhados.
+     --------------------------------------------------------- */
+  const alvos = document.querySelectorAll('.revela');
+  if (reduzido || !('IntersectionObserver' in window)) {
+    alvos.forEach(function (el) { el.classList.add('vista'); });
+  } else {
+    const obs = new IntersectionObserver(function (entradas) {
+      entradas.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('vista'); obs.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -12% 0px' });
+    alvos.forEach(function (el) { obs.observe(el); });
+  }
+})();
+</script>

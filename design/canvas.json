@@ -1,0 +1,54 @@
+{
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "A · Silêncio"
+    },
+    {
+      "file": "Concierge.dc.html",
+      "x": 490,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "B · Concierge"
+    },
+    {
+      "file": "Roadbook.dc.html",
+      "x": 980,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "C · Roadbook"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "nota-a",
+      "x": 0,
+      "y": -160,
+      "w": 390,
+      "text": "A · SILÊNCIO — tranquilidade\nA fotografia é o ecrã. Uma coisa de cada vez, tudo o resto reduzido a uma linha.\nReferência: Aman, Rolex editorial.\nTrade-off: quebra a regra dos guidelines §7 (sem texto sobre fotografia) e exige fotografia excelente — sem ela, colapsa."
+    },
+    {
+      "id": "nota-b",
+      "x": 490,
+      "y": -160,
+      "w": 390,
+      "text": "B · CONCIERGE — confiança\nA pessoa está no topo de tudo, com promessa de resposta. Estado à vista: hora, altitude, distância, onde está o grupo.\nReferência: Four Seasons Chat, Soho House.\nTrade-off: mais denso; a serenidade sofre um pouco em troca de segurança."
+    },
+    {
+      "id": "nota-c",
+      "x": 980,
+      "y": -160,
+      "w": 390,
+      "text": "C · ROADBOOK — luxo de objeto\nA app como impresso: fólio, filete duplo, algarismos de estilo antigo, perfil de altitude, chapa de rali.\nReferência: roadbooks de rali, Hermès editorial.\nTrade-off: sem fotografia nenhuma no herói — ganha carácter, perde o arrebatamento da paisagem."
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  }
+}

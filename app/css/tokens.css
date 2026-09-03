@@ -1,0 +1,100 @@
+/* =========================================================
+   Pietra e Vigna — tokens
+   Fonte única de verdade. Derivado de BRAND-GUIDELINES.md §12.
+   Não introduzir cores fora desta folha.
+   ========================================================= */
+
+:root {
+  /* Superfícies — pedra */
+  --calce: #F7F4EE;
+  --istria: #FCFAF6;
+  --intonaco: #EFEAE1;
+  --pietra: #E0D9CD;
+  --pietra-forte: #CFC6B6;
+
+  /* Texto — tinta aldina */
+  --inchiostro: #1E1B18;
+  --inchiostro-medio: #6B6459;
+  --inchiostro-chiaro: #736B5D;
+
+  /* Acentos */
+  --verde: #3B4A3E;
+  --verde-chiaro: #6E8069;
+  --rosso: #8A4034;
+  --radicchio: #6B2E3E;
+  --ottone: #7A6234;
+
+  /* Texto sobre preenchimento de acento */
+  --sobre-acento: #FCFAF6;
+
+  /* Tipografia */
+  --font-editorial: "EB Garamond", Georgia, "Times New Roman", serif;
+  --font-ui: "Instrument Sans", Inter, system-ui, -apple-system, sans-serif;
+
+  /* Forma */
+  --raio-cartao: 12px;
+  --raio-controlo: 8px;
+  --raio-foto: 4px;
+
+  /* Ritmo — múltiplos de 8 */
+  --esp-1: 8px;
+  --esp-2: 16px;
+  --esp-3: 24px;
+  --esp-4: 32px;
+  --esp-5: 48px;
+
+  /* Margem lateral única da grelha em socalco */
+  --margem: 20px;
+
+  /* Movimento */
+  --transicao: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transicao-cerimonia: 600ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Alturas do chrome */
+  --alt-cabecalho: 52px;
+  --alt-navegacao: 60px;
+}
+
+/* Modo escuro — lagoa ao anoitecer.
+   Não é o modo claro invertido: é outro material. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) {
+    --calce: #15171B;
+    --istria: #1E2126;
+    --intonaco: #1A1D21;
+    --pietra: #2E3339;
+    --pietra-forte: #3D434A;
+
+    --inchiostro: #EDE8E0;
+    --inchiostro-medio: #A8A196;
+    --inchiostro-chiaro: #9A9287;
+
+    --verde: #9DB39A;
+    --verde-chiaro: #7E8F7A;
+    --rosso: #D08C7E;
+    --radicchio: #C08494;
+    --ottone: #C9A96A;
+
+    --sobre-acento: #15171B;
+  }
+}
+
+:root[data-tema="escuro"] {
+  --calce: #15171B;
+  --istria: #1E2126;
+  --intonaco: #1A1D21;
+  --pietra: #2E3339;
+  --pietra-forte: #3D434A;
+
+  --inchiostro: #EDE8E0;
+  --inchiostro-medio: #A8A196;
+  --inchiostro-chiaro: #9A9287;
+
+  --verde: #9DB39A;
+  --verde-chiaro: #7E8F7A;
+  --rosso: #D08C7E;
+  --radicchio: #C08494;
+  --ottone: #C9A96A;
+
+  --sobre-acento: #15171B;
+}

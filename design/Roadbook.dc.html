@@ -1,0 +1,148 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Instrument+Sans:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #7A6234; text-decoration: none; }
+    a:hover { color: #5E4B27; }
+    .tema {
+      --calce:#F4F1E9; --istria:#FCFAF6; --intonaco:#EBE6DB; --pietra:#DDD5C6; --pietra-forte:#C4BAA6;
+      --inchiostro:#1E1B18; --inchiostro-medio:#6B6459; --inchiostro-chiaro:#736B5D;
+      --verde:#3B4A3E; --ottone:#7A6234;
+    }
+    .tema.escuro {
+      --calce:#14161A; --istria:#1E2126; --intonaco:#1A1D21; --pietra:#2E3339; --pietra-forte:#3D434A;
+      --inchiostro:#EDE8E0; --inchiostro-medio:#A8A196; --inchiostro-chiaro:#9A9287;
+      --verde:#9DB39A; --ottone:#C9A96A;
+    }
+  </style>
+</helmet>
+
+<div class="{{cls}}" style="width:390px;height:844px;background:var(--calce);font-family:'Instrument Sans',system-ui,sans-serif;color:var(--inchiostro);display:flex;flex-direction:column;overflow:hidden">
+
+  <!-- cabeça de página impressa: fólio, data, filete duplo -->
+  <div style="flex:none;padding:20px 20px 0;display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;align-items:baseline;justify-content:space-between">
+      <span style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--inchiostro-chiaro)">Dolomitas · Etapa II</span>
+      <span style="font-family:'EB Garamond',Georgia,serif;font-size:17px;font-variant-numeric:oldstyle-nums;color:var(--inchiostro-chiaro)">02 / 04</span>
+    </div>
+    <div style="height:3px;border-top:1px solid var(--inchiostro);border-bottom:1px solid var(--inchiostro)"></div>
+  </div>
+
+  <div style="flex:1;min-height:0;overflow:hidden;padding:0 20px">
+
+    <div style="padding-top:20px">
+      <div style="font-family:'EB Garamond',Georgia,serif;font-size:19px;font-variant-numeric:oldstyle-nums;color:var(--inchiostro-medio)">18 de setembro de 2026</div>
+      <div style="font-family:'EB Garamond',Georgia,serif;font-size:34px;line-height:1.1;margin-top:4px">A Sellaronda</div>
+    </div>
+
+    <!-- a entrada do roadbook: coluna de hora, filete, entrada -->
+    <div style="margin-top:28px;display:grid;grid-template-columns:56px 1fr;gap:16px;border-top:1px solid var(--inchiostro);padding-top:14px">
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <span style="font-family:'EB Garamond',Georgia,serif;font-size:24px;line-height:1;font-variant-numeric:oldstyle-nums">09.30</span>
+        <span style="font-size:11px;color:var(--inchiostro-chiaro);font-variant-numeric:tabular-nums">10.00</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <span style="font-family:'EB Garamond',Georgia,serif;font-size:26px;line-height:1.15">Café no Falzarego</span>
+        <span style="font-size:13px;color:var(--inchiostro-medio)">Vinte e nove curvas desde Cortina</span>
+
+        <!-- perfil de altitude: o desenho é o dado -->
+        <div style="margin-top:6px">
+          <svg viewBox="0 0 260 54" style="width:100%;height:54px">
+            <path d="M0 50 L34 46 L62 40 L88 34 L112 24 L138 12 L164 10 L192 18 L222 26 L260 30 L260 54 L0 54 Z" fill="none" stroke="currentColor" stroke-width="1.25" style="color:var(--pietra-forte)"></path>
+            <path d="M0 50 L34 46 L62 40 L88 34 L112 24 L138 12 L164 10" fill="none" stroke="currentColor" stroke-width="1.75" style="color:var(--ottone)"></path>
+            <circle cx="164" cy="10" r="3" fill="currentColor" style="color:var(--ottone)"></circle>
+          </svg>
+          <div style="display:flex;justify-content:space-between;margin-top:2px">
+            <span style="font-size:11px;color:var(--inchiostro-chiaro);font-variant-numeric:tabular-nums">1224 m</span>
+            <span style="font-size:11px;color:var(--inchiostro-chiaro);font-variant-numeric:tabular-nums">2105 m</span>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:16px;padding-top:6px;border-top:1px solid var(--pietra)">
+          <span style="font-size:12px;color:var(--inchiostro-chiaro);font-variant-numeric:tabular-nums">21 km</span>
+          <span style="font-size:12px;color:var(--inchiostro-chiaro);font-variant-numeric:tabular-nums">37 min</span>
+          <span style="font-size:12px;color:var(--inchiostro-chiaro);font-variant-numeric:tabular-nums">29 curvas</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- marginália: a nota do curador -->
+    <div style="margin-top:20px;display:grid;grid-template-columns:56px 1fr;gap:16px">
+      <span style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ottone);padding-top:5px">Nota</span>
+      <span style="font-family:'EB Garamond',Georgia,serif;font-style:italic;font-size:19px;line-height:1.5;color:var(--inchiostro-medio)">Há café no cimo e um teleférico para o Lagazuoi. Dez graus abaixo de Cortina.</span>
+    </div>
+
+    <div style="margin-top:20px;display:grid;grid-template-columns:56px 1fr;gap:16px;border-top:1px solid var(--pietra);padding-top:14px">
+      <span style="font-family:'EB Garamond',Georgia,serif;font-size:20px;line-height:1;font-variant-numeric:oldstyle-nums;color:var(--inchiostro-chiaro)">13.00</span>
+      <span style="font-family:'EB Garamond',Georgia,serif;font-size:20px;line-height:1.2;color:var(--inchiostro-chiaro)">Almoço · Passo Pordoi</span>
+    </div>
+
+    <!-- chapa de rali: o carro é uma placa, não um ícone -->
+    <div style="margin-top:24px;border:1px solid var(--inchiostro);display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--istria)">
+      <span style="font-family:'EB Garamond',Georgia,serif;font-size:30px;line-height:1;font-variant-numeric:oldstyle-nums;padding-right:12px;border-right:1px solid var(--pietra)">01</span>
+      <svg width="86" height="30" viewBox="0 0 400 140" style="flex:none">
+        <circle cx="104" cy="105" r="27" fill="#26241F"></circle><circle cx="104" cy="105" r="12" fill="#B9B3A3"></circle>
+        <circle cx="306" cy="105" r="27" fill="#26241F"></circle><circle cx="306" cy="105" r="12" fill="#B9B3A3"></circle>
+        <path d="M16 110 C 12 102 14 94 24 90 C 44 84 60 80 76 76 C 108 66 140 60 166 57 C 184 40 208 29 238 28 C 266 27 288 33 304 45 C 326 61 348 74 368 81 C 382 86 389 95 387 106 L 384 112 L 338 112 A 32 32 0 0 0 274 112 L 136 112 A 32 32 0 0 0 72 112 L 20 112 Z" fill="#1D3A2C" stroke="rgba(30,27,24,0.22)" stroke-width="2"></path>
+        <path d="M182 54 C 198 42 216 35 240 34 C 262 33 282 39 296 50 Z" fill="rgba(30,27,24,0.16)"></path>
+      </svg>
+      <span style="display:flex;flex-direction:column;gap:1px;min-width:0">
+        <span style="font-size:14px;font-weight:500">DB12</span>
+        <span style="font-size:11px;color:var(--inchiostro-chiaro);font-variant-numeric:tabular-nums;letter-spacing:0.06em">AA-12-BB</span>
+      </span>
+    </div>
+
+  </div>
+
+  <!-- pé de página: os totais da etapa, como num roadbook impresso -->
+  <div style="flex:none;margin:0 20px 16px;padding-top:10px;border-top:1px solid var(--inchiostro);display:flex;justify-content:space-between;align-items:baseline">
+    <span style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--inchiostro-chiaro)">Totais da etapa</span>
+    <span style="display:flex;gap:14px">
+      <span style="font-family:'EB Garamond',Georgia,serif;font-size:17px;font-variant-numeric:oldstyle-nums">141 km</span>
+      <span style="font-family:'EB Garamond',Georgia,serif;font-size:17px;font-variant-numeric:oldstyle-nums">4 h 10</span>
+      <span style="font-family:'EB Garamond',Georgia,serif;font-size:17px;font-variant-numeric:oldstyle-nums">2244 m</span>
+    </span>
+  </div>
+
+  <div style="flex:none;display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--inchiostro);background:var(--calce)">
+    <div style="min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--ottone)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><path d="M4 6h16v14H4z"></path><path d="M4 10h16"></path><path d="M8 3v4M16 3v4"></path></svg>
+      <span style="font-size:12px;font-weight:500;line-height:1">Hoje</span>
+    </div>
+    <div style="min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--inchiostro-chiaro)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><path d="M4 4h7v16H4z"></path><path d="M13 4h7v16h-7z"></path></svg>
+      <span style="font-size:12px;font-weight:500;line-height:1">Roadbook</span>
+    </div>
+    <div style="min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--inchiostro-chiaro)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"></path><path d="M9 4v14M15 6v14"></path></svg>
+      <span style="font-size:12px;font-weight:500;line-height:1">Mapa</span>
+    </div>
+    <div style="min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--inchiostro-chiaro)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><path d="M3 7h4l1.5-2h7L17 7h4v13H3z"></path><path d="M12 17a4 4 0 100-8 4 4 0 000 8z"></path></svg>
+      <span style="font-size:12px;font-weight:500;line-height:1">Galeria</span>
+    </div>
+    <div style="min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--inchiostro-chiaro)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>
+      <span style="font-size:12px;font-weight:500;line-height:1">Mais</span>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":390,"height":844},"escuro":{"editor":"boolean","default":false,"section":"Tema"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { cls: this.props.escuro ? 'tema escuro' : 'tema' };
+  }
+}
+</script>
+</body>
+</html>
