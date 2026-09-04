@@ -198,7 +198,8 @@
     }
 
     elCabecalho.innerHTML = esquerda +
-      '<span class="cabecalho__titulo" data-visivel="' + (c.tituloSempre ? 'sim' : 'nao') + '">' + UI.h(c.titulo || '') + '</span>' +
+      '<span class="cabecalho__titulo" data-sempre="' + (c.tituloSempre ? 'sim' : 'nao') + '" ' +
+        'data-visivel="' + (c.tituloSempre ? 'sim' : 'nao') + '">' + UI.h(c.titulo || '') + '</span>' +
       direita;
     elCabecalho.dataset.linha = c.linha === false ? 'nao' : 'sim';
   }
@@ -268,12 +269,22 @@
     });
   }
 
-  /* Título do cabeçalho aparece quando o título do ecrã sai de vista. */
+  /* Título do cabeçalho aparece quando o título do ecrã sai de vista.
+     Com capa a ecrã inteiro, o gatilho é o próprio título da capa a
+     passar por baixo do cabeçalho — não uma distância fixa, que numa
+     capa de 100dvh apareceria com o título grande ainda à vista. */
   function atualizarTituloCabecalho() {
     const alvo = elCabecalho.querySelector('.cabecalho__titulo');
-    if (!alvo || alvo.dataset.visivel === 'sim') return;
-    const y = window.scrollY || document.documentElement.scrollTop;
-    alvo.dataset.visivel = y > 72 ? 'sim' : 'nao';
+    if (!alvo || alvo.dataset.sempre === 'sim') return;
+
+    const texto = elEcra.querySelector('.capa__texto');
+    let visivel;
+    if (texto) {
+      visivel = texto.getBoundingClientRect().bottom < 92;
+    } else {
+      visivel = (window.scrollY || document.documentElement.scrollTop) > 72;
+    }
+    alvo.dataset.visivel = visivel ? 'sim' : 'nao';
   }
 
   window.addEventListener('scroll', atualizarTituloCabecalho, { passive: true });

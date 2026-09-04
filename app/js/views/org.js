@@ -13,7 +13,7 @@
     const condutores = DADOS.participantes.filter(function (p) { return p.papel === 'condutor'; }).length;
     const acompanhantes = DADOS.participantes.length - condutores;
 
-    return '<div class="capa">' +
+    return '<div class="capa capa--curta">' +
       UI.foto({ semente: e.nome || 'organizacao', variante: 'paisagem' }, 'foto--32 capa__imagem') +
       '<div class="capa__texto">' +
         '<p class="etiqueta">Organização</p>' +
