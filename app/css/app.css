@@ -215,7 +215,14 @@ a { color: var(--verde); text-decoration: none; }
   transition: color var(--transicao);
 }
 .nav-item[aria-current="page"] { color: var(--ottone); }
-.nav-item__rotulo { font-size: 12px; font-weight: 500; line-height: 1; }
+.nav-item__rotulo {
+  font-family: var(--font-editorial);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
 
 /* ---------------------------------------------------------
    Botões
