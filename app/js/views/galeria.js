@@ -67,9 +67,12 @@
         .concat(DADOS.dias.map(function (d) { return { id: d.id, rotulo: 'Dia ' + d.numero }; }))
         .concat([{ id: 'minhas', rotulo: 'Minhas' }]);
 
-      return '<div class="faixa" style="padding-top:24px">' +
-          '<h1 class="capa-titulo">Galeria</h1>' +
-          '<p class="subtitulo" style="margin-top:8px">' + UI.plural(Estado.fotos().length, 'fotografia', 'fotografias') + ' do grupo.</p>' +
+      return '<div class="capa">' +
+          UI.foto({ semente: 'galeria', variante: 'paisagem' }, 'foto--32 capa__imagem') +
+          '<div class="capa__texto">' +
+            '<h1 class="capa-titulo">Galeria</h1>' +
+            '<p class="subtitulo" style="margin-top:8px">' + UI.plural(Estado.fotos().length, 'fotografia', 'fotografias') + ' do grupo.</p>' +
+          '</div>' +
         '</div>' +
 
         '<div class="faixa" style="margin-top:24px">' +

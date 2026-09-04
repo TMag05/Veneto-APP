@@ -33,13 +33,15 @@ A app existe para o passeio e só para o passeio. Os convidados recebem acesso p
 
 **Nos dias anteriores** — o briefing, e uma **revelação por dia**: uma paragem do percurso que se abre, com fotografia e três linhas. É o que faz a app abrir-se todos os dias antes de partir.
 
-**Durante** — o ecrã "Hoje" é imersivo: sem cabeçalho, sem navegação normal, **uma coisa de cada vez** a ecrã inteiro sobre a paisagem — o momento em curso, a hora, a altitude, a distância. Tocar na fotografia avança para o momento seguinte; tocar na pauta em baixo convoca o dia inteiro numa folha, com os totais da etapa. A navegação sobre a fotografia usa um sinal próprio — cinco punções desenhados do vocabulário do passeio (sol nascente, gancho de rota, retícula com curvas de nível, provas empilhadas, filetes em degradé), gravados em latão sobre o escuro; é a única navegação da app que não usa os ícones gerais. Roadbook por etapas, com cada troço a abrir individualmente no Google Maps e exportação GPX; a história de cada paragem apresentada como **promessa** — um excerto sobre a fotografia do sítio — que se revela à chegada; mapa monocromático com os carros a cores reais e uma **manchete** quando o grupo se junta num sítio; galeria com câmara nativa; concierge com cara, nome e promessa de resposta; contactos e SOS.
+**Durante** — o ecrã "Hoje" é imersivo: sem cabeçalho, sem navegação normal, **uma coisa de cada vez** a ecrã inteiro sobre a paisagem — o momento em curso, a hora, a altitude, a distância. Tocar na fotografia avança para o momento seguinte; tocar na pauta em baixo convoca o dia inteiro numa folha, com os totais da etapa. Roadbook por etapas, com cada troço a abrir individualmente no Google Maps e exportação GPX; a história de cada paragem apresentada como **promessa** — um excerto sobre a fotografia do sítio — que se revela à chegada; mapa monocromático com os carros a cores reais e uma **manchete** quando o grupo se junta num sítio; galeria com câmara nativa; concierge com cara, nome e promessa de resposta; contactos e SOS.
+
+**Toda a app é escura e fotográfica.** Não há modo claro nem escolha de tema — a lagoa ao anoitecer é o único material, em todos os ecrãs, sempre. Cada ecrã que não tem fotografia própria (Roadbook, Mapa, Galeria, Contactos, Perfil, Definições, o meu carro) ganhou uma capa de paisagem gerada. A navegação principal usa um sinal próprio — cinco punções desenhados do vocabulário do passeio (sol nascente, gancho de rota, retícula com curvas de nível, provas empilhadas, filetes em degradé), gravados em três pesos de traço e destacados a latão; é a única navegação da app que não usa o conjunto geral de ícones. A exceção deliberada é o SOS, que continua o único ecrã inteiramente vermelho — sem fotografia, para não distrair de uma emergência.
 
 **Depois** — o álbum abre com uma **certidão do percurso**: quilómetros, etapas, paragens visitadas, ponto mais alto com altitude, viatura, matrícula e número de edição, seguida dos passos ordenados por altitude e das fotografias.
 
 Não há checkup, não há transporte de viatura e não há inscrições — essas fases não fazem parte do âmbito.
 
-**Sempre** — funciona sem rede, com fila local de escritas; cada ecrã tem endereço fixo e partilhável; modo escuro; alvos de 44 px e contrastes AA/AAA.
+**Sempre** — funciona sem rede, com fila local de escritas; cada ecrã tem endereço fixo e partilhável; alvos de 44 px e contrastes AA/AAA.
 
 Enquanto a organização não publicar itinerário, o convidado vê estados de espera legíveis — nunca um ecrã partido.
 
@@ -47,7 +49,7 @@ Enquanto a organização não publicar itinerário, o convidado vê estados de e
 
 ## A área da organização
 
-Três separadores, como no documento, mais os dados do evento.
+Três separadores, como no documento, mais os dados do evento. Mesma identidade escura e fotográfica do lado do convidado; os ícones da navegação continuam os gerais (a organização precisa de reconhecer Itinerário/Pessoas/Contactos/Evento de relance, não de se emocionar), mas o separador ativo destaca-se a latão.
 
 **Itinerário** — etapas com data, título, subtítulo e notas de percurso; reordenáveis. Dentro de cada etapa: as paragens (ordenáveis) e o programa do dia ao minuto. Alterar a hora de um momento marca-o como alterado no telemóvel de toda a gente, com a razão à vista.
 
@@ -92,7 +94,7 @@ app/
     ui.js               datas, distâncias, links do Maps, GPX, campos de edição
     silhuetas.js        perfis dos carros em SVG + paleta de carroçaria
     views/chegada.js    a primeira abertura, uma vez por instalação
-    icones.js           conjunto outline de 1.5px
+    icones.js           conjunto outline de 1.5px + os punções da navegação principal
     imagens.js          imagens de reserva, a substituir por fotografia
     app.js              encaminhamento, histórico e chrome
     views/              ecrãs do convidado; org*.js são a área da organização
@@ -147,7 +149,9 @@ Os oito movimentos de [O Luxo é Atmosfera](PESQUISA-LUXO.html) estão implement
 
 **A app não veste a marca Aston Martin, veste a região.** A presença da marca está em três sítios: a assinatura no ecrã de entrada, as silhuetas dos carros e o rodapé do álbum.
 
-**Uma cor de acento por ecrã.** O álbum é o momento `Radicchio`, as alterações de programa são `Rosso Verona`, o SOS é o único ecrã inteiramente vermelho. Tudo o resto é `Verde Veronese`.
+**Uma cor de acento por ecrã.** O álbum é o momento `Radicchio`, as alterações de programa são `Rosso Verona`, o SOS é o único ecrã inteiramente vermelho, a navegação principal é `Ottone`. Tudo o resto é `Verde Veronese`.
+
+**A app é sempre escura.** Deixou de haver modo claro. Os valores que antes eram só o "modo escuro" — a lagoa ao anoitecer da BRAND-GUIDELINES.md §12 — passaram a ser os únicos valores em `tokens.css`; não sobrevive nenhuma cor clara fora dos componentes que já eram sempre escuros por natureza (a chegada, o ecrã imersivo da Hoje).
 
 **Serif conta, sans instrui.** EB Garamond para o editorial, Instrument Sans para a interface, com algarismos tabulares. Servidas localmente: a app não faz um único pedido a servidores externos.
 

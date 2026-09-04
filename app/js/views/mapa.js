@@ -230,9 +230,14 @@
     nav: 'mapa',
     cabecalho: { titulo: 'Mapa' },
     html: function () {
+      const capa = '<div class="capa">' +
+          UI.foto({ semente: 'mapa', variante: 'paisagem' }, 'foto--32 capa__imagem') +
+          '<div class="capa__texto"><h1 class="capa-titulo">Mapa</h1></div>' +
+        '</div>';
+
       const dia = DADOS.dia(diaVisivel) || Estado.diaAtivo();
       if (!dia) {
-        return '<div class="faixa" style="padding-top:24px"><div class="selado">' +
+        return capa + '<div class="faixa" style="margin-top:24px"><div class="selado">' +
           '<div class="selado__icone">' + Icone('mapa', 24) + '</div>' +
           '<p class="corpo-editorial">O percurso ainda não está publicado.</p>' +
         '</div></div>';
@@ -240,7 +245,7 @@
       diaVisivel = dia.id;
       const E = enquadrar(dia);
 
-      return manchete(dia) +
+      return capa + manchete(dia) +
         '<div class="faixa" style="padding-top:16px;padding-bottom:16px">' +
           '<div class="escolhas">' + DADOS.dias.map(function (d) {
             return '<button class="escolha" type="button" data-acao="dia" data-valor="' + d.id + '" ' +
@@ -281,18 +286,21 @@
     nav: 'mapa',
     cabecalho: { voltar: '#/mapa', titulo: 'Participantes', tituloSempre: true },
     html: function () {
+      const capa = '<div class="capa">' +
+        UI.foto({ semente: 'participantes', variante: 'paisagem' }, 'foto--32 capa__imagem') +
+        '<div class="capa__texto"><h1 class="titulo-editorial">Participantes</h1>';
+
       if (!DADOS.carros.length) {
-        return '<div class="faixa" style="padding-top:24px">' +
-          '<h1 class="titulo-editorial">Participantes</h1>' +
+        return capa +
           '<p class="corpo-editorial silencioso" style="margin-top:8px">A lista ainda não está fechada.</p>' +
-        '</div>';
+        '</div></div>';
       }
-      return '<div class="faixa" style="padding-top:24px">' +
-        '<h1 class="titulo-editorial">Participantes</h1>' +
+      return capa +
         '<p class="corpo-editorial silencioso" style="margin-top:8px">' +
           UI.plural(DADOS.carros.length, 'carro', 'carros') + ', ' +
           UI.plural(DADOS.participantes.length, 'lugar', 'lugares') + '.</p>' +
-        '<div style="margin-top:24px">' + DADOS.carros.map(function (c) {
+        '</div></div>' +
+        '<div class="faixa" style="margin-top:24px">' + DADOS.carros.map(function (c) {
           return '<div class="presenca-linha">' +
             '<div class="presenca-linha__carro">' + Silhuetas.svg(c.modelo, c.cor, { rodas: false }) + '</div>' +
             '<div style="flex:1;min-width:0">' +

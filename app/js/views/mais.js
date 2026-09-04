@@ -11,13 +11,15 @@
       const e = Estado.get();
       const fase = Estado.fase();
       const carro = Estado.meuCarro();
+      const eu = Estado.euParticipante();
 
-      return '<div class="faixa" style="padding-top:24px">' +
-          '<h1 class="capa-titulo">' + UI.h(e.perfil.nome || 'Convidado') + '</h1>' +
-          '<p class="subtitulo" style="margin-top:8px">' +
-            (carro ? UI.h(Silhuetas.modelo(carro.modelo).nome) : 'Sem carro associado') + '</p>' +
-          (carro ? '<div style="max-width:200px;margin-top:16px">' +
-            Silhuetas.svg(carro.modelo, carro.cor) + '</div>' : '') +
+      return '<div class="capa">' +
+          UI.foto({ dataUrl: eu && eu.foto, semente: e.perfil.nome || 'convidado', variante: 'paisagem' }, 'foto--32 capa__imagem') +
+          '<div class="capa__texto">' +
+            '<h1 class="capa-titulo">' + UI.h(e.perfil.nome || 'Convidado') + '</h1>' +
+            '<p class="subtitulo" style="margin-top:8px">' +
+              (carro ? UI.h(Silhuetas.modelo(carro.modelo).nome) : 'Sem carro associado') + '</p>' +
+          '</div>' +
         '</div>' +
 
         '<div class="faixa" style="margin-top:32px">' +
@@ -48,7 +50,7 @@
             (Estado.ehOrganizacao()
               ? UI.linhaLista({ titulo: 'Área da organização', nota: 'Itinerário, pessoas, contactos', icone: 'oficina', href: '#/org/itinerario' })
               : '') +
-            UI.linhaLista({ titulo: 'Definições', nota: 'Aspeto, notificações, demonstração', icone: 'definicoes', href: '#/definicoes' }) +
+            UI.linhaLista({ titulo: 'Definições', nota: 'Organização, demonstração', icone: 'definicoes', href: '#/definicoes' }) +
           '</div>' +
           '<p class="meta" style="margin-top:24px">' + UI.h(DADOS.evento.nome || 'Passeio') + ' · versão de trabalho' +
             (fase === 'pre' ? ' · pré-evento' : (fase === 'pos' ? ' · pós-evento' : '')) + '</p>' +
@@ -77,18 +79,14 @@
     html: function () {
       const e = Estado.get();
 
-      return '<div class="faixa" style="padding-top:24px">' +
-          '<h2 class="etiqueta">Aspeto</h2>' +
-          '<div class="escolhas" style="margin-top:12px">' +
-            [['auto', 'Automático'], ['claro', 'Claro'], ['escuro', 'Escuro']].map(function (t) {
-              return '<button class="escolha" type="button" data-acao="tema" data-valor="' + t[0] + '" ' +
-                'aria-pressed="' + (e.tema === t[0] ? 'true' : 'false') + '">' + t[1] + '</button>';
-            }).join('') +
+      return '<div class="capa">' +
+          UI.foto({ semente: 'definicoes', variante: 'noite' }, 'foto--32 capa__imagem') +
+          '<div class="capa__texto">' +
+            '<h1 class="titulo-editorial">Definições</h1>' +
           '</div>' +
-          '<p class="meta" style="margin-top:12px">O modo escuro não é o claro invertido. É outro material.</p>' +
         '</div>' +
 
-        '<div class="faixa" style="margin-top:48px">' +
+        '<div class="faixa" style="margin-top:24px">' +
           '<h2 class="etiqueta">Organização</h2>' +
           '<p class="corpo-ui silencioso" style="margin-top:8px">Quem organiza o passeio entra aqui para criar o itinerário, registar participantes e gerir contactos.</p>' +
           '<div class="lista" style="margin-top:16px">' +
@@ -124,11 +122,6 @@
         '</div>';
     },
     acoes: {
-      tema: function (t) {
-        Estado.definir({ tema: t });
-        App.tema(t);
-      },
-
       /* Porta de entrada provisória. Com servidor passa a ser conta
          própria, com registo de quem alterou o quê. */
       entrarOrg: function () {

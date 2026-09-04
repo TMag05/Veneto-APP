@@ -22,7 +22,6 @@ window.Estado = (function () {
     fila: [],
     chegadaVista: false,
     demoFase: 'auto',
-    tema: 'auto',
     album: false,
     papel: 'convidado'
   };

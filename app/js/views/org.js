@@ -13,12 +13,17 @@
     const condutores = DADOS.participantes.filter(function (p) { return p.papel === 'condutor'; }).length;
     const acompanhantes = DADOS.participantes.length - condutores;
 
-    return '<div class="faixa--recuada" style="padding:20px">' +
-      '<p class="etiqueta">Organização</p>' +
-      '<h1 class="titulo-editorial" style="margin-top:4px">' + UI.h(e.nome || 'Passeio sem nome') + '</h1>' +
-      '<p class="meta" style="margin-top:4px">' +
-        UI.h([e.base, UI.intervaloEvento()].filter(Boolean).join(' · ')) + '</p>' +
-      '<div class="dados dados--quatro" style="margin-top:20px">' +
+    return '<div class="capa">' +
+      UI.foto({ semente: e.nome || 'organizacao', variante: 'paisagem' }, 'foto--32 capa__imagem') +
+      '<div class="capa__texto">' +
+        '<p class="etiqueta">Organização</p>' +
+        '<h1 class="titulo-editorial" style="margin-top:4px">' + UI.h(e.nome || 'Passeio sem nome') + '</h1>' +
+        '<p class="meta" style="margin-top:4px">' +
+          UI.h([e.base, UI.intervaloEvento()].filter(Boolean).join(' · ')) + '</p>' +
+      '</div>' +
+    '</div>' +
+    '<div class="faixa" style="margin-top:20px">' +
+      '<div class="dados dados--quatro">' +
         '<div><div class="dado__valor num">' + DADOS.dias.length + '</div><div class="dado__rotulo meta">Etapas</div></div>' +
         '<div><div class="dado__valor num">' + condutores + '</div><div class="dado__rotulo meta">Condutores</div></div>' +
         '<div><div class="dado__valor num">' + acompanhantes + '</div><div class="dado__rotulo meta">Acompanhantes</div></div>' +

@@ -206,11 +206,12 @@
   function desenharNav(vista) {
     if (ehVerdadeiro(vista.semNav)) { elNav.hidden = true; return; }
     elNav.hidden = false;
-    const abas = vista.area === 'organizacao' ? ABAS_ORGANIZACAO : ABAS_CONVIDADO;
+    const organizacao = vista.area === 'organizacao';
+    const abas = organizacao ? ABAS_ORGANIZACAO : ABAS_CONVIDADO;
     elNav.innerHTML = abas.map(function (a) {
       const ativo = a.nav === vista.nav;
       return '<a class="nav-item" href="' + a.rota + '"' + (ativo ? ' aria-current="page"' : '') + '>' +
-        Icone(a.icone, 24) +
+        (organizacao ? Icone(a.icone, 24) : IconePuncao(a.icone, ativo)) +
         '<span class="nav-item__rotulo">' + a.rotulo + '</span>' +
         '</a>';
     }).join('');
@@ -305,18 +306,13 @@
     ir: function (rota) { location.hash = rota; },
     substituir: irSubstituindo,
     voltar: voltar,
-    repintar: desenhar,
-    tema: function (t) {
-      if (t === 'auto') document.documentElement.removeAttribute('data-tema');
-      else document.documentElement.setAttribute('data-tema', t);
-    }
+    repintar: desenhar
   };
 
   /* ---------------------------------------------------------
      Arranque
      --------------------------------------------------------- */
 
-  App.tema(Estado.get().tema || 'auto');
   navegar();
   Estado.sincronizar();
 

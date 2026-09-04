@@ -24,22 +24,24 @@
     nav: 'roadbook',
     cabecalho: { titulo: 'Roadbook' },
     html: function () {
+      const capa = '<div class="capa">' +
+          UI.foto({ semente: 'roadbook', variante: 'paisagem' }, 'foto--32 capa__imagem') +
+          '<div class="capa__texto">' +
+            '<h1 class="capa-titulo">Roadbook</h1>';
+
       if (!DADOS.dias.length) {
-        return '<div class="faixa" style="padding-top:24px">' +
-            '<h1 class="capa-titulo">Roadbook</h1>' +
-          '</div>' +
+        return capa + '</div></div>' +
           '<div class="faixa" style="margin-top:24px"><div class="selado">' +
             '<div class="selado__icone">' + Icone('roadbook', 24) + '</div>' +
             '<p class="corpo-editorial">Os percursos ainda estão a ser preparados.</p>' +
           '</div></div>';
       }
 
-      return '<div class="faixa" style="padding-top:24px">' +
-          '<h1 class="capa-titulo">Roadbook</h1>' +
+      return capa +
           '<p class="subtitulo" style="margin-top:8px">' +
             UI.plural(DADOS.dias.length, 'capítulo', 'capítulos') + ', ' +
             DADOS.dias.reduce(function (t, d) { return t + (d.distancia || 0); }, 0) + ' quilómetros.</p>' +
-        '</div>' +
+        '</div></div>' +
         DADOS.dias.map(function (d) {
           return '<div class="faixa">' + cartaoDia(d) + '</div>';
         }).join('');

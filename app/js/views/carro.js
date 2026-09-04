@@ -15,10 +15,15 @@
       const eu = Estado.euParticipante();
 
       if (!carro) {
-        return '<div class="faixa" style="padding-top:24px">' +
-            '<h1 class="capa-titulo">O meu carro</h1>' +
-            '<p class="subtitulo" style="margin-top:8px">Ainda não está associado.</p>' +
-            '<p class="corpo-editorial" style="margin-top:24px">O carro é registado pela organização, com o modelo, a cor e a matrícula. ' +
+        return '<div class="capa">' +
+            UI.foto({ semente: 'sem-carro', variante: 'paisagem' }, 'foto--32 capa__imagem') +
+            '<div class="capa__texto">' +
+              '<h1 class="capa-titulo">O meu carro</h1>' +
+              '<p class="subtitulo" style="margin-top:8px">Ainda não está associado.</p>' +
+            '</div>' +
+          '</div>' +
+          '<div class="faixa" style="margin-top:24px">' +
+            '<p class="corpo-editorial">O carro é registado pela organização, com o modelo, a cor e a matrícula. ' +
               'Se não aparece aqui, é porque o email com que entrou não coincide com o da lista.</p>' +
             '<a class="botao botao--secundario botao--largo" style="margin-top:32px" href="#/concierge">Falar com a organização</a>' +
           '</div>';
@@ -28,11 +33,17 @@
         return !eu || n !== DADOS.nomeCompleto(eu);
       });
 
-      return '<div class="faixa" style="padding-top:24px">' +
-          '<div style="max-width:320px;margin:0 auto">' + Silhuetas.svg(carro.modelo, carro.cor) + '</div>' +
-          '<h1 class="titulo-poi" style="text-align:center;margin-top:24px">' + UI.h(Silhuetas.modelo(carro.modelo).nome) + '</h1>' +
-          '<p class="subtitulo" style="text-align:center;margin-top:4px">' + UI.h(Silhuetas.cor(carro.cor).nome) + '</p>' +
-          (carro.matricula ? '<p class="meta num" style="text-align:center;margin-top:8px">' + UI.h(carro.matricula) + '</p>' : '') +
+      return '<div class="capa">' +
+          UI.foto({ semente: carro.modelo || 'carro', variante: 'paisagem' }, 'foto--32 capa__imagem') +
+          '<div class="capa__texto">' +
+            '<h1 class="capa-titulo">' + UI.h(Silhuetas.modelo(carro.modelo).nome) + '</h1>' +
+            '<p class="subtitulo" style="margin-top:8px">' + UI.h(Silhuetas.cor(carro.cor).nome) +
+              (carro.matricula ? ' · ' + UI.h(carro.matricula) : '') + '</p>' +
+          '</div>' +
+        '</div>' +
+
+        '<div class="faixa" style="margin-top:8px">' +
+          '<div style="max-width:280px;margin:0 auto">' + Silhuetas.svg(carro.modelo, carro.cor) + '</div>' +
         '</div>' +
 
         '<div class="faixa">' +
@@ -81,10 +92,14 @@
       const p = Estado.get().perfil;
       const ficha = Estado.euParticipante();
 
-      return '<div class="faixa" style="padding-top:24px">' +
-          '<h1 class="titulo-editorial">Perfil</h1>' +
-          '<p class="corpo-ui silencioso" style="margin-top:8px">Nome e contacto. Nada mais.</p>' +
-          '<form id="form-perfil" class="pilha-2" style="margin-top:24px">' +
+      return '<div class="capa">' +
+          UI.foto({ dataUrl: ficha && ficha.foto, semente: p.nome || 'perfil', variante: 'paisagem' }, 'foto--32 capa__imagem') +
+          '<div class="capa__texto">' +
+            '<h1 class="titulo-editorial">Perfil</h1>' +
+            '<p class="corpo-ui silencioso" style="margin-top:8px">Nome e contacto. Nada mais.</p>' +
+          '</div>' +
+        '</div>' +
+          '<form id="form-perfil" class="pilha-2 faixa" style="margin-top:24px">' +
             '<label class="campo"><span class="campo__rotulo">Nome</span>' +
               '<input class="campo__entrada" name="nome" value="' + UI.h(p.nome) + '" autocomplete="name"></label>' +
             '<label class="campo"><span class="campo__rotulo">Email</span>' +
@@ -93,11 +108,12 @@
               '<input class="campo__entrada" name="telefone" type="tel" value="' + UI.h(p.telefone) + '" autocomplete="tel" placeholder="+351"></label>' +
             '<button class="botao botao--principal botao--largo" type="submit">Guardar</button>' +
           '</form>' +
+          '<div class="faixa">' +
           (ficha
-            ? '<p class="meta" style="margin-top:24px">Está associado à ficha ' + UI.h(DADOS.nomeCompleto(ficha)) +
+            ? '<p class="meta">Está associado à ficha ' + UI.h(DADOS.nomeCompleto(ficha)) +
                 ', carro ' + UI.h(ficha.equipa || '—') + '.</p>'
-            : '<p class="meta" style="margin-top:24px">O email não coincide com nenhuma ficha da organização, por isso não há carro associado.</p>') +
-        '</div>';
+            : '<p class="meta">O email não coincide com nenhuma ficha da organização, por isso não há carro associado.</p>') +
+          '</div>';
     },
     montar: function (el) {
       const f = el.querySelector('#form-perfil');

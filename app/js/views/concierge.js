@@ -18,20 +18,25 @@
 
       const c = DADOS.concierge;
 
-      return '<div class="faixa" style="padding-top:24px">' +
-          (c.nome
-            ? '<div class="pessoa">' +
-                '<span class="pessoa__foto"' + (c.foto ? ' style="background-image:url(\'' + c.foto + '\')"' : '') + '>' +
-                  (c.foto ? '' : Icone('pessoas', 24)) + '</span>' +
-                '<span class="pessoa__texto">' +
-                  '<span class="pessoa__nome">' + UI.h(c.nome) + '</span>' +
-                  '<span class="meta">' + UI.h(c.papel || 'Concierge do passeio') + '</span>' +
-                '</span>' +
-              '</div>' +
-              (c.promessa ? '<p class="promessa-tempo">' + UI.h(c.promessa) + '</p>' : '')
-            : '<h1 class="capa-titulo">Concierge</h1>' +
-              '<p class="subtitulo" style="margin-top:8px">Escreva o que precisa. A equipa responde.</p>') +
-        '</div>' +
+      return (c.nome
+        ? '<div class="faixa" style="padding-top:24px">' +
+            '<div class="pessoa">' +
+              '<span class="pessoa__foto"' + (c.foto ? ' style="background-image:url(\'' + c.foto + '\')"' : '') + '>' +
+                (c.foto ? '' : Icone('pessoas', 24)) + '</span>' +
+              '<span class="pessoa__texto">' +
+                '<span class="pessoa__nome">' + UI.h(c.nome) + '</span>' +
+                '<span class="meta">' + UI.h(c.papel || 'Concierge do passeio') + '</span>' +
+              '</span>' +
+            '</div>' +
+            (c.promessa ? '<p class="promessa-tempo">' + UI.h(c.promessa) + '</p>' : '') +
+          '</div>'
+        : '<div class="capa">' +
+            UI.foto({ semente: 'concierge', variante: 'paisagem' }, 'foto--32 capa__imagem') +
+            '<div class="capa__texto">' +
+              '<h1 class="capa-titulo">Concierge</h1>' +
+              '<p class="subtitulo" style="margin-top:8px">Escreva o que precisa. A equipa responde.</p>' +
+            '</div>' +
+          '</div>') +
 
         '<div class="faixa" style="margin-top:32px">' +
           '<form id="form-pedido">' +
@@ -83,10 +88,16 @@
     html: function () {
       const locais = DADOS.locais;
 
-      return '<div class="faixa" style="padding-top:24px">' +
-          '<h1 class="titulo-editorial">Contactos</h1>' +
+      return '<div class="capa">' +
+          UI.foto({ semente: 'contactos', variante: 'noite' }, 'foto--32 capa__imagem') +
+          '<div class="capa__texto">' +
+            '<h1 class="titulo-editorial">Contactos</h1>' +
+          '</div>' +
+        '</div>' +
+
+        '<div class="faixa" style="margin-top:24px">' +
           (DADOS.contactos.length
-            ? '<div class="lista" style="margin-top:24px">' +
+            ? '<div class="lista">' +
               DADOS.contactos.map(function (c) {
                 return UI.linhaLista({
                   titulo: c.nome,

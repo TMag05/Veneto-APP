@@ -214,7 +214,7 @@ a { color: var(--verde); text-decoration: none; }
   padding: 6px 2px 8px;
   transition: color var(--transicao);
 }
-.nav-item[aria-current="page"] { color: var(--verde); }
+.nav-item[aria-current="page"] { color: var(--ottone); }
 .nav-item__rotulo { font-size: 12px; font-weight: 500; line-height: 1; }
 
 /* ---------------------------------------------------------
