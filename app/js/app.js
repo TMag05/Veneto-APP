@@ -275,16 +275,18 @@
      capa de 100dvh apareceria com o título grande ainda à vista. */
   function atualizarTituloCabecalho() {
     const alvo = elCabecalho.querySelector('.cabecalho__titulo');
-    if (!alvo || alvo.dataset.sempre === 'sim') return;
+    if (!alvo) return;
 
+    /* Havendo capa, é ela que manda: o título do cabeçalho entra
+       quando o da capa sai, mesmo nos ecrãs de título sempre visível —
+       senão o mesmo nome aparecia duas vezes ao mesmo tempo. */
     const texto = elEcra.querySelector('.capa__texto');
-    let visivel;
     if (texto) {
-      visivel = texto.getBoundingClientRect().bottom < 92;
-    } else {
-      visivel = (window.scrollY || document.documentElement.scrollTop) > 72;
+      alvo.dataset.visivel = texto.getBoundingClientRect().bottom < 92 ? 'sim' : 'nao';
+      return;
     }
-    alvo.dataset.visivel = visivel ? 'sim' : 'nao';
+    if (alvo.dataset.sempre === 'sim') return;
+    alvo.dataset.visivel = (window.scrollY || document.documentElement.scrollTop) > 72 ? 'sim' : 'nao';
   }
 
   window.addEventListener('scroll', atualizarTituloCabecalho, { passive: true });

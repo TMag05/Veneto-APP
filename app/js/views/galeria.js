@@ -58,7 +58,7 @@
 
   Vistas.galeria = {
     nav: 'galeria',
-    cabecalho: { titulo: 'Galeria' },
+    semCabecalho: true,
     html: function () {
       const fotos = lista();
       const fase = Estado.fase();

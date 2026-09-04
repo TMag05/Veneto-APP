@@ -77,7 +77,7 @@
       const x = px(E, p), y = py(E, p);
       const visitado = Estado.chegou(id);
       return '<rect x="' + (x - 7).toFixed(1) + '" y="' + (y - 7).toFixed(1) + '" width="14" height="14" ' +
-        'fill="' + (visitado ? 'var(--verde)' : 'var(--calce)') + '" stroke="var(--inchiostro)" stroke-width="2"/>';
+        'fill="' + (visitado ? 'var(--verde)' : 'var(--intonaco)') + '" stroke="#0D0F11" stroke-width="2"/>';
     }).join('');
   }
 
@@ -209,14 +209,14 @@
       '<div class="seccao-cabecalho"><h2 class="etiqueta">Onde está o grupo</h2>' +
         '<span class="meta num">' + DADOS.carros.length + ' carros</span></div>' +
       grupos.reverse().map(function (g) {
-        return '<div style="padding:16px 0;border-bottom:1px solid var(--pietra)">' +
-          '<div class="par par--espalhado">' +
-            '<a class="titulo-ui" href="#/poi/' + g.id + '" style="color:inherit">' + UI.h(POIS[g.id].nome) + '</a>' +
+        return '<div class="presenca-grupo">' +
+          '<div class="presenca-grupo__cabeca">' +
+            '<a class="presenca-grupo__nome" href="#/poi/' + g.id + '" style="color:inherit">' + UI.h(POIS[g.id].nome) + '</a>' +
             '<span class="meta num">' + UI.plural(g.carros.length, 'carro', 'carros') + '</span>' +
           '</div>' +
-          '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">' +
+          '<div class="presenca-grupo__carros">' +
             g.carros.map(function (c) {
-              return '<div style="width:56px" title="' + UI.h(c.perfis.join(' e ')) + '">' + Silhuetas.svg(c.modelo, c.cor, { rodas: false }) + '</div>';
+              return '<span title="' + UI.h(c.perfis.join(' e ')) + '">' + Silhuetas.svg(c.modelo, c.cor, { rodas: false }) + '</span>';
             }).join('') +
           '</div>' +
         '</div>';
@@ -228,7 +228,7 @@
 
   Vistas.mapa = {
     nav: 'mapa',
-    cabecalho: { titulo: 'Mapa' },
+    semCabecalho: true,
     html: function () {
       const capa = '<div class="capa">' +
           UI.foto({ semente: 'mapa', variante: 'paisagem' }, 'foto--32 capa__imagem') +
@@ -258,7 +258,7 @@
         '<div class="mapa-legenda">' +
           '<span class="mapa-legenda__item"><span style="width:12px;height:12px;background:var(--verde);display:block"></span>' +
             '<span class="meta">visitado</span></span>' +
-          '<span class="mapa-legenda__item"><span style="width:12px;height:12px;background:var(--calce);border:1.5px solid var(--inchiostro);display:block"></span>' +
+          '<span class="mapa-legenda__item"><span style="width:12px;height:12px;background:var(--intonaco);border:1.5px solid #0D0F11;display:block"></span>' +
             '<span class="meta">por visitar</span></span>' +
           '<span class="mapa-legenda__item"><span style="width:18px;height:0;border-top:3px solid var(--verde);display:block"></span>' +
             '<span class="meta">percurso</span></span>' +

@@ -9,20 +9,25 @@
 
   function cartaoDia(d) {
     const troços = Math.max((d.etapas || []).length - 1, 0);
-    return '<a href="#/roadbook/' + d.id + '" style="display:block;color:inherit">' +
-      UI.foto(d.imagem, 'foto--32') +
-      '<p class="etiqueta" style="margin-top:12px">Dia ' + d.numero +
-        (d.data ? ' · ' + UI.dataCurta(d.data) : '') + '</p>' +
-      '<h3 class="titulo-poi" style="margin-top:4px">' + UI.h(d.titulo || 'Etapa ' + d.numero) + '</h3>' +
-      (d.resumo ? '<p class="corpo-editorial silencioso" style="margin-top:8px">' + UI.h(d.resumo) + '</p>' : '') +
-      (troços ? '<p class="meta num" style="margin-top:8px">' + d.distancia + ' km · ' + UI.h(d.duracao) + ' · ' +
-        UI.plural(troços, 'troço', 'troços') + '</p>' : '') +
+    const paragens = (d.etapas || []).length;
+    return '<a class="cartao-dia" href="#/roadbook/' + d.id + '">' +
+      UI.foto(d.imagem, 'cartao-dia__foto') +
+      '<span class="cartao-dia__corpo">' +
+        '<span class="etiqueta" style="display:block">Dia ' + d.numero +
+          (d.data ? ' · ' + UI.dataCurta(d.data) : '') + '</span>' +
+        '<span class="cartao-dia__titulo">' + UI.h(d.titulo || 'Etapa ' + d.numero) + '</span>' +
+        (d.resumo ? '<span class="cartao-dia__resumo">' + UI.h(d.resumo) + '</span>' : '') +
+        '<span class="cartao-dia__meta">' +
+          UI.plural(paragens, 'paragem', 'paragens') +
+          (troços ? ' · ' + UI.plural(troços, 'troço', 'troços') : '') +
+        '</span>' +
+      '</span>' +
     '</a>';
   }
 
   Vistas.roadbook = {
     nav: 'roadbook',
-    cabecalho: { titulo: 'Roadbook' },
+    semCabecalho: true,
     html: function () {
       const capa = '<div class="capa">' +
           UI.foto({ semente: 'roadbook', variante: 'paisagem' }, 'foto--32 capa__imagem') +
@@ -42,9 +47,9 @@
             UI.plural(DADOS.dias.length, 'capítulo', 'capítulos') + ', ' +
             DADOS.dias.reduce(function (t, d) { return t + (d.distancia || 0); }, 0) + ' quilómetros.</p>' +
         '</div></div>' +
-        DADOS.dias.map(function (d) {
-          return '<div class="faixa">' + cartaoDia(d) + '</div>';
-        }).join('');
+        '<div style="display:flex;flex-direction:column;gap:14px;padding:16px">' +
+          DADOS.dias.map(cartaoDia).join('') +
+        '</div>';
     }
   };
 

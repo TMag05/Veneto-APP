@@ -1,46 +1,56 @@
 /* =========================================================
    Pietra e Vigna — tokens
-   Fonte única de verdade. Derivado de BRAND-GUIDELINES.md §12.
-   Não introduzir cores fora desta folha.
+   Fonte única de verdade. Não introduzir cores fora desta folha.
 
-   A app é sempre escura — lagoa ao anoitecer, fotografia a
-   toda a largura. Não há modo claro: era o material errado
-   para uma marca que se vive de noite, ao volante, sob as
-   estrelas dos passos. Estes eram os valores do antigo modo
-   escuro; são agora os únicos.
+   A app é sempre escura. Os valores vêm do sistema desenhado em
+   "App - Separadores" e "App - Hoje (durante) v2": fundo de ardósia,
+   cartões de superfície, e o acento em cobre — o latão deu lugar a
+   uma cor mais quente, que é a que a fotografia da montanha pede.
    ========================================================= */
 
 :root {
-  /* Superfícies — pedra, ao anoitecer */
-  --calce: #15171B;
-  --istria: #1E2126;
-  --intonaco: #1A1D21;
-  --pietra: #2E3339;
+  /* Superfícies */
+  --calce: #121417;
+  --istria: #1A1D21;
+  --intonaco: #22262B;
+  --pietra: #2A2F35;
   --pietra-forte: #3D434A;
 
-  /* Texto — tinta aldina, clara sobre escuro */
+  /* Linhas e preenchimentos translúcidos */
+  --borda: rgba(237, 232, 224, 0.10);
+  --pill: rgba(237, 232, 224, 0.07);
+
+  /* Texto */
   --inchiostro: #EDE8E0;
-  --inchiostro-medio: #A8A196;
-  --inchiostro-chiaro: #9A9287;
+  --inchiostro-medio: rgba(237, 232, 224, 0.66);
+  --inchiostro-chiaro: rgba(237, 232, 224, 0.60);
 
   /* Acentos */
-  --verde: #9DB39A;
+  --verde: #6E9A7C;
   --verde-chiaro: #7E8F7A;
   --rosso: #D08C7E;
+  --rosso-forte: #8E2B24;
   --radicchio: #C08494;
-  --ottone: #C9A96A;
+  --ottone: #D9915F;
 
   /* Texto sobre preenchimento de acento */
-  --sobre-acento: #15171B;
+  --sobre-acento: #FBF8F2;
 
   /* Tipografia */
   --font-editorial: "EB Garamond", Georgia, "Times New Roman", serif;
   --font-ui: "Instrument Sans", Inter, system-ui, -apple-system, sans-serif;
 
-  /* Forma */
-  --raio-cartao: 12px;
-  --raio-controlo: 8px;
-  --raio-foto: 4px;
+  /* Forma — o sistema é de cantos redondos e cápsulas */
+  --raio-capa: 26px;
+  --raio-cartao: 20px;
+  --raio-linha: 18px;
+  --raio-foto: 12px;
+  --raio-controlo: 12px;
+  --raio-pill: 999px;
+
+  /* Elevação — sombra difusa, não contorno */
+  --sombra-cartao: 0 18px 44px -24px rgba(0, 0, 0, 0.85);
+  --sombra-folha: 0 -20px 50px -28px rgba(0, 0, 0, 0.9);
 
   /* Ritmo — múltiplos de 8 */
   --esp-1: 8px;
@@ -50,7 +60,7 @@
   --esp-5: 48px;
 
   /* Margem lateral única da grelha em socalco */
-  --margem: 20px;
+  --margem: 16px;
 
   /* Movimento */
   --transicao: 200ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -58,5 +68,5 @@
 
   /* Alturas do chrome */
   --alt-cabecalho: 52px;
-  --alt-navegacao: 65px;
+  --alt-navegacao: 68px;
 }

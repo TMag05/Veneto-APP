@@ -6,7 +6,7 @@
 
   Vistas.mais = {
     nav: 'mais',
-    cabecalho: { titulo: 'Mais' },
+    semCabecalho: true,
     html: function () {
       const e = Estado.get();
       const fase = Estado.fase();

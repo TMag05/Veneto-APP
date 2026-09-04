@@ -114,9 +114,7 @@ a { color: var(--verde); text-decoration: none; }
   gap: var(--esp-1);
   padding-left: 12px;
   padding-right: 12px;
-  /* Véu, como a barra de baixo: a fotografia da capa corre por
-     baixo do cabeçalho e o ecrã abre a cheio. */
-  background: linear-gradient(to bottom, var(--calce) 34%, rgba(21,23,27,0) 100%);
+  background: var(--calce);
   transition: background var(--transicao);
 }
 .cabecalho[data-linha="sim"], .cabecalho[data-vazio="sim"] { border-bottom: 0; }
@@ -162,7 +160,7 @@ a { color: var(--verde); text-decoration: none; }
 }
 
 .faixa { padding: 0 var(--margem); }
-.faixa + .faixa { margin-top: var(--esp-5); }
+.faixa + .faixa { margin-top: var(--esp-4); }
 .faixa--recuada {
   background: var(--intonaco);
   padding-top: var(--esp-4);
@@ -199,7 +197,9 @@ a { color: var(--verde); text-decoration: none; }
      a da organização tem quatro. */
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
-  padding: 0 8px calc(env(safe-area-inset-bottom) + var(--esp-2)) 8px;
+  padding: 6px 10px calc(env(safe-area-inset-bottom) + 18px);
+  background: var(--istria);
+  border-top: 1px solid var(--borda);
 }
 .navegacao {
   position: fixed;
@@ -211,9 +211,6 @@ a { color: var(--verde); text-decoration: none; }
      um left:50% deixaria a barra com metade do ecrã. */
   max-width: 430px;
   margin: 0 auto;
-  /* Véu, não superfície: a fotografia continua por baixo, como na
-     Hoje, mas o conteúdo que sobe não passa por trás dos rótulos. */
-  background: linear-gradient(to top, var(--calce) 44%, rgba(21,23,27,0) 100%);
 }
 .navegacao[hidden] { display: none; }
 
@@ -223,22 +220,19 @@ a { color: var(--verde); text-decoration: none; }
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  gap: 9px;
-  padding-top: 12px;
-  color: rgba(237, 232, 224, 0.62);
-  border-top: 1px solid rgba(237, 232, 224, 0.12);
-  transition: color 260ms, border-color 260ms;
+  gap: 8px;
+  padding: 10px 0 2px;
+  color: var(--inchiostro-chiaro);
+  transition: color 260ms;
 }
 .nav-item[aria-current="page"], .imersivo__nav-item[aria-current="page"] {
   color: var(--ottone);
-  border-top-color: var(--ottone);
 }
 .nav-item__rotulo, .imersivo__nav-item span:last-child {
-  font-family: var(--font-editorial);
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 500;
   line-height: 1;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -252,28 +246,29 @@ a { color: var(--verde); text-decoration: none; }
   align-items: center;
   justify-content: center;
   gap: var(--esp-1);
-  min-height: 48px;
-  padding: 12px 20px;
-  border-radius: var(--raio-controlo);
-  font-size: 16px;
+  min-height: 50px;
+  padding: 12px 22px;
+  border-radius: var(--raio-pill);
+  font-size: 14px;
   font-weight: 500;
+  letter-spacing: 0.04em;
   line-height: 1.2;
   text-align: center;
   transition: background var(--transicao), border-color var(--transicao), opacity var(--transicao);
 }
 .botao--largo { display: flex; width: 100%; }
 
-.botao--principal { background: var(--verde); color: var(--sobre-acento); }
+.botao--principal { background: var(--ottone); color: var(--sobre-acento); }
 .botao--principal:active { opacity: 0.86; }
 
 .botao--secundario {
-  background: transparent;
+  background: rgba(237, 232, 224, 0.06);
   color: var(--inchiostro);
-  border: 1px solid var(--pietra-forte);
+  border: 1px solid rgba(237, 232, 224, 0.18);
 }
 .botao--secundario:active { background: var(--intonaco); }
 
-.botao--rosso { background: var(--rosso); color: var(--sobre-acento); }
+.botao--rosso { background: var(--rosso-forte); color: #FBF3EE; }
 .botao--ottone { background: var(--ottone); color: var(--sobre-acento); }
 .botao--radicchio { background: var(--radicchio); color: var(--sobre-acento); }
 
@@ -294,10 +289,9 @@ a { color: var(--verde); text-decoration: none; }
   z-index: 10;
   display: flex;
   gap: var(--esp-1);
-  margin-top: var(--esp-5);
+  margin-top: var(--esp-4);
   padding: var(--esp-2) var(--margem);
   background: var(--calce);
-  box-shadow: 0 -1px 0 var(--pietra);
 }
 .barra-inferior .botao { flex: 1; }
 .barra-inferior .botao--fixo-estreito { flex: 0 0 auto; }
@@ -335,22 +329,33 @@ a { color: var(--verde); text-decoration: none; }
 .campo__entrada::placeholder, .campo__area::placeholder { color: var(--inchiostro-chiaro); }
 .campo__nota { margin-top: 6px; }
 
-.escolhas { display: flex; flex-wrap: wrap; gap: var(--esp-1); }
+/* Cápsulas numa fila que corre na horizontal, não numa grelha que
+   quebra: quatro dias e dois filtros não devem empurrar o mapa. */
+.escolhas {
+  display: flex;
+  gap: var(--esp-1);
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.escolhas::-webkit-scrollbar { display: none; }
 .escolha {
-  min-height: 44px;
-  padding: 10px 14px;
-  border: 1px solid var(--pietra-forte);
-  border-radius: var(--raio-controlo);
-  background: var(--istria);
-  font-size: 15px;
-  font-weight: 400;
+  flex: none;
+  min-height: 38px;
+  padding: 9px 16px;
+  border: 1px solid rgba(237, 232, 224, 0.18);
+  border-radius: var(--raio-pill);
+  background: transparent;
+  color: rgba(237, 232, 224, 0.66);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
   transition: all var(--transicao);
 }
 .escolha[aria-pressed="true"] {
-  border-color: var(--verde);
-  background: var(--verde);
-  color: var(--sobre-acento);
-  font-weight: 500;
+  border-color: var(--inchiostro);
+  background: var(--inchiostro);
+  color: var(--calce);
 }
 
 /* ---------------------------------------------------------
@@ -359,25 +364,73 @@ a { color: var(--verde); text-decoration: none; }
 
 .cartao {
   background: var(--istria);
-  border: 1px solid var(--pietra);
+  border: 1px solid var(--borda);
   border-radius: var(--raio-cartao);
   padding: var(--esp-3);
 }
 
-.lista { border-top: 1px solid var(--pietra); }
+/* Cada dia do roadbook é um cartão: fotografia em cima, texto em
+   baixo, cantos redondos. */
+.cartao-dia {
+  display: block;
+  padding-bottom: var(--esp-2);
+  border-radius: var(--raio-cartao);
+  overflow: hidden;
+  background: var(--istria);
+  border: 1px solid var(--borda);
+  color: inherit;
+}
+.cartao-dia__foto {
+  display: block;
+  height: 120px;
+  border-radius: 0;
+  aspect-ratio: auto;
+}
+.cartao-dia__corpo { display: block; padding: 14px 18px 0; }
+.cartao-dia__titulo {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font-editorial);
+  font-size: 26px;
+  line-height: 1.1;
+}
+.cartao-dia__resumo {
+  display: block;
+  margin-top: 8px;
+  font-family: var(--font-editorial);
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--inchiostro-medio);
+}
+.cartao-dia__meta {
+  display: block;
+  margin-top: 12px;
+  font-size: 12px;
+  font-variant-numeric: oldstyle-nums;
+  color: var(--inchiostro-chiaro);
+}
+
+/* A lista é um cartão: as linhas vivem lá dentro, separadas por
+   filete, e o grupo tem cantos redondos. */
+.lista {
+  border-radius: var(--raio-cartao);
+  overflow: hidden;
+  background: var(--istria);
+  border: 1px solid var(--borda);
+}
 .lista-linha {
   display: flex;
   align-items: center;
   gap: var(--esp-2);
   width: 100%;
   min-height: 60px;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--pietra);
+  padding: 16px 18px;
   text-align: left;
   color: inherit;
 }
+.lista-linha + .lista-linha { border-top: 1px solid var(--borda); }
 .lista-linha__corpo { flex: 1; min-width: 0; }
-.lista-linha__seta { color: var(--inchiostro-chiaro); flex: none; }
+.lista-linha__seta { color: var(--ottone); flex: none; }
 .lista-linha:active { background: var(--intonaco); }
 .lista-linha__icone { color: var(--inchiostro-medio); flex: none; }
 
@@ -429,19 +482,19 @@ a { color: var(--verde); text-decoration: none; }
    Capa de dia
    --------------------------------------------------------- */
 
-/* A capa é o ecrã inteiro, como na Hoje: a fotografia ocupa tudo e o
-   título assenta no fundo dela. Na Hoje a imagem é fixa porque o ecrã
-   não corre; aqui corre com o conteúdo, mas abre sempre a ecrã cheio. */
+/* A capa é um cartão de fotografia, inserido das margens e de cantos
+   redondos, com o título assente no fundo dela. */
 .capa {
   position: relative;
-  min-height: 100dvh;
+  min-height: 200px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  /* Sobe para debaixo do cabeçalho: a fotografia começa no topo
-     do ecrã, não abaixo dele. */
-  margin: calc((var(--alt-cabecalho) + env(safe-area-inset-top)) * -1) 0 var(--esp-4);
+  margin: var(--esp-2) var(--margem) 0;
+  padding: 22px;
+  border-radius: var(--raio-capa);
   overflow: hidden;
+  box-shadow: var(--sombra-cartao);
 }
 .capa__imagem {
   position: absolute;
@@ -456,38 +509,27 @@ a { color: var(--verde); text-decoration: none; }
   content: '';
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(to bottom, rgba(16,18,22,0.55) 0%, rgba(16,18,22,0) 20%),
-    linear-gradient(to bottom, rgba(12,16,22,0.10) 26%, rgba(12,16,22,0.55) 62%, rgba(21,23,27,0.96) 100%);
+  background: linear-gradient(to top, rgba(16,18,22,0.82), rgba(16,18,22,0.18) 62%, rgba(16,18,22,0.04));
   pointer-events: none;
 }
 .capa__texto {
   position: relative;
   z-index: 1;
-  /* Assenta acima da barra, que flutua por cima do fundo da capa. */
-  padding: 0 var(--margem) calc(var(--alt-navegacao) + env(safe-area-inset-bottom) + var(--esp-3));
-  color: #EDE8E0;
+  padding: 0;
+  color: #FBF8F2;
 }
-.capa--curta .capa__texto { padding-bottom: var(--esp-4); }
-
-/* Numa página com barra de ação fixa — a captura da galeria — o título
-   da capa tem de assentar acima dela também, não só acima da navegação. */
-.ecra:has(.barra-inferior) .capa:not(.capa--curta) .capa__texto {
-  padding-bottom: calc(var(--alt-navegacao) + env(safe-area-inset-bottom) + var(--esp-3) + 76px);
-}
-.capa__texto .capa-titulo, .capa__texto .titulo-editorial { color: #F2EEE7; }
-.capa__texto .subtitulo, .capa__texto .corpo-ui { color: rgba(237, 232, 224, 0.72); }
+.capa__texto .capa-titulo, .capa__texto .titulo-editorial { color: #FBF8F2; }
+.capa__texto .subtitulo, .capa__texto .corpo-ui { color: rgba(251, 248, 242, 0.86); }
 .capa__data {
   font-family: var(--font-editorial);
   font-size: 19px;
   font-variant-numeric: oldstyle-nums;
-  color: rgba(237, 232, 224, 0.66);
+  color: rgba(251, 248, 242, 0.8);
   margin: 0 0 6px;
 }
 
-/* A área da organização é ferramenta de trabalho: mesma capa, mas sem
-   engolir o ecrã antes de se chegar aos campos. */
-.capa--curta { min-height: 46dvh; }
+/* Só o título: não precisa da altura de uma capa com subtítulo. */
+.capa--curta { min-height: 150px; }
 
 /* ---------------------------------------------------------
    Programa vivo
@@ -658,9 +700,10 @@ a { color: var(--verde); text-decoration: none; }
 
 .mapa-moldura {
   position: relative;
-  background: var(--intonaco);
-  border-top: 1px solid var(--pietra);
-  border-bottom: 1px solid var(--pietra);
+  margin: 12px var(--margem) 0;
+  background: #191C20;
+  border: 1px solid var(--borda);
+  border-radius: 22px;
   overflow: hidden;
   touch-action: pan-y;
 }
@@ -673,8 +716,22 @@ a { color: var(--verde); text-decoration: none; }
 }
 .mapa-legenda__item { display: flex; align-items: center; gap: 6px; }
 
-.presenca-linha { display: flex; align-items: center; gap: var(--esp-2); padding: 12px 0; border-bottom: 1px solid var(--pietra); }
+.presenca-linha { display: flex; align-items: center; gap: var(--esp-2); padding: 12px 0; border-bottom: 1px solid var(--borda); }
 .presenca-linha__carro { width: 56px; flex: none; }
+
+/* Onde está o grupo: um cartão por paragem, com as silhuetas de quem
+   lá está. */
+.presenca-grupo {
+  padding: 16px 18px;
+  border-radius: var(--raio-linha);
+  background: var(--istria);
+  border: 1px solid var(--borda);
+}
+.presenca-grupo + .presenca-grupo { margin-top: 12px; }
+.presenca-grupo__cabeca { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.presenca-grupo__nome { font-family: var(--font-editorial); font-size: 20px; color: var(--inchiostro); }
+.presenca-grupo__carros { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.presenca-grupo__carros > span { display: block; width: 56px; }
 
 /* Etiquetas e carros por cima do mapa, em HTML, para manterem
    a escala tipográfica real em vez de escalarem com o SVG. */
@@ -688,13 +745,15 @@ a { color: var(--verde); text-decoration: none; }
   pointer-events: auto;
 }
 .mapa-etiqueta__nome {
-  font-size: 13px;
+  /* Chapa em vez de halo: no escuro, um fundo sólido lê-se melhor
+     por cima da linha do percurso do que um contorno difuso. */
+  padding: 4px 9px;
+  border-radius: 6px;
+  background: rgba(18, 20, 23, 0.86);
+  font-size: 11px;
   font-weight: 500;
   line-height: 1.2;
   white-space: nowrap;
-  /* Halo cartográfico: mantém a etiqueta legível por cima da linha
-     do percurso. Não é elevação — é a prática dos mapas impressos. */
-  text-shadow: 0 0 3px var(--intonaco), 0 0 3px var(--intonaco), 0 0 4px var(--intonaco);
 }
 .mapa-carros {
   position: absolute;
@@ -715,7 +774,7 @@ a { color: var(--verde); text-decoration: none; }
 .grelha-fotos {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 2px;
+  gap: 6px;
 }
 .grelha-fotos__celula {
   position: relative;
@@ -1250,12 +1309,33 @@ a { color: var(--verde); text-decoration: none; }
    Manchete do grupo
    --------------------------------------------------------- */
 
-.manchete { display: block; color: inherit; }
+/* A manchete do grupo é uma cápsula tingida do acento, não um título
+   solto: lê-se de relance sem competir com o nome do dia. */
+.manchete {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 14px var(--margem) 0;
+  padding: 14px 18px;
+  border-radius: var(--raio-linha);
+  background: rgba(217, 145, 95, 0.14);
+  color: var(--ottone);
+}
 .manchete__texto {
   font-family: var(--font-editorial);
-  font-size: 26px;
-  line-height: 1.25;
+  font-style: italic;
+  font-size: 17px;
+  line-height: 1.3;
   display: block;
+}
+.manchete::after {
+  content: 'Ver';
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 /* ---------------------------------------------------------
