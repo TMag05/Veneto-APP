@@ -1,7 +1,7 @@
 /* =========================================================
    Pietra e Vigna — folha principal
-   Regras não negociáveis: sem sombras, sem pílulas, sem gradientes
-   em superfícies, pesos 400/500 apenas, nada abaixo de 12px.
+   O sistema é o de claude.ai/design: cartões de cantos redondos,
+   cápsulas, sombra difusa e acento em cobre. Tudo escuro, sempre.
    ========================================================= */
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -187,29 +187,29 @@ a { color: var(--verde); text-decoration: none; }
    Navegação inferior
    --------------------------------------------------------- */
 
-/* A barra é a mesma em toda a app: estas regras servem tanto a
-   navegação fixa como a que o ecrã imersivo da Hoje desenha dentro
-   do seu próprio rodapé. Uma regra só — não uma cópia que volta a
-   divergir. O que difere é apenas o posicionamento. */
+/* A barra é um cartão que flutua sobre o conteúdo, com a mesma forma
+   dos outros cartões da app. Uma regra só para a navegação fixa e para
+   a que a Hoje desenha no seu rodapé. */
 .navegacao, .imersivo__nav {
   display: grid;
   /* Colunas automáticas: a barra do convidado tem cinco separadores,
      a da organização tem quatro. */
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
-  padding: 6px 10px calc(env(safe-area-inset-bottom) + 18px);
+  padding: 6px 8px;
+  border-radius: var(--raio-cartao);
   background: var(--istria);
-  border-top: 1px solid var(--borda);
+  border: 1px solid var(--borda);
 }
+.imersivo__nav { margin: 0 var(--margem) var(--esp-2); }
 .navegacao {
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: var(--margem);
+  right: var(--margem);
+  bottom: calc(env(safe-area-inset-bottom) + var(--esp-2));
   z-index: 30;
-  /* Centrada por margens, não por left:50% — com right:0 no sítio,
-     um left:50% deixaria a barra com metade do ecrã. */
-  max-width: 430px;
+  /* Centrada por margens dentro da coluna da app. */
+  max-width: 398px;
   margin: 0 auto;
 }
 .navegacao[hidden] { display: none; }
@@ -219,9 +219,9 @@ a { color: var(--verde); text-decoration: none; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 8px;
-  padding: 10px 0 2px;
+  padding: 10px 0;
   color: var(--inchiostro-chiaro);
   transition: color 260ms;
 }
@@ -230,9 +230,11 @@ a { color: var(--verde); text-decoration: none; }
 }
 .nav-item__rotulo, .imersivo__nav-item span:last-child {
   font-size: 10px;
-  font-weight: 500;
+  /* O desenho pede 800; a família vai até 700, que é o peso que
+     agora acompanha a app. Acima disso o browser fingia o negrito. */
+  font-weight: 700;
   line-height: 1;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   white-space: nowrap;
 }

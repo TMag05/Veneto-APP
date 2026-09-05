@@ -8,7 +8,7 @@
 /* Subir esta versão sempre que se publica: força a reinstalação do
    cache e é o que faz chegar conteúdo novo aos telemóveis. Deve
    acompanhar o ?v= dos ficheiros em index.html. */
-const VERSAO = 'passeio-v34';
+const VERSAO = 'passeio-v35';
 
 const CONCHA = [
   './',
@@ -23,6 +23,8 @@ const CONCHA = [
   './assets/fonts/EBGaramond-italic-latin-ext.woff2',
   './assets/fonts/InstrumentSans-normal-latin.woff2',
   './assets/fonts/InstrumentSans-normal-latin-ext.woff2',
+  './assets/fonts/InstrumentSans-bold-latin.woff2',
+  './assets/fonts/InstrumentSans-bold-latin-ext.woff2',
   './assets/img/icone-192.png',
   './assets/img/icone-512.png',
   './assets/img/icone-180.png',
