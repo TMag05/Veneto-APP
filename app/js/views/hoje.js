@@ -92,7 +92,7 @@
         '<linearGradient id="farI" x1="0" y1=".2" x2="0" y2="1"><stop offset="0" stop-color="#E9C3A4"/><stop offset=".45" stop-color="#A98D8B"/><stop offset="1" stop-color="#6E6570"/></linearGradient>' +
         '<linearGradient id="nearI" x1="0" y1=".3" x2="0" y2="1"><stop offset="0" stop-color="#55505C"/><stop offset="1" stop-color="#25242C"/></linearGradient>' +
         '<linearGradient id="veuI" x1="0" y1=".26" x2="0" y2="1"><stop offset="0" stop-color="#101216" stop-opacity="0"/><stop offset=".54" stop-color="#101216" stop-opacity=".46"/><stop offset="1" stop-color="#101216" stop-opacity=".95"/></linearGradient>' +
-        '<linearGradient id="topoI" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#101216" stop-opacity=".55"/><stop offset="1" stop-color="#101216" stop-opacity="0"/></linearGradient>' +
+        '<linearGradient id="topoI" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#101216" stop-opacity=".4"/><stop offset="1" stop-color="#101216" stop-opacity="0"/></linearGradient>' +
       '</defs>' +
       '<rect width="390" height="844" fill="url(#ceuI)"/>' +
       '<path d="M-10 844 L-10 452 L34 318 L62 352 L92 342 L138 262 L172 306 L204 296 L258 380 L300 300 L336 344 L368 330 L400 352 L400 844 Z" fill="url(#farI)"/>' +
@@ -117,11 +117,10 @@
       percurso = t.km + ' km · ' + UI.duracao(t.min);
     }
 
-    const N = dia.momentos.length;
     const barras = dia.momentos.map(function (_, n) {
-      const h = n === i ? 22 : (n < i ? 8 : 4);
-      const cor = n === i ? '#EDE8E0' : (n < i ? 'rgba(237,232,224,.5)' : 'rgba(237,232,224,.26)');
-      return '<span style="display:block;background:' + cor + ';height:' + h + 'px"></span>';
+      const h = n === i ? 20 : (n < i ? 8 : 4);
+      const cor = n === i ? 'var(--ottone)' : (n < i ? 'rgba(237,232,224,.42)' : 'rgba(237,232,224,.18)');
+      return '<span style="background:' + cor + ';height:' + h + 'px"></span>';
     }).join('');
 
     const abas = [
@@ -151,28 +150,33 @@
     const maisAlto = altitudes.length ? Math.max.apply(null, altitudes) : null;
 
     return '<div class="imersivo">' +
-      fundoImersivo() +
-      '<div class="imersivo__toque" data-acao="avancar">' +
-        '<div class="imersivo__topo">' +
-          '<span class="num">' + (dia.data ? UI.dataCurta(dia.data) : 'Dia ' + dia.numero) + '</span>' +
-          '<span>' + UI.h((dia.titulo || '').toUpperCase()) + '</span>' +
-        '</div>' +
+      '<div class="imersivo__topo">' +
+        '<span class="imersivo__data num">' + (dia.data ? UI.dataCurta(dia.data) : 'Dia ' + dia.numero) + '</span>' +
+        '<span class="imersivo__etapa">' + UI.h((dia.titulo || '').toUpperCase()) + '</span>' +
+      '</div>' +
+
+      '<div class="imersivo__cena" data-acao="avancar">' +
+        fundoImersivo() +
+        '<span class="imersivo__escurecer"></span>' +
         '<div class="imersivo__hero">' +
           '<span class="imersivo__etiqueta">' + (i === atual ? 'Agora' : 'A seguir') +
             (m.alterado ? ' · alterado' : '') + '</span>' +
-          '<span class="imersivo__titulo">' + UI.h(m.titulo) + '</span>' +
-          (m.nota ? '<span class="imersivo__nota">' + UI.h(m.nota) + '</span>'
-            : (m.alterado ? '<span class="imersivo__nota">Era às ' + UI.h(m.alterado.antes.replace(':', 'h')) + '. ' + UI.h(m.alterado.razao) + '.</span>' : '')) +
-          '<span class="imersivo__fila num">' +
-            '<span>' + UI.h(m.hora) + (m.fim ? '–' + UI.h(m.fim) : '') + '</span>' +
-            (poi && poi.altitude ? '<span>' + poi.altitude + ' m</span>' : '') +
-            (percurso ? '<span>' + percurso + '</span>' : '') +
-          '</span>' +
+          '<div class="imersivo__hero-fundo">' +
+            '<span class="imersivo__titulo">' + UI.h(m.titulo) + '</span>' +
+            (m.nota ? '<span class="imersivo__nota">' + UI.h(m.nota) + '</span>'
+              : (m.alterado ? '<span class="imersivo__nota">Era às ' + UI.h(m.alterado.antes.replace(':', 'h')) + '. ' + UI.h(m.alterado.razao) + '.</span>' : '')) +
+            '<span class="imersivo__fila num">' +
+              '<span class="imersivo__pastilha imersivo__pastilha--hora">' + UI.h(m.hora) + (m.fim ? '–' + UI.h(m.fim) : '') + '</span>' +
+              (poi && poi.altitude ? '<span class="imersivo__pastilha">' + poi.altitude + ' m</span>' : '') +
+              (percurso ? '<span class="imersivo__pastilha">' + percurso + '</span>' : '') +
+            '</span>' +
+          '</div>' +
         '</div>' +
       '</div>' +
+
       '<div class="imersivo__rodape">' +
         '<div class="imersivo__pauta" data-acao="abrirDia">' +
-          '<div class="imersivo__barras" style="grid-template-columns:repeat(' + N + ',1fr)">' + barras + '</div>' +
+          '<div class="imersivo__barras">' + barras + '</div>' +
           '<div class="imersivo__seguinte">' +
             '<span>' + (seg ? 'A seguir, ' + UI.h(seg.titulo) : 'Fim do dia') + '</span>' +
             '<span>O dia</span>' +
@@ -182,6 +186,7 @@
       '</div>' +
       '<div class="imersivo__veu-folha" data-acao="fecharDia" data-aberto="' + (folhaAberta ? 'sim' : 'nao') + '"></div>' +
       '<div class="imersivo__folha" data-aberto="' + (folhaAberta ? 'sim' : 'nao') + '">' +
+        '<span class="imersivo__puxador"></span>' +
         '<div class="imersivo__folha-cab" data-acao="fecharDia">' +
           '<span class="imersivo__folha-titulo">O dia inteiro</span><span>Fechar</span>' +
         '</div>' +

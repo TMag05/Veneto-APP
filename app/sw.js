@@ -8,7 +8,7 @@
 /* Subir esta versão sempre que se publica: força a reinstalação do
    cache e é o que faz chegar conteúdo novo aos telemóveis. Deve
    acompanhar o ?v= dos ficheiros em index.html. */
-const VERSAO = 'passeio-v33';
+const VERSAO = 'passeio-v34';
 
 const CONCHA = [
   './',
