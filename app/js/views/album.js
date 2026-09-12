@@ -67,6 +67,7 @@
         '<div class="cert">' +
           '<p class="cert__olho">Registo do percurso</p>' +
           '<h2 class="cert__titulo">' + UI.h(DADOS.evento.nome || 'Passeio') + '</h2>' +
+          (DADOS.evento.subtitulo ? '<p class="cert__sub">' + UI.h(DADOS.evento.subtitulo) + '</p>' : '') +
           '<p class="cert__sub">' + UI.intervaloEvento() + '</p>' +
 
           '<div class="cert__corpo">' +
@@ -114,7 +115,7 @@
           '<p class="assinatura-am" style="color:inherit;opacity:0.8">Aston Martin</p>' +
           '<h1 class="capa-titulo" style="margin-top:32px">' + UI.h(DADOS.evento.nome || 'Passeio') + '<br>' +
             (DADOS.evento.inicio ? DADOS.evento.inicio.slice(0, 4) : DADOS.evento.ano) + '</h1>' +
-          '<p class="subtitulo" style="margin-top:12px">' + UI.intervaloEvento() + '</p>' +
+          '<p class="subtitulo" style="margin-top:12px">' + UI.h(DADOS.evento.subtitulo || UI.intervaloEvento()) + '</p>' +
         '</div>' +
 
         certidao +

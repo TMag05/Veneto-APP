@@ -1,6 +1,6 @@
 # CLAUDE.md — instruções do projeto
 
-App do passeio anual de clientes Aston Martin. Edição de 2026: **Dolomitas**.
+App do passeio anual de clientes Aston Martin. Edição de 2026: **Dolomitas** — *Da Grande Guerra à Laguna de Veneza*. Do Monte Grappa às Pale di San Martino, pelas colinas do Prosecco e pelo Cansiglio, até Veneza. Não passa por Cortina.
 Este ficheiro é a linha de pensamento do projeto. Ler antes de escrever código.
 
 ---
@@ -58,7 +58,7 @@ O documento do diretor-geral (`Estrutura-App-Passeio-Dolomitas.docx`) é a espec
 
 ## 5. Tom de voz
 
-Português europeu. Italiano só em nomes próprios — `Passo Falzarego`, `Cortina d'Ampezzo` — e topónimos nunca se traduzem. Frases curtas, no máximo duas por ecrã. Sem exclamações, sem emoji, sem *Title Case*. Nunca escrever "utilizador", "conteúdo", "experiência" ou "jornada" em texto visível.
+Português europeu. Italiano só em nomes próprios — `Passo di San Boldo`, `Piazza San Marco`, `Caffè Florian` — e topónimos nunca se traduzem. As exceções são os nomes que o convidado já diz em português: Veneza, Dolomitas, Itália. Frases curtas, no máximo duas por ecrã. Sem exclamações, sem emoji, sem *Title Case*. Nunca escrever "utilizador", "conteúdo", "experiência" ou "jornada" em texto visível.
 
 > Não: "Ups! Algo correu mal."  Sim: "Sem ligação. Guardámos para enviar depois."
 
@@ -145,7 +145,7 @@ A secção **Demonstração** (`js/views/mais.js`) e o campo `demoFase` (`js/sto
 2. **Servidor** — Firestore para conteúdo, chegadas e pedidos; Storage para fotografias; Auth por link mágico; papéis com regras a sério; Cloud Messaging.
 3. **Publicação e notificação** — o botão que empurra uma alteração para os telemóveis. Sem isto, a regra operacional do manifesto §4 não se cumpre.
 4. **Corrigir os waypoints âncora para a rota real de 2026.** Desceu de prioridade: com batedores, já não sustentam a experiência principal. Mas são o que o link de recurso usa — e para quem se afastar da caravana só serve se apontar para a estrada certa.
-5. **Revisão da identidade para as Dolomitas.** `Pietra e Vigna` foi deduzida do Veneto de planície. Em Cortina o material é dolomia, larício e cultura ladina. A paleta e as regras sobrevivem; a fundamentação tem de ser reescrita — ver `ENQUADRAMENTO.md` §4.
+5. **Revisão da identidade para a rota real.** `Pietra e Vigna` foi deduzida do Veneto — pedra, vinha, Veneza — e a rota de 2026 passa a maior parte do tempo precisamente aí: Possagno, as colinas do Prosecco, o Cansiglio, a laguna. O que a fundamentação ainda não tem são os dois fios que o passeio acrescenta: a Grande Guerra (o Grappa e San Boldo) e a dolomia das Pale di San Martino. A paleta e as regras ficam; a revisão acrescenta, não substitui — ver `ENQUADRAMENTO.md` §4.
 6. **Exportação do roadbook em PDF** (o CSV de participantes já existe).
 
 ---
@@ -162,7 +162,7 @@ Sem dependências, sem build. Instalar no telemóvel pelo *Adicionar ao ecrã pr
 
 ## 12. Antes de dar por feito
 
-1. Se retirasse as silhuetas dos carros, isto passaria por uma app de um hotel de cinco estrelas em Cortina?
+1. Se retirasse as silhuetas dos carros, isto passaria por uma app de um hotel de cinco estrelas no Veneto?
 2. Lê-se ao sol, de pé, ao meio-dia?
 3. Há mais do que uma cor de acento neste ecrã? Se sim, retirar uma.
 4. Entrou alguma cor, raio ou espaçamento fora de `tokens.css`?

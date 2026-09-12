@@ -1,6 +1,6 @@
 # App do Passeio — versão de trabalho
 
-Aplicação web mobile, instalável como PWA, para o passeio anual de clientes Aston Martin. Edição de 2026: **Dolomitas**.
+Aplicação web mobile, instalável como PWA, para o passeio anual de clientes Aston Martin. Edição de 2026: **Dolomitas** — *Da Grande Guerra à Laguna de Veneza*. Do Monte Grappa às Pale di San Martino, pelas colinas do Prosecco e pelo Cansiglio, até Veneza.
 
 São **duas apps sobre a mesma base de dados**:
 
@@ -53,7 +53,7 @@ Três separadores, como no documento, mais os dados do evento. Mesma identidade 
 
 **Itinerário** — etapas com data, título, subtítulo e notas de percurso; reordenáveis. Dentro de cada etapa: as paragens (ordenáveis) e o programa do dia ao minuto. Alterar a hora de um momento marca-o como alterado no telemóvel de toda a gente, com a razão à vista.
 
-**Paragens** — criadas de raiz ou escolhidas de uma **biblioteca de sugestões da região** com coordenadas já preenchidas (28 sítios das Dolomitas). Aceita-se um endereço colado do Google Maps: as coordenadas são extraídas automaticamente. Cada paragem tem subtítulo, história em parágrafos e nota prática.
+**Paragens** — criadas de raiz ou escolhidas de uma **biblioteca de sugestões da região** com coordenadas já preenchidas: primeiro as onze paragens reais de 2026, já com texto (a partir de [docs/pesquisa-locais-passeio-dolomitas-2026.md](docs/pesquisa-locais-passeio-dolomitas-2026.md)); depois os 28 sítios da maqueta de Cortina, que saem quando entrar o itinerário real. Aceita-se um endereço colado do Google Maps: as coordenadas são extraídas automaticamente. Cada paragem tem subtítulo, história em parágrafos e nota prática.
 
 **Pessoas** — cartão por participante com nome, apelido, data de nascimento, papel, nº do carro, email e fotografia. O bloco do veículo — carta, apólice, matrícula, modelo e cor — só aparece para condutores. Os carros são derivados do nº de equipa: quem partilha o número, partilha o carro.
 
@@ -67,7 +67,7 @@ Três separadores, como no documento, mais os dados do evento. Mesma identidade 
 
 **Concierge** — retrato, nome, função e promessa de resposta. Sem resposta automática: um pedido fica *entregue* e é uma pessoa que responde. Fingir uma resposta é pior do que não ter nenhuma.
 
-**Evento** — nome, base, datas, o briefing (como se anda na estrada, o que levar e as notas práticas) e cópia de segurança: descarregar tudo em JSON, restaurar de ficheiro, e exportar os participantes em CSV para Excel.
+**Evento** — nome, subtítulo, base, datas, o briefing (como se anda na estrada, o que levar e as notas práticas) e cópia de segurança: descarregar tudo em JSON, restaurar de ficheiro, e exportar os participantes em CSV para Excel.
 
 Gravação automática em todo o lado. Não existe botão de guardar.
 
@@ -108,7 +108,7 @@ servidor.js             servidor estático de desenvolvimento
 
 ## Demonstração
 
-Em **Mais › Definições › Demonstração** salta-se entre os dias anteriores, cada etapa e o pós-evento, e carrega-se um **passeio de exemplo** — quatro etapas nas Dolomitas, com participantes e contactos — para mostrar a app sem escrever um itinerário à mão. Serve para demonstrar fora das datas do evento e **não deve existir na versão entregue aos convidados** — apagar a secção `Demonstração` em `js/views/mais.js` e o campo `demoFase` em `js/store.js`.
+Em **Mais › Definições › Demonstração** salta-se entre os dias anteriores, cada etapa e o pós-evento, e carrega-se um **passeio de exemplo** — quatro etapas à volta de Cortina, com participantes e contactos — para mostrar a app sem escrever um itinerário à mão. É uma maqueta anterior à rota real, a substituir pelo itinerário de 2026 assim que chegar `docs/informacao-base-passeio-dolomitas-2026.md`. Serve para demonstrar fora das datas do evento e **não deve existir na versão entregue aos convidados** — apagar a secção `Demonstração` em `js/views/mais.js` e o campo `demoFase` em `js/store.js`.
 
 ---
 
@@ -128,7 +128,7 @@ Em **Mais › Definições › Demonstração** salta-se entre os dias anteriore
 
 ## O que veio da pesquisa
 
-Os oito movimentos de [O Luxo é Atmosfera](PESQUISA-LUXO.html) estão implementados: fotografia a toda a largura com carregamento pela organização, a chegada, um momento de cada vez, o concierge com cara, a revelação diária, a manchete do grupo, a história como recompensa e o álbum como certidão. O que continua a faltar é a fotografia real — nenhum desenho gerado substitui uma sessão nas Dolomitas.
+Os oito movimentos de [O Luxo é Atmosfera](PESQUISA-LUXO.html) estão implementados: fotografia a toda a largura com carregamento pela organização, a chegada, um momento de cada vez, o concierge com cara, a revelação diária, a manchete do grupo, a história como recompensa e o álbum como certidão. O que continua a faltar é a fotografia real — nenhum desenho gerado substitui uma sessão no percurso.
 
 ---
 
@@ -138,7 +138,7 @@ Os oito movimentos de [O Luxo é Atmosfera](PESQUISA-LUXO.html) estão implement
 2. **Servidor.** Firestore para conteúdo, chegadas e pedidos; Storage para fotografias; Auth por link mágico; papéis de organização e convidado com regras de segurança a sério; Cloud Messaging para as notificações de alteração de programa.
 3. **Publicação e notificação.** O botão que empurra uma alteração para os telemóveis. Sem isto a regra operacional da secção 4 do manifesto não se cumpre.
 4. **Corrigir os waypoints âncora para a rota real de 2026.** Desceu de prioridade: com batedores, já não sustentam a experiência principal. Mas são o que o link de recurso usa, e para quem se afastar da caravana só serve se apontar para a estrada certa. É trabalho manual, uma vez por rota.
-5. **Revisão da identidade para as Dolomitas.** `Pietra e Vigna` foi deduzida do Veneto de planície — pedra de Istria, verde Veronese, villas palladianas, tipografia aldina. Em Cortina o material é dolomia, larício e cultura ladina. A paleta e as regras sobrevivem; a fundamentação precisa de ser reescrita. Ver [ENQUADRAMENTO.md](ENQUADRAMENTO.md) §4.
+5. **Revisão da identidade para a rota real.** `Pietra e Vigna` foi deduzida do Veneto — pedra de Istria, verde Veronese, villas palladianas, tipografia aldina — e a rota de 2026 passa a maior parte do tempo precisamente aí. O que a fundamentação ainda não tem são os dois fios que o passeio acrescenta: a Grande Guerra (o Grappa e San Boldo) e a dolomia das Pale di San Martino. A paleta e as regras ficam; a revisão acrescenta, não substitui. Ver [ENQUADRAMENTO.md](ENQUADRAMENTO.md) §4.
 6. **Exportação em PDF** do roadbook (o CSV de participantes já existe).
 
 ---

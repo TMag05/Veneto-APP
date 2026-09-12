@@ -16,7 +16,10 @@ Vistas.entrada = (function () {
       '<div>' +
         '<h1 class="capa-titulo">' + UI.h(DADOS.evento.nome || 'Passeio') + '.' +
           (DADOS.dias.length ? '<br>' + UI.plural(DADOS.dias.length, 'dia', 'dias') + '.' : '') + '</h1>' +
-        '<p class="subtitulo" style="margin-top:12px">' + UI.intervaloEvento() + '</p>' +
+        (DADOS.evento.subtitulo
+          ? '<p class="subtitulo" style="margin-top:12px">' + UI.h(DADOS.evento.subtitulo) + '</p>' +
+            '<p class="meta num" style="margin-top:8px">' + UI.intervaloEvento() + '</p>'
+          : '<p class="subtitulo" style="margin-top:12px">' + UI.intervaloEvento() + '</p>') +
       '</div>' +
 
       (passo === 'identificacao' ? formIdentificacao() : formCodigo()) +

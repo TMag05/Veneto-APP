@@ -108,8 +108,8 @@
           }).join('') + '</div>' +
 
           '<div class="lista" style="margin-top:24px">' +
-            UI.linhaLista({ titulo: 'Carregar passeio de exemplo', nota: 'Quatro etapas nas Dolomitas', icone: 'juntar', acao: 'exemplo' }) +
-            UI.linhaLista({ titulo: 'Repor tudo', nota: 'Apaga o conteúdo e o estado local', icone: 'fechar', acao: 'repor' }) +
+            UI.linhaLista({ titulo: 'Carregar passeio de exemplo', nota: 'Quatro etapas, maqueta de Cortina', icone: 'juntar', acao: 'exemplo' }) +
+            UI.linhaLista({ titulo: 'Repor tudo', nota: 'Apaga o passeio e o estado local', icone: 'fechar', acao: 'repor' }) +
           '</div>' +
         '</div>' +
 
@@ -118,7 +118,7 @@
           '<p class="corpo-editorial" style="margin-top:12px">Aplicação do passeio Aston Martin' +
             (DADOS.evento.nome ? ' — ' + UI.h(DADOS.evento.nome) : '') + '. ' +
             'Identidade Pietra e Vigna, versão de trabalho.</p>' +
-          '<p class="meta" style="margin-top:12px">Funciona sem rede. O conteúdo do dia é pré-carregado de manhã.</p>' +
+          '<p class="meta" style="margin-top:12px">Funciona sem rede. O programa do dia fica no telemóvel desde manhã.</p>' +
         '</div>';
     },
     acoes: {
@@ -148,7 +148,7 @@
 
       exemplo: function () {
         UI.abrirFolha('Carregar exemplo',
-          '<p class="corpo-ui silencioso">Substitui o conteúdo atual por um passeio completo de quatro etapas nas Dolomitas, com participantes e contactos. Serve para mostrar a app; não é o roadbook real.</p>' +
+          '<p class="corpo-ui silencioso">Substitui o que está na app por um passeio de quatro etapas, com participantes e contactos. É a maqueta de Cortina, anterior à rota real — não é o roadbook de 2026.</p>' +
           '<button class="botao botao--principal botao--largo" style="margin-top:24px" type="button" id="btn-exemplo">Carregar</button>');
         document.getElementById('btn-exemplo').addEventListener('click', function () {
           UI.fecharFolha();

@@ -85,22 +85,26 @@ O silêncio do documento sobre estas funcionalidades é provavelmente sinal de q
 
 ---
 
-## 4. O destino: Dolomitas ou Veneto
+## 4. O destino: a rota real de 2026
 
-Não são necessariamente incompatíveis. **Cortina d'Ampezzo fica na província de Belluno, que é Veneto.** O passeio do exemplo do documento — Cortina → Passo Falzarego → Passo Gardena — parte do Veneto e entra no Alto Ádige.
+**Respondido a 12.09.2026.** O passeio chama-se *Dolomitas — Da Grande Guerra à Laguna de Veneza* e **não passa por Cortina, pelo Falzarego nem pela Gardena**. O exemplo do documento do diretor-geral, e a maqueta que a app construiu a partir dele, partiam de um pressuposto que a rota real desfez.
 
-O que muda conforme a resposta:
+A rota vai de Possagno e do Monte Grappa ao Passo di San Boldo, desce às colinas do Prosecco (Refrontolo, Miane), sobe à Val Canali e às Pale di San Martino, já no Trentino, e acaba pelo Nevegal e pelo Cansiglio em Veneza. As Dolomitas a sério aparecem num dia; o resto é Veneto de colina e pré-Alpes. Fontes: `docs/informacao-base-passeio-dolomitas-2026.md` (§0 e §2) e `docs/pesquisa-locais-passeio-dolomitas-2026.md`.
 
-| | Se o passeio for aos Dolomitas |
+Decidido com a organização: sai tudo o que é Cortina; o nome fica *Dolomitas*, com o título oficial como subtítulo.
+
+| | Estado |
 |---|---|
-| Conteúdo dos POIs | **Reescrever por inteiro** — os catorze POIs atuais são Veneto de planície: Prosecco, Palladio, Verona |
-| Dias, programa, distâncias | Reescrever |
-| Mapa | **Funciona sem alteração** — o enquadramento é calculado a partir das coordenadas |
-| Waypoints âncora | Recurar. Nos passos alpinos são ainda mais críticos do que na planície |
+| Texto das paragens | **Escrito** para as onze paragens reais, a partir da pesquisa, e posto no topo da biblioteca. Três (Rifugio Bassano, La Candola, La Casera) têm só subtítulo: a pesquisa não chega lá e não se inventa |
+| Dias, programa, distâncias | À espera de `informacao-base` §2. Até lá, o passeio de exemplo continua a ser a maqueta de Cortina, e sai de uma vez com a biblioteca antiga |
+| Mapa | **Sem alteração** — o enquadramento é calculado a partir das coordenadas |
+| Waypoints âncora | Por corrigir para a rota real. Com batedores, já só servem o link de recurso |
 | Estrutura da app | **Sem alteração** |
-| Identidade `Pietra e Vigna` | **A repensar.** O argumento é pedra de Istria, verde Veronese, villas palladianas e a tipografia aldina de Veneza. Em Cortina o material é dolomia, madeira de larício e cultura ladina. A paleta sobrevive; a fundamentação, não. Fingir que sim seria fazer exatamente o que os guidelines proíbem: escolher cores por gosto e inventar-lhes uma história |
+| Identidade `Pietra e Vigna` | **Mais perto do que parecia** — ver abaixo |
 
-Se o passeio for mesmo aos Dolomitas, o mais honesto é uma revisão do documento de marca — mesma disciplina, mesmas regras de contraste e tipografia, argumento cultural novo. É meio dia de trabalho, não um recomeço.
+**A identidade.** Com Cortina, a fundamentação de `Pietra e Vigna` caía: o material seria dolomia, larício e cultura ladina, e fingir o contrário era escolher cores por gosto e inventar-lhes uma história. A rota real devolve-lhe o chão. Pedra de Istria, verde Veronese, villas palladianas e a tipografia aldina de Veneza são o território onde o passeio passa a maior parte do tempo — e onde acaba.
+
+O que falta à fundamentação são os dois fios que o passeio acrescenta. **A Grande Guerra**, que dá o nome ao passeio e tem aqui as suas duas âncoras: o Sacrario do Grappa e a estrada de San Boldo, dos dois lados da mesma frente. E **a dolomia das Pale di San Martino**, o único dia em que o passeio toca a montanha a sério. A paleta e as regras ficam; a revisão do documento de marca acrescenta estes dois capítulos, não substitui o argumento.
 
 ---
 

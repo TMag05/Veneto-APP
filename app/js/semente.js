@@ -13,11 +13,11 @@ window.SEMENTE = (function () {
 
   const evento = {
     nome: 'Dolomitas',
-    subtitulo: '',
+    subtitulo: 'Da Grande Guerra à Laguna de Veneza',
     ano: 2026,
     inicio: '',
     fim: '',
-    base: 'Cortina d\'Ampezzo',
+    base: '',
     hotel: '',
     /* Quem responde do outro lado. Uma pessoa, com nome e cara. */
     concierge: { nome: '', papel: '', foto: '', promessa: 'Respondemos em menos de dez minutos. Sempre uma pessoa.' },
@@ -27,14 +27,14 @@ window.SEMENTE = (function () {
     /* Briefing que o convidado lê nos dias anteriores. */
     levar: [
       'Carta de condução e documento de identificação',
-      'Casaco quente — nos passos acima dos 2000 m a temperatura desce dez graus',
+      'Casaco quente — o Grappa passa dos 1700 m, e em outubro sente-se',
       'Óculos de sol. A luz na altitude é outra',
       'Sapato confortável para as paragens a pé',
       'Adaptador de tomada tipo L ou F'
     ],
     notas: [
       'Portagens e combustível estão incluídos e são liquidados pela organização.',
-      'Alguns passos podem fechar por neve fora de época. A organização confirma a rota na véspera.'
+      'A organização confirma o programa de cada dia na véspera.'
     ]
   };
 
@@ -45,6 +45,98 @@ window.SEMENTE = (function () {
      Coordenadas aproximadas ao centro do local — confirmar.
      --------------------------------------------------------- */
   const biblioteca = [
+
+    /* As paragens reais de 2026, pela ordem do programa. Factos de
+       docs/pesquisa-locais-passeio-dolomitas-2026.md; coordenadas a
+       acertar com docs/informacao-base-passeio-dolomitas-2026.md.
+       Onde a pesquisa não chega, fica só o subtítulo — nada inventado. */
+
+    { nome: 'Tempio Canoviano', local: 'Possagno', tipo: 'monumento', lat: 45.8553, lng: 11.8836,
+      subtitulo: 'Canova desenhou-o para a terra onde nasceu.',
+      historia: [
+        'Antonio Canova nasceu aqui em 1757 e desenhou este templo aos quarenta e sete anos. Assistiu à primeira pedra, em 1819, e não o chegou a ver acabado.',
+        'Morreu em Veneza em 1822. O templo só ficou pronto em 1857, no centenário do seu nascimento, e é nele que está sepultado.',
+        'Ao lado, a Gypsotheca guarda os gessos originais: os modelos das estátuas que hoje estão em mármore pelos museus da Europa. É o momento em que a ideia ainda podia mudar de forma.'
+      ] },
+
+    { nome: 'Sacrario del Monte Grappa', local: 'Cima Grappa', tipo: 'monumento', lat: 45.8722, lng: 11.8028,
+      subtitulo: 'Pela estrada que o exército italiano abriu em 1917.', altitude: 1776,
+      historia: [
+        'Aqui estão sepultados os dois lados da mesma batalha, a poucos metros um do outro. Mais de doze mil italianos e dez mil austro-húngaros, na grande maioria sem nome.',
+        'Depois de Caporetto, no inverno de 1917, o Grappa foi a linha que não cedeu. Atrás dela só havia a planície do Veneto.',
+        'Chega-se pela Strada Cadorna, a estrada militar que abastecia a frente. A 1776 metros, o silêncio é o oposto do que este lugar já foi.'
+      ] },
+
+    { nome: 'Rifugio Bassano', local: 'Cima Grappa', tipo: 'miradouro', lat: 45.8705, lng: 11.8040,
+      subtitulo: 'Almoço no cimo do Grappa.' },
+
+    /* O fio da Grande Guerra: o Grappa e San Boldo são os dois lados da
+       mesma frente. San Boldo faz-se duas vezes, nos dias 2 e 4. */
+    { nome: 'Passo di San Boldo', local: 'Strada dei 100 Giorni', tipo: 'estrada', lat: 46.0130, lng: 12.1660,
+      subtitulo: 'Cem dias, em 1918, do outro lado da frente.', altitude: 706,
+      historia: [
+        'Cem dias, sete mil pessoas e uma estrada escavada na rocha para vencer cem metros de desnível. Abriu-a o exército austro-húngaro, em 1918.',
+        'Trabalharam soldados, prisioneiros italianos, russos e bósnios, e a gente de Tovena, com idosos, mulheres e crianças. São seis curvas em espiral e cinco túneis, sempre a dez por cento.',
+        'Foi feita para levar o exército à frente do Grappa e do Piave. Meses depois, serviu-lhe para recuar.'
+      ],
+      nota: 'É o único troço que o passeio faz duas vezes, uma em cada sentido.' },
+
+    /* Sensibilidade: em 2014 houve aqui uma cheia mortal. Não se menciona,
+       e evita-se escrever sobre a água como coisa calma. */
+    { nome: 'Molinetto della Croda', local: 'Refrontolo', tipo: 'monumento', lat: 45.9330, lng: 12.2030,
+      subtitulo: 'Um moinho de 1630, nas colinas do Prosecco.',
+      historia: [
+        'Um moinho de 1630, movido pela queda de doze metros do Lierza. Moeu durante quase trezentos e trinta anos, até 1953.',
+        'É das imagens mais fotografadas das colinas do Prosecco, e foi cenário de «Mogliamante», com Marcello Mastroianni, em 1977. Hoje é um pequeno museu da moagem.'
+      ],
+      nota: 'Aqui faz-se a fotografia do grupo e a de cada carro. Segue-se um aperitivo, servido pela Locanda Al Bakaro.' },
+
+    { nome: 'Ateliê de Valentino Moro', local: 'Miane', tipo: 'vinha', lat: 45.9420, lng: 12.0930,
+      subtitulo: 'Um ferreiro que trabalha sozinho, entre as vinhas.',
+      historia: [
+        'Trabalha sozinho, num ateliê que começou por ser um pequeno depósito entre as vinhas. Nada sai daqui em série.',
+        'Usa ferro puro, sem ligas, porque só o ferro puro se deixa remodelar enquanto está quente. Às vezes junta-lhe pedra ou vidro.',
+        'Para ele, o desenho é só o ponto de partida. O resto decide-se com o metal ainda quente.'
+      ] },
+
+    /* Almoço do dia 3. Substitui o Malga Ces, que chegou a estar previsto. */
+    { nome: 'Chalet Piereni', local: 'Val Canali', tipo: 'miradouro', lat: 46.2060, lng: 11.8640,
+      subtitulo: 'Almoço de frente para as Pale di San Martino.',
+      historia: [
+        'É aqui que o passeio entra na Dolomita a sério. Do chalet, as Pale di San Martino ficam mesmo em frente.',
+        'A Val Canali está dentro do Parco Naturale Paneveggio – Pale di San Martino e é um dos acessos a pé ao planalto das Pale. Desde 2009, estas montanhas são Património Mundial.',
+        'A cozinha é a do Trentino. Já não estamos no Veneto.'
+      ] },
+
+    { nome: 'La Candola', local: 'Eremo di San Gallo', tipo: 'miradouro', lat: 45.9030, lng: 12.1170,
+      subtitulo: 'Jantar junto ao Eremo di San Gallo.' },
+
+    { nome: 'La Casera', local: 'Nevegal', tipo: 'miradouro', lat: 46.1040, lng: 12.2400,
+      subtitulo: 'Paragem curta no Nevegal.' },
+
+    { nome: 'Rifugio Città di Vittorio Veneto', local: 'Monte Pizzoc', tipo: 'miradouro', lat: 46.0500, lng: 12.3380,
+      subtitulo: 'A floresta que fazia os remos de Veneza.', altitude: 1547,
+      historia: [
+        'Em dia limpo vê-se tudo daqui: as Dolomitas a norte, as friulanas a leste e, a sul, a laguna de Veneza. É o resto do dia, visto de cima.',
+        'Veneza pôs a floresta do Cansiglio sob proteção em 1420. A partir de 1548 foi o Bosco da Reme: faias criadas durante mais de um século para dar remos ao Arsenale.',
+        'Proibia-se ali o pastoreio, e marcos de pedra fechavam o perímetro. A floresta que remava a Serenissima ainda aqui está.'
+      ],
+      nota: 'Buffet de pé, a caminho de Veneza.' },
+
+    /* Sensibilidade: a frase do «salão de estar da Europa» não tem
+       confirmação de ter sido dita por Napoleão. Não se usa. */
+    { nome: 'Piazza San Marco', local: 'Veneza', tipo: 'cidade', lat: 45.4341, lng: 12.3388,
+      subtitulo: 'O fim da estrada é uma praça sem carros.',
+      historia: [
+        'O Caffè Florian abriu a 29 de dezembro de 1720, com o nome de Alla Venezia Trionfante. É o café mais antigo de Itália, sempre no mesmo lugar.',
+        'Em frente fica o Caffè Quadri, que era o dos oficiais austríacos. O Florian era o dos venezianos, e em 1848 tratavam-se lá os feridos da revolta.',
+        'Os quatro cavalos de bronze da basílica foram levados por Napoleão para Paris em 1797, e voltaram em 1815. O campanário caiu inteiro em 1902 e voltou a erguer-se igual, no mesmo sítio.'
+      ],
+      nota: 'Aperitivo do grupo no Caffè Florian.' },
+
+    /* Maqueta anterior à rota real: sítios de Cortina e do Sella, que
+       servem o passeio de exemplo. Saem quando entrar o itinerário de 2026. */
+
     { nome: 'Cortina d\'Ampezzo', local: 'Corso Italia', tipo: 'vila', lat: 46.5405, lng: 12.1357,
       subtitulo: 'A rainha das Dolomitas.', altitude: 1224,
       historia: ['A Ampezzo foi ladina antes de ser italiana, e ainda se ouve. O ladino é uma língua românica com raízes que antecedem o vêneto, e sobrevive nestes vales de forma teimosa: nos topónimos, nas ementas, nos apelidos.', 'Recebeu os Jogos Olímpicos de Inverno em 1956 e volta a recebê-los em 2026, com Milão. Entre uma coisa e outra passaram setenta anos em que a vila mudou pouco: a mesma rua principal, as mesmas fachadas, o mesmo campanário a marcar a hora.', 'O melhor de Cortina não se vê da rua. Vê-se das estradas que saem dela — e é para essas que vamos.'],

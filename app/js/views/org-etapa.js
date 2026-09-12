@@ -86,7 +86,7 @@
           '<div class="pilha-2" style="margin-top:24px">' +
             UI.campo({ rotulo: 'Data', nome: 'data', valor: d.data, tipo: 'data' }) +
             UI.campo({ rotulo: 'Título da etapa', nome: 'titulo', valor: d.titulo,
-              placeholder: 'Cortina → Falzarego → Gardena' }) +
+              placeholder: 'Possagno → Grappa → San Boldo' }) +
             UI.campo({ rotulo: 'Subtítulo', nome: 'subtitulo', valor: d.subtitulo,
               placeholder: 'Uma frase, em itálico, por baixo do título' }) +
             UI.campo({ rotulo: 'Notas, percurso e paragens', nome: 'resumo', valor: d.resumo, tipo: 'area', linhas: 5,
