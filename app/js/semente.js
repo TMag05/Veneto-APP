@@ -21,6 +21,9 @@ window.SEMENTE = (function () {
     hotel: '',
     /* Quem responde do outro lado. Uma pessoa, com nome e cara. */
     concierge: { nome: '', papel: '', foto: '', promessa: 'Respondemos em menos de dez minutos. Sempre uma pessoa.' },
+    /* Como se anda na estrada. Há batedores e o grupo segue em
+       caravana: a app é o guia do dia, não o de condução. */
+    formato: 'Na estrada, segue-se a caravana, atrás dos batedores. A app diz o que vem a seguir — o caminho é com eles.',
     /* Briefing que o convidado lê nos dias anteriores. */
     levar: [
       'Carta de condução e documento de identificação',

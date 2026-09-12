@@ -656,22 +656,17 @@ a { color: var(--verde); text-decoration: none; }
 .etapa__titulo { font-family: var(--font-editorial); font-size: 22px; line-height: 1.25; margin: 0; }
 .etapa__meta { margin-top: 4px; display: flex; gap: var(--esp-2); flex-wrap: wrap; }
 
-.troco {
-  display: flex;
-  align-items: center;
-  gap: var(--esp-1);
-  margin: var(--esp-2) 0 var(--esp-1);
-  padding: 12px 14px;
-  border: 1px solid var(--pietra);
-  border-radius: var(--raio-controlo);
-  background: var(--istria);
-  width: 100%;
-  min-height: 48px;
-  text-align: left;
+/* Ritmo do dia: distância e tempo entre duas paragens. Dado ambiente,
+   não instrução — o grupo segue os batedores. Alinha com a coluna do
+   título, por baixo da hora. */
+.ritmo {
+  margin: 0;
+  padding: var(--esp-1) 0 var(--esp-1) calc(58px + var(--esp-2));
+  font-size: 12px;
+  color: var(--inchiostro-chiaro);
+  border-bottom: 1px solid var(--pietra);
 }
-.troco__texto { flex: 1; min-width: 0; }
-.troco__titulo { font-size: 15px; font-weight: 500; }
-.troco__icone { color: var(--verde); flex: none; }
+.etapa__conteudo .ritmo { padding: 0 0 var(--esp-1); border-bottom: 0; }
 
 /* ---------------------------------------------------------
    POI

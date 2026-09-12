@@ -179,6 +179,9 @@
           '<div class="seccao-cabecalho"><h2 class="etiqueta">Briefing</h2></div>' +
           '<p class="corpo-ui silencioso">O que o convidado lê nos dias que antecedem a partida.</p>' +
           '<div class="pilha-2" style="margin-top:16px">' +
+            UI.campo({ rotulo: 'Como se anda na estrada', nome: 'formato',
+              valor: e.formato === undefined ? SEMENTE.evento.formato : e.formato, tipo: 'area', linhas: 3,
+              nota: 'Aparece por cima do programa. Deixar vazio para não mostrar.' }) +
             UI.campo({ rotulo: 'O que levar', nome: 'levar', valor: (e.levar || []).join('\n'), tipo: 'area', linhas: 6,
               placeholder: 'Um item por linha' }) +
             UI.campo({ rotulo: 'Notas práticas', nome: 'notas', valor: (e.notas || []).join('\n'), tipo: 'area', linhas: 3,

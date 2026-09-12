@@ -52,6 +52,16 @@
     '</div>';
   }
 
+  /* A paragem de onde o grupo vem: o último momento anterior com
+     paragem associada. É daí que se conta o troço. */
+  function poiAnterior(momentos, i) {
+    for (let n = i - 1; n >= 0; n--) {
+      const p = momentos[n].poi;
+      if (p && POIS[p]) return p;
+    }
+    return null;
+  }
+
   /* Qual é o momento em curso — ou o próximo, se estivermos entre dois. */
   function indiceAtual(dia) {
     const agora = UI.horaAgora();
@@ -110,9 +120,12 @@
     const atual = indiceAtual(dia);
     const poi = m.poi ? POIS[m.poi] : null;
 
+    /* Ritmo do dia, não instrução de condução: o grupo segue em
+       caravana, por isso a distância mede-se da paragem anterior do
+       programa, não do sítio onde cada um marcou a última chegada. */
     let percurso = '';
-    const de = Estado.ultimaChegada();
-    if (poi && de && de !== m.poi && POIS[de]) {
+    const de = poiAnterior(dia.momentos, i);
+    if (poi && de && de !== m.poi) {
       const t = UI.troco(de, m.poi);
       percurso = t.km + ' km · ' + UI.duracao(t.min);
     }
@@ -283,6 +296,14 @@
     '</div>';
   }
 
+  /* Como se anda na estrada. O campo pode faltar em conteúdo guardado
+     antes de existir; nesse caso vale a semente. Vazio de propósito é
+     vazio — a organização pode querer não o mostrar. */
+  function formato() {
+    const f = DADOS.evento.formato;
+    return f === undefined ? SEMENTE.evento.formato : f;
+  }
+
   function briefingHtml() {
     const faltam = Estado.diasAte();
     const carro = Estado.meuCarro();
@@ -325,6 +346,7 @@
       (DADOS.dias.length
         ? '<div class="faixa">' +
             '<div class="seccao-cabecalho"><h2 class="etiqueta">O programa</h2></div>' +
+            (formato() ? '<p class="corpo-editorial silencioso" style="margin-bottom:16px">' + UI.h(formato()) + '</p>' : '') +
             '<div class="lista">' + DADOS.dias.map(function (d) {
               return UI.linhaLista({
                 titulo: 'Dia ' + d.numero + (d.titulo ? ' — ' + d.titulo : ''),
@@ -486,5 +508,5 @@
     }
   };
 
-  window.Programa = { momento: momento, programa: programa, capaDia: capaDia };
+  window.Programa = { momento: momento, programa: programa, capaDia: capaDia, indiceAtual: indiceAtual, poiAnterior: poiAnterior };
 })();

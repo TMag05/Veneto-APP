@@ -90,7 +90,8 @@ servidor.js             servidor estático de desenvolvimento
 - **Offline é o estado normal.** Escrita local imediata, fila de sincronização, nunca um erro de rede à vista do convidado. Não existe botão de guardar em lado nenhum.
 - **Cada ecrã tem endereço fixo e partilhável** (`ROTAS` em `app.js`). É isto que permite ao WhatsApp ser o sino e à app ser o arquivo — e é a decisão com maior impacto no sucesso do projeto.
 - **Voltar é recuar no caminho feito, não subir na hierarquia.** O ecrã-pai declarado só serve quando não há histórico — o caso do link vindo do WhatsApp.
-- **Navegação troço a troço.** Cada troço entre duas paragens é um link individual para o Google Maps, com waypoints âncora. Enviar o dia inteiro dissolveria a curadoria: o Maps recalcula sempre pelo mais rápido.
+- **O grupo segue em caravana: a app explica o dia, não indica o caminho.** Há batedores na estrada e os carros seguem-nos. O ecrã Hoje e o Itinerário dizem primeiro o que vai acontecer — paragem, hora, o que se faz ali. A distância e o tempo até à paragem seguinte são ritmo do dia, não instrução de condução, e medem-se de paragem a paragem do programa. O CTA principal de um ecrã nunca é "abrir no Maps".
+- **O Google Maps é rede de segurança, troço a troço.** Para quem se atrasar ou se separar da caravana, cada troço entre duas paragens tem o seu link individual, com waypoints âncora — nunca o dia inteiro, que o Maps recalcularia pelo mais rápido e dissolveria a estrada escolhida. Vive no fim do Itinerário, junto com o GPX, não no centro. Decisão de 12.09.2026: `docs/decisao-navegacao-caravana.md`.
 - **Estados de espera legíveis.** Enquanto a organização não publicar itinerário, o convidado vê um estado de espera — nunca um ecrã partido.
 - **Commits em português, no imperativo, uma linha** — como os que já existem: *"Aplica o sistema de App - Separadores aos quatro separadores"*. Sem prefixos de convenção.
 
@@ -128,7 +129,7 @@ O código de acesso da organização (`2026`, em `js/views/mais.js`) é uma port
 |---|---|
 | Coordenadas da biblioteca de sugestões | `semente.js` — aproximadas ao centro do local |
 | Distâncias e tempos dos troços | `ui.js` › `troco()` — linha reta com fator de sinuosidade; erram por defeito nos passos alpinos |
-| Waypoints âncora | `ui.js` › `ANCORAS` — **ainda são os do Veneto** |
+| Waypoints âncora | `ui.js` › `ANCORAS` — **ainda são os do Veneto do ano passado**. Já não sustentam a experiência principal, só o link de recurso do Itinerário — mas esse só serve se apontar para a rota real de 2026 (`docs/informacao-base-passeio-dolomitas-2026.md` §0) |
 | Fotografias | `imagens.js` — desenhos de dolomia gerados por hora do dia |
 | Silhuetas dos carros | `silhuetas.js` › `FORMAS` — cinco arquétipos, não um perfil por modelo |
 | Cores de carroçaria | `silhuetas.js` › `CORES` — hexadecimais aproximados |
@@ -141,9 +142,9 @@ A secção **Demonstração** (`js/views/mais.js`) e o campo `demoFase` (`js/sto
 ## 10. Por fazer, por ordem
 
 1. **Sessão fotográfica, ou arquivo licenciado.** É o único movimento que não se resolve com código, e o de maior efeito.
-2. **Recurar os waypoints âncora para as Dolomitas.** Sem eles, o Maps troca o Giau pela autoestrada.
-3. **Servidor** — Firestore para conteúdo, chegadas e pedidos; Storage para fotografias; Auth por link mágico; papéis com regras a sério; Cloud Messaging.
-4. **Publicação e notificação** — o botão que empurra uma alteração para os telemóveis. Sem isto, a regra operacional do manifesto §4 não se cumpre.
+2. **Servidor** — Firestore para conteúdo, chegadas e pedidos; Storage para fotografias; Auth por link mágico; papéis com regras a sério; Cloud Messaging.
+3. **Publicação e notificação** — o botão que empurra uma alteração para os telemóveis. Sem isto, a regra operacional do manifesto §4 não se cumpre.
+4. **Corrigir os waypoints âncora para a rota real de 2026.** Desceu de prioridade: com batedores, já não sustentam a experiência principal. Mas são o que o link de recurso usa — e para quem se afastar da caravana só serve se apontar para a estrada certa.
 5. **Revisão da identidade para as Dolomitas.** `Pietra e Vigna` foi deduzida do Veneto de planície. Em Cortina o material é dolomia, larício e cultura ladina. A paleta e as regras sobrevivem; a fundamentação tem de ser reescrita — ver `ENQUADRAMENTO.md` §4.
 6. **Exportação do roadbook em PDF** (o CSV de participantes já existe).
 

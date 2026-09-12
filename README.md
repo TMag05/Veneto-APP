@@ -31,9 +31,9 @@ A app existe para o passeio e só para o passeio. Os convidados recebem acesso p
 
 **A primeira abertura** — uma chegada, uma vez por instalação: fotografia a ecrã inteiro, o nome do convidado em Garamond, as datas e o carro dele em tamanho de objeto. É o equivalente digital de abrir a caixa.
 
-**Nos dias anteriores** — o briefing, e uma **revelação por dia**: uma paragem do percurso que se abre, com fotografia e três linhas. É o que faz a app abrir-se todos os dias antes de partir.
+**Nos dias anteriores** — o briefing, que explica também como se anda na estrada: há batedores e o grupo segue em caravana, a app é o guia do dia e não o de condução. E uma **revelação por dia**: uma paragem do percurso que se abre, com fotografia e três linhas. É o que faz a app abrir-se todos os dias antes de partir.
 
-**Durante** — o ecrã "Hoje" mostra **uma coisa de cada vez**: a data e a etapa numa linha no topo, e por baixo um cartão de fotografia que ocupa o resto do ecrã, com o momento em curso — etiqueta em cápsula, o título em Garamond de 44 px, e a hora, a altitude e a distância em pastilhas. Tocar no cartão avança para o momento seguinte; tocar na pauta que fica por baixo convoca o dia inteiro numa folha que sobe, com puxador, a lista dos momentos e os totais da etapa em pastilhas. Roadbook por etapas, com cada troço a abrir individualmente no Google Maps e exportação GPX; a história de cada paragem apresentada como **promessa** — um excerto sobre a fotografia do sítio — que se revela à chegada; mapa monocromático com os carros a cores reais e uma **manchete** quando o grupo se junta num sítio; galeria com câmara nativa; concierge com cara, nome e promessa de resposta; contactos e SOS.
+**Durante** — o ecrã "Hoje" mostra **uma coisa de cada vez**: a data e a etapa numa linha no topo, e por baixo um cartão de fotografia que ocupa o resto do ecrã, com o momento em curso — etiqueta em cápsula, o título em Garamond de 44 px, e a hora, a altitude e a distância desde a paragem anterior em pastilhas. Tocar no cartão avança para o momento seguinte; tocar na pauta que fica por baixo convoca o dia inteiro numa folha que sobe, com puxador, a lista dos momentos e os totais da etapa em pastilhas. Roadbook por etapas, com o programa de cada dia — hora, paragem, o que se faz ali — e a distância entre paragens como ritmo; no fim de cada etapa, um link de Google Maps por troço e o GPX, para quem se afastar da caravana; a história de cada paragem apresentada como **promessa** — um excerto sobre a fotografia do sítio — que se revela à chegada; mapa monocromático com os carros a cores reais e uma **manchete** quando o grupo se junta num sítio; galeria com câmara nativa; concierge com cara, nome e promessa de resposta; contactos e SOS.
 
 **Toda a app é escura e fotográfica.** Não há modo claro nem escolha de tema. Cada separador abre com uma **capa** — um cartão de fotografia inserido das margens, de cantos redondos, com o título assente no fundo dela — e os separadores de topo não têm cabeçalho: a capa é o cabeçalho. Por baixo dela o conteúdo vive em cartões: os dias do roadbook, os grupos de linhas do Mais, as paragens do "onde está o grupo", a moldura do mapa. Os filtros e os dias são cápsulas numa fila que corre na horizontal. A barra de navegação é a mesma regra em toda a app — a fixa e a que a Hoje desenha no seu rodapé. A navegação principal usa um sinal próprio — cinco punções desenhados do vocabulário do passeio (sol nascente, gancho de rota, retícula com curvas de nível, provas empilhadas, filetes em degradé), gravados em três pesos de traço e destacados a latão; é a única navegação da app que não usa o conjunto geral de ícones. A exceção deliberada é o SOS, que continua o único ecrã inteiramente vermelho — sem fotografia, para não distrair de uma emergência.
 
@@ -67,7 +67,7 @@ Três separadores, como no documento, mais os dados do evento. Mesma identidade 
 
 **Concierge** — retrato, nome, função e promessa de resposta. Sem resposta automática: um pedido fica *entregue* e é uma pessoa que responde. Fingir uma resposta é pior do que não ter nenhuma.
 
-**Evento** — nome, base, datas, o briefing (o que levar e as notas práticas) e cópia de segurança: descarregar tudo em JSON, restaurar de ficheiro, e exportar os participantes em CSV para Excel.
+**Evento** — nome, base, datas, o briefing (como se anda na estrada, o que levar e as notas práticas) e cópia de segurança: descarregar tudo em JSON, restaurar de ficheiro, e exportar os participantes em CSV para Excel.
 
 Gravação automática em todo o lado. Não existe botão de guardar.
 
@@ -118,7 +118,7 @@ Em **Mais › Definições › Demonstração** salta-se entre os dias anteriore
 |---|---|---|
 | Coordenadas da biblioteca de sugestões | `semente.js` | Aproximadas ao centro do local — **confirmar antes de publicar os percursos** |
 | Distâncias e tempos dos troços | `ui.js` › `troco()` | Linha reta com fator de sinuosidade. Nos passos alpinos erram por defeito; devem vir dos GPX reais |
-| Waypoints âncora | `ui.js` › `ANCORAS` | Ainda são os do Veneto. **Recurar para as Dolomitas** — nos passos é onde mais importa |
+| Waypoints âncora | `ui.js` › `ANCORAS` | Ainda são os do Veneto do ano passado. Já só servem o link de recurso do Itinerário; **corrigir para a rota real de 2026** |
 | Fotografias | `imagens.js` | Desenhos de dolomia gerados por hora do dia (alvorada, dia, poente, noite). **A organização já pode carregar fotografias reais** em cada etapa e cada paragem; assim que existem, substituem o desenho |
 | Silhuetas dos carros | `silhuetas.js` › `FORMAS` | Cinco arquétipos. A versão final deve ter um perfil por modelo |
 | Cores de carroçaria | `silhuetas.js` › `CORES` | Nomes reais, hexadecimais aproximados — pedir os códigos à marca |
@@ -135,9 +135,9 @@ Os oito movimentos de [O Luxo é Atmosfera](PESQUISA-LUXO.html) estão implement
 ## Por fazer, por ordem
 
 1. **Sessão fotográfica, ou arquivo licenciado.** É o único movimento que não se resolve com código, e é o de maior efeito.
-2. **Recurar os waypoints âncora para as Dolomitas.** Sem eles, o Google Maps troca o Giau pela autoestrada. É trabalho manual, uma vez por rota.
-3. **Servidor.** Firestore para conteúdo, chegadas e pedidos; Storage para fotografias; Auth por link mágico; papéis de organização e convidado com regras de segurança a sério; Cloud Messaging para as notificações de alteração de programa.
-4. **Publicação e notificação.** O botão que empurra uma alteração para os telemóveis. Sem isto a regra operacional da secção 4 do manifesto não se cumpre.
+2. **Servidor.** Firestore para conteúdo, chegadas e pedidos; Storage para fotografias; Auth por link mágico; papéis de organização e convidado com regras de segurança a sério; Cloud Messaging para as notificações de alteração de programa.
+3. **Publicação e notificação.** O botão que empurra uma alteração para os telemóveis. Sem isto a regra operacional da secção 4 do manifesto não se cumpre.
+4. **Corrigir os waypoints âncora para a rota real de 2026.** Desceu de prioridade: com batedores, já não sustentam a experiência principal. Mas são o que o link de recurso usa, e para quem se afastar da caravana só serve se apontar para a estrada certa. É trabalho manual, uma vez por rota.
 5. **Revisão da identidade para as Dolomitas.** `Pietra e Vigna` foi deduzida do Veneto de planície — pedra de Istria, verde Veronese, villas palladianas, tipografia aldina. Em Cortina o material é dolomia, larício e cultura ladina. A paleta e as regras sobrevivem; a fundamentação precisa de ser reescrita. Ver [ENQUADRAMENTO.md](ENQUADRAMENTO.md) §4.
 6. **Exportação em PDF** do roadbook (o CSV de participantes já existe).
 
@@ -155,7 +155,7 @@ Os oito movimentos de [O Luxo é Atmosfera](PESQUISA-LUXO.html) estão implement
 
 **Serif conta, sans instrui.** EB Garamond para o editorial, Instrument Sans para a interface, com algarismos tabulares. Servidas localmente: a app não faz um único pedido a servidores externos.
 
-**Navegação troço a troço.** O Google Maps recalcula sempre pelo critério mais rápido; enviar o dia inteiro dissolveria a curadoria.
+**A caravana leva o grupo; a app explica o dia.** Há batedores na estrada. O Hoje e o Itinerário dizem o que vai acontecer e quando, e a distância entre paragens é ritmo, não instrução. O Google Maps fica como rede de segurança, um link por troço — nunca o dia inteiro, que o Maps recalcularia pelo mais rápido e dissolveria a estrada escolhida. Ver [docs/decisao-navegacao-caravana.md](docs/decisao-navegacao-caravana.md).
 
 **Voltar é recuar no caminho feito, não subir na hierarquia.** Cada vista declara um ecrã-pai, mas esse só é usado quando não há histórico — o caso do deep link vindo do WhatsApp.
 
