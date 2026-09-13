@@ -51,38 +51,68 @@ window.Icone = (function () {
 })();
 
 /* =========================================================
-   Punções — os cinco sinais desenhados do vocabulário do
-   passeio (sol nascente, gancho de rota, retícula com curvas
-   de nível, provas empilhadas, filetes em degradé), gravados
-   em três pesos de traço. É a navegação principal da app do
-   convidado — a organização mantém os ícones gerais.
+   Punções da navegação — Passeio Dolomitas 2026
+   Cinco ícones desenhados na mesma gramática: grelha de 48, traço
+   de 3, pontas e junções redondas, sem preenchimento. A única área
+   cheia em todo o conjunto é a bola de entrada da tulipa do
+   Roadbook — é convenção de roadbook de rally, não decoração.
+
+   A cor vem sempre de fora, por currentColor: o separador ativo
+   herda --ottone, os restantes o cinzento da barra. Nenhum
+   hexadecimal aqui. É a navegação principal da app do convidado —
+   a organização mantém os ícones gerais.
    ========================================================= */
 
-window.IconePuncao = (function () {
-  const P = {
-    hoje: '<path d="M2 22 H46"/><path d="M8 21.6 Q24 6.4 40 21.6"/>' +
-      '<path d="M19 14.7 A5 5 0 0 1 29 14.7" stroke-width=".7" opacity=".62"/>' +
-      '<g stroke-width="1"><path d="M24 8.4 V5.2"/><path d="M20.5 9.4 L18.91 6.86"/><path d="M27.5 9.4 L29.09 6.86"/><path d="M18.07 12.11 L15.37 10.79"/><path d="M29.93 12.11 L32.63 10.79"/></g>' +
-      '<g stroke-width=".6" opacity=".55"><path d="M17.41 14.54 L15.42 14.4"/><path d="M30.59 14.54 L32.58 14.4"/></g>' +
-      '<g stroke-width=".5" opacity=".4"><path d="M6 22.8 V24.6"/><path d="M12 22.8 V24.6"/><path d="M18 22.8 V24.6"/><path d="M24 22.8 V25.6"/><path d="M30 22.8 V24.6"/><path d="M36 22.8 V24.6"/><path d="M42 22.8 V24.6"/></g>',
-    roadbook: '<path d="M6 24 H24 Q32 24 32 19 Q32 14.4 22 14.4 Q12 14.4 12 9.6 Q12 5 20 5 H42" stroke-linecap="round" stroke-linejoin="round"/>' +
-      '<g stroke-width=".7" opacity=".72"><path d="M13.6 22.5 L15.4 24 L13.6 25.5"/><path d="M25.6 12.9 L24 14.4 L25.6 15.9"/><path d="M35.4 3.5 L37.2 5 L35.4 6.5"/></g>' +
-      '<circle cx="6" cy="24" r="1.2" fill="currentColor" stroke="none"/><circle cx="42" cy="5" r="1.6" stroke-width=".8" opacity=".8"/>',
-    mapa: '<path d="M4 7.4 L17 4.6 L30.5 7.4 L44 4.6 L44 17.2 L30.5 20 L17 17.2 L4 20 Z" stroke-linejoin="miter"/>' +
-      '<g stroke-width=".95" opacity=".42"><path d="M17 4.6 V17.2"/><path d="M30.5 7.4 V20"/></g>' +
-      '<g stroke-width=".95"><path d="M7 11 C11 9.2 14 9.6 17.6 10.6 C21.6 11.7 25 12.2 29 11.2 C33 10.2 37 9.6 41 10.8" opacity=".55"/><path d="M7 14.8 C11.4 13.6 14.6 13.9 18 14.6 C22 15.5 25.6 15.9 29.6 15 C33.4 14.2 37.2 13.7 41 14.6" opacity=".4"/></g>' +
-      '<path d="M24 6.6 L25.6 9.2 H22.4 Z" stroke-width=".55" opacity=".5"/><circle cx="24" cy="8.3" r=".85" fill="currentColor" stroke="none"/>',
-    galeria: '<path d="M15.4 3.6 H35.4 V17.6 H15.4 Z" stroke-width=".55" opacity=".32"/>' +
-      '<path d="M13 5.8 H33 V19.8 H13 Z" stroke-width=".75" opacity=".56"/>' +
-      '<path d="M10.6 8 H30.6 V22 H10.6 Z"/><path d="M12.4 9.8 H28.8 V20.2 H12.4 Z" stroke-width=".5" opacity=".34"/>' +
-      '<path d="M13 17.8 Q17.4 13.4 20.6 16.6 Q22.6 18.6 24 17.2 Q26 15.2 28.2 18" stroke-width=".6" opacity=".5" stroke-linecap="round" stroke-linejoin="round"/>',
-    mais: '<path d="M8 7 H40"/><path d="M8 13 H40" stroke-width=".85" opacity=".72"/><path d="M8 19 H40" stroke-width=".55" opacity=".44"/>' +
-      '<g stroke-width=".5" opacity=".42"><path d="M8 4.6 V9.4"/><path d="M40 4.6 V9.4"/><path d="M8 11 V15"/><path d="M40 11 V15"/><path d="M8 17.4 V20.6" opacity=".7"/><path d="M40 17.4 V20.6" opacity=".7"/></g>'
+window.PUNCOES = (function () {
+  const VISTA = '0 0 48 48';
+
+  const FORMAS = {
+
+    // Picos das Odle com o sol a nascer e a linha de base.
+    // É o único com sol — marca o dia a começar.
+    hoje:
+      '<path d="M2 40 L13 19 L19 27 L28 10 L37 25 L43 19 L46 40 M2 40 H46"/>' +
+      '<circle cx="10" cy="9" r="4.5"/>',
+
+    // Tulipa: bola de entrada, haste da estrada percorrida, seta no ramo
+    // a seguir, traço a fechar o ramo que se ignora.
+    roadbook:
+      '<circle cx="24" cy="37" r="3.2" fill="currentColor" stroke="none"/>' +
+      '<path d="M24 37 V22 L38 8 M38 15 L38 8 L31 8 M24 22 L13 11 M10.2 13.8 L15.8 8.2"/>',
+
+    // Mapa dobrado, dois vincos. O contorno em zigue-zague rima com a
+    // crista dos picos sem repetir o desenho.
+    mapa:
+      '<path d="M3 12 L16 6 L31 12 L45 6 L45 36 L31 42 L16 36 L3 42 Z M16 6 V36 M31 12 V42"/>',
+
+    // Moldura com paisagem dentro. É o contentor que o distingue do Hoje,
+    // não o motivo — por isso não leva sol.
+    galeria:
+      '<rect x="3" y="8" width="42" height="34" rx="6"/>' +
+      '<path d="M3 31 L13 21 L19 27 L28 17 L45 31"/>',
+
+    // Três estratos de comprimentos diferentes: lê-se como menu e como
+    // camadas de dolomia.
+    mais:
+      '<path d="M11 15 H37 M5 24 H43 M14 33 H34"/>'
   };
 
-  return function (nome, ativo) {
-    const peso = ativo ? 1.5 : 1.05;
-    return '<svg width="30" height="16" viewBox="0 0 48 26" fill="none" stroke="currentColor" ' +
-      'stroke-width="' + peso + '" stroke-linecap="round" aria-hidden="true">' + (P[nome] || '') + '</svg>';
-  };
+  // Devolve o SVG completo de um punção. Tamanho por omissão: 26.
+  function svg(nome, tamanho) {
+    const forma = FORMAS[nome];
+    if (!forma) return '';
+    const t = tamanho || 26;
+    return '<svg width="' + t + '" height="' + t + '" viewBox="' + VISTA + '"' +
+      ' fill="none" stroke="currentColor" stroke-width="3"' +
+      ' stroke-linecap="round" stroke-linejoin="round"' +
+      ' aria-hidden="true" focusable="false">' + forma + '</svg>';
+  }
+
+  return { vista: VISTA, formas: FORMAS, svg: svg };
 })();
+
+/* A API de sempre. O separador ativo distingue-se só pela cor, que
+   vem de fora: o traço é o mesmo nos dois estados. */
+window.IconePuncao = function (nome) {
+  return PUNCOES.svg(nome);
+};

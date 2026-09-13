@@ -39,8 +39,7 @@
     ['org/participante/:id', 'orgParticipante'],
     ['org/contactos', 'orgContactos'],
     ['org/contacto/:id', 'orgContacto'],
-    ['org/local/:id', 'orgLocal'],
-    ['org/dados', 'orgDados']
+    ['org/local/:id', 'orgLocal']
   ];
 
   const ABAS_CONVIDADO = [

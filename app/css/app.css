@@ -211,6 +211,8 @@ a { color: var(--verde); text-decoration: none; }
 }
 .navegacao[hidden] { display: none; }
 
+/* Punção de 26 + 8 + rótulo de 10: com 5 em cima e em baixo, cabe
+   nos 68 da barra, com a mesma folga de 11 até à borda nos dois lados. */
 .nav-item {
   min-height: 44px;
   display: flex;
@@ -218,7 +220,7 @@ a { color: var(--verde); text-decoration: none; }
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 10px 0;
+  padding: 5px 0;
   color: var(--inchiostro-chiaro);
   transition: color 260ms;
 }
