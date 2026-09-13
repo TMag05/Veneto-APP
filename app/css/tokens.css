@@ -73,5 +73,8 @@
 
   /* Alturas do chrome */
   --alt-cabecalho: 52px;
-  --alt-navegacao: 72px;
+  --alt-navegacao: 68px;
+  /* Do fundo do ecrã ao topo da barra de navegação, que flutua a
+     --esp-2 do fundo. É a linha onde assenta o que fica por cima dela. */
+  --acima-navegacao: calc(env(safe-area-inset-bottom) + var(--esp-2) + var(--alt-navegacao));
 }

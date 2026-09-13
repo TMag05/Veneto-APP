@@ -176,6 +176,7 @@
   function duranteHtml(dia) {
     const i = indiceAtual(dia);
     const jaComecou = i >= 0 && UI.horaAgora() >= UI.minutos(dia.momentos[i].hora);
+    const s = i >= 0 ? dia.momentos[i + 1] : null;
 
     return '<div class="hoje-dia">' +
       '<div class="hoje-dia__fundo">' + paisagem() + '</div>' +
@@ -186,14 +187,22 @@
       '</div>' +
 
       (i >= 0
-        ? cartaoAgora(dia, i) +
-          '<div class="hoje-dia__seguinte">' + seguinteHtml(dia, i, jaComecou ? 'A seguir' : 'Depois') + '</div>'
+        ? cartaoAgora(dia, i)
         : '<div class="agora agora--fim">' +
             '<span class="agora__estado">Fim do dia</span>' +
             '<span class="agora__titulo">O programa de hoje terminou.</span>' +
           '</div>') +
 
-      '<a class="hoje-dia__atalho" href="#/roadbook/' + dia.id + '">O dia inteiro no roadbook' + Icone('seta', 16) + '</a>' +
+      /* O que vem depois e o caminho para o dia inteiro, num só cartão —
+         é ele que assenta em cima da barra de navegação. */
+      '<div class="hoje-dia__seguinte faixa"><div class="lista">' +
+        (s ? UI.linhaLista({
+          titulo: (jaComecou ? 'A seguir' : 'Depois') + ', às ' + s.hora,
+          nota: [s.titulo, s.local].filter(Boolean).join(' · '),
+          href: '#/momento/' + dia.id + '/' + (i + 1)
+        }) : '') +
+        UI.linhaLista({ titulo: 'O dia inteiro no roadbook', href: '#/roadbook/' + dia.id }) +
+      '</div></div>' +
     '</div>';
   }
 

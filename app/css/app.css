@@ -147,7 +147,7 @@ a { color: var(--verde); text-decoration: none; }
 
 .ecra {
   flex: 1;
-  padding-bottom: calc(var(--alt-navegacao) + env(safe-area-inset-bottom) + var(--esp-5));
+  padding-bottom: calc(var(--acima-navegacao) + var(--esp-4));
   animation: entrada var(--transicao) both;
 }
 .ecra[data-sem-nav="sim"] { padding-bottom: calc(env(safe-area-inset-bottom) + var(--esp-3)); }
@@ -195,6 +195,7 @@ a { color: var(--verde); text-decoration: none; }
      a da organização tem quatro. */
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
+  height: var(--alt-navegacao);
   padding: 6px 8px;
   border-radius: var(--raio-cartao);
   background: var(--istria);
@@ -283,7 +284,7 @@ a { color: var(--verde); text-decoration: none; }
    o conteúdo passa por baixo sem se ler através do botão. */
 .barra-inferior {
   position: sticky;
-  bottom: calc(var(--alt-navegacao) + env(safe-area-inset-bottom));
+  bottom: var(--acima-navegacao);
   z-index: 10;
   display: flex;
   gap: var(--esp-1);
@@ -1092,7 +1093,17 @@ a { color: var(--verde); text-decoration: none; }
    está a acontecer agora. Tocar abre a página do momento.
    --------------------------------------------------------- */
 
-.hoje-dia { position: relative; }
+/* Tudo assenta no fundo, logo acima da barra de navegação, com a
+   mesma folga que separa os cartões entre si e a barra do fundo do
+   ecrã. A paisagem fica com o resto. */
+.hoje-dia {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: calc(100dvh - var(--acima-navegacao) - var(--esp-2));
+  margin-bottom: calc(var(--esp-2) - var(--esp-4));
+}
 
 /* Parada no ecrã, dentro da coluna da app. */
 .hoje-dia__fundo {
@@ -1121,10 +1132,6 @@ a { color: var(--verde); text-decoration: none; }
 .hoje-dia__abertura {
   position: relative;
   z-index: 1;
-  min-height: 34dvh;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
   padding: calc(env(safe-area-inset-top) + var(--esp-3)) 24px var(--esp-3);
 }
 .hoje-dia__titulo {
@@ -1184,21 +1191,8 @@ a { color: var(--verde); text-decoration: none; }
 }
 .agora--fim { padding-right: 22px; }
 
-.hoje-dia__seguinte { position: relative; z-index: 1; margin-top: 14px; }
+.hoje-dia__seguinte { position: relative; z-index: 1; margin-top: var(--esp-2); }
 
-.hoje-dia__atalho {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  min-height: 44px;
-  margin-top: var(--esp-1);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--ottone);
-}
 
 /* ---------------------------------------------------------
    Revelação diária, nos dias antes de partir
@@ -1527,7 +1521,7 @@ a { color: var(--verde); text-decoration: none; }
   position: fixed;
   left: var(--margem);
   right: var(--margem);
-  bottom: calc(var(--alt-navegacao) + env(safe-area-inset-bottom) + var(--esp-1));
+  bottom: calc(var(--acima-navegacao) + var(--esp-1));
   z-index: 50;
   display: flex;
   align-items: center;
