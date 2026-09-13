@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1600" width="1200" height="1600">
+  <defs>
+    <linearGradient id="bgAgua" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#171310"/>
+      <stop offset="100%" stop-color="#0d0b09"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="1600" fill="url(#bgAgua)"/>
+  <!-- ondulações da laguna -->
+  <g fill="none" stroke="#D9915F">
+    <path d="M -50 980 Q 250 940 550 980 T 1250 980" stroke-width="1.6" stroke-opacity="0.5"/>
+    <path d="M -50 1060 Q 250 1020 550 1060 T 1250 1060" stroke-width="1.2" stroke-opacity="0.35"/>
+    <path d="M -50 1140 Q 250 1100 550 1140 T 1250 1140" stroke-width="1" stroke-opacity="0.22"/>
+  </g>
+  <rect x="595" y="560" width="10" height="220" fill="#D9915F" fill-opacity="0.6"/>
+</svg>

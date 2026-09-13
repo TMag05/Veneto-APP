@@ -40,6 +40,10 @@
   --sobre-foto: #FBF8F2;
   --sobre-foto-medio: rgba(251, 248, 242, 0.8);
   --pastilha-foto: rgba(16, 18, 22, 0.42);
+  /* Véus de leitura por cima da fotografia, do mais leve ao cheio */
+  --veu-leve: rgba(16, 18, 22, 0.18);
+  --veu-forte: rgba(16, 18, 22, 0.62);
+  --veu-cheio: rgba(16, 18, 22, 0.9);
 
   /* Tipografia */
   --font-editorial: "EB Garamond", Georgia, "Times New Roman", serif;

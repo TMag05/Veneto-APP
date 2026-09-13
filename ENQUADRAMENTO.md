@@ -89,16 +89,16 @@ O silêncio do documento sobre estas funcionalidades é provavelmente sinal de q
 
 **Respondido a 12.09.2026.** O passeio chama-se *Dolomitas — Da Grande Guerra à Laguna de Veneza* e **não passa por Cortina, pelo Falzarego nem pela Gardena**. O exemplo do documento do diretor-geral, e a maqueta que a app construiu a partir dele, partiam de um pressuposto que a rota real desfez.
 
-A rota vai de Possagno e do Monte Grappa ao Passo di San Boldo, desce às colinas do Prosecco (Refrontolo, Miane), sobe à Val Canali e às Pale di San Martino, já no Trentino, e acaba pelo Nevegal e pelo Cansiglio em Veneza. As Dolomitas a sério aparecem num dia; o resto é Veneto de colina e pré-Alpes. Fontes: `docs/informacao-base-passeio-dolomitas-2026.md` (§0 e §2) e `docs/pesquisa-locais-passeio-dolomitas-2026.md`.
+A rota vai de Possagno e do Monte Grappa ao Passo di San Boldo, desce às colinas do Prosecco (Refrontolo, Miane), sobe à Val Canali e às Pale di San Martino, já no Trentino, e acaba pelo Nevegal e pelo Cansiglio em Veneza. As Dolomitas a sério aparecem num dia; o resto é Veneto de colina e pré-Alpes. Fontes: a proposta da Stappando de 27.04.2026 (itinerário dia a dia, hotéis, restaurantes, serviços), `docs/pesquisa-locais-passeio-dolomitas-2026.md` (factos e ganchos dos oito sítios de maior peso) e `docs/imagens-por-paragem.md` (fotografias e gráficos de logística). A organização deu esta informação como definitiva a 13.09.2026.
 
 Decidido com a organização: sai tudo o que é Cortina; o nome fica *Dolomitas*, com o título oficial como subtítulo.
 
 | | Estado |
 |---|---|
-| Texto das paragens | **Escrito** para as onze paragens reais, a partir da pesquisa, e posto no topo da biblioteca. Três (Rifugio Bassano, La Candola, La Casera) têm só subtítulo: a pesquisa não chega lá e não se inventa |
-| Dias, programa, distâncias | À espera de `informacao-base` §2. Até lá, o passeio de exemplo continua a ser a maqueta de Cortina, e sai de uma vez com a biblioteca antiga |
+| Texto das paragens | **Escrito** a partir da pesquisa para os sítios de maior peso. Os outros (Rifugio Bassano, Da Gigetto, La Candola, La Casera, o hotel, os de Veneza fora da praça) têm só subtítulo e nota: a pesquisa não chega lá e não se inventa |
+| Dias, programa, distâncias | **Escrito** a partir da proposta, com as correções dos documentos (o almoço do dia 3 é no Chalet Piereni, não no Malga Ces). Cinco dias, de 1 a 5 de outubro, na semente: é o que cada telemóvel carrega. A maqueta de Cortina saiu por inteiro. Por confirmar: as horas da chegada do dia 1 |
 | Mapa | **Sem alteração** — o enquadramento é calculado a partir das coordenadas |
-| Waypoints âncora | Por corrigir para a rota real. Com batedores, já só servem o link de recurso |
+| Waypoints âncora | **Postos** para a rota real, lidos do programa — por confirmar com a organização; os do dia 3 ainda faltam. Com batedores, só servem o link de recurso |
 | Estrutura da app | **Sem alteração** |
 | Identidade `Pietra e Vigna` | **Mais perto do que parecia** — ver abaixo |
 

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1600" width="1200" height="1600">
+  <defs>
+    <linearGradient id="bgTroca" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1512"/>
+      <stop offset="100%" stop-color="#0f0c0a"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="1600" fill="url(#bgTroca)"/>
+  <!-- linhas de perspetiva convergentes, sugerindo fila de viaturas / parque -->
+  <g stroke="#D9915F" stroke-width="1.4" fill="none">
+    <path d="M 60 1500 L 600 760" stroke-opacity="0.5"/>
+    <path d="M 320 1500 L 600 900" stroke-opacity="0.35"/>
+    <path d="M 880 1500 L 600 900" stroke-opacity="0.35"/>
+    <path d="M 1140 1500 L 600 760" stroke-opacity="0.5"/>
+  </g>
+  <circle cx="600" cy="760" r="6" fill="#D9915F" fill-opacity="0.85"/>
+  <line x1="0" y1="1500" x2="1200" y2="1500" stroke="#D9915F" stroke-width="1" stroke-opacity="0.25"/>
+</svg>

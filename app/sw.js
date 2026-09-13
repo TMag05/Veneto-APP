@@ -8,7 +8,7 @@
 /* Subir esta versão sempre que se publica: força a reinstalação do
    cache e é o que faz chegar conteúdo novo aos telemóveis. Deve
    acompanhar o ?v= dos ficheiros em index.html. */
-const VERSAO = 'passeio-v51';
+const VERSAO = 'passeio-v55';
 
 const CONCHA = [
   './',
@@ -28,6 +28,22 @@ const CONCHA = [
   './assets/img/icone-192.png',
   './assets/img/icone-512.png',
   './assets/img/icone-180.png',
+  './assets/fotos/hotel-villa-soligo.jpg',
+  './assets/fotos/tempio-canoviano.jpg',
+  './assets/fotos/sacrario-grappa.jpg',
+  './assets/fotos/rifugio-bassano.jpg',
+  './assets/fotos/passo-san-boldo.jpg',
+  './assets/fotos/molinetto-della-croda.jpg',
+  './assets/fotos/da-gigetto.jpg',
+  './assets/fotos/valentino-moro.jpg',
+  './assets/fotos/chalet-piereni.jpg',
+  './assets/fotos/la-candola.jpg',
+  './assets/fotos/la-casera.jpg',
+  './assets/fotos/rifugio-vittorio-veneto.jpg',
+  './assets/fotos/canal-grande.jpg',
+  './assets/fotos/piazza-san-marco.jpg',
+  './assets/fotos/jw-marriott.jpg',
+  './assets/fotos/sagra.jpg',
   './js/silhuetas.js',
   './js/icones.js',
   './js/imagens.js',

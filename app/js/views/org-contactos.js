@@ -131,7 +131,7 @@
       return '<div class="faixa" style="padding-top:24px">' +
           '<div class="pilha-2">' +
             UI.campo({ rotulo: 'Tipo', nome: 'tipo', valor: l.tipo, tipo: 'lista', opcoes: TIPOS_LOCAL }) +
-            UI.campo({ rotulo: 'Nome do local', nome: 'nome', valor: l.nome, placeholder: 'Hotel de la Poste' }) +
+            UI.campo({ rotulo: 'Nome do local', nome: 'nome', valor: l.nome, placeholder: 'Hotel Villa Soligo' }) +
             UI.campo({ rotulo: 'Telefone', nome: 'telefone', valor: l.telefone, tipo: 'tel' }) +
             UI.campo({ rotulo: 'Morada', nome: 'morada', valor: l.morada, tipo: 'area', linhas: 2 }) +
             UI.campo({ rotulo: 'Notas', nome: 'notas', valor: l.notas, tipo: 'area', linhas: 2 }) +

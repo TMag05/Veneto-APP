@@ -13,11 +13,14 @@
     { valor: 'monumento', rotulo: 'Monumento' },
     { valor: 'villa', rotulo: 'Villa ou palácio' },
     { valor: 'vinha', rotulo: 'Produtor' },
+    { valor: 'hotel', rotulo: 'Hotel' },
+    { valor: 'restaurante', rotulo: 'Restaurante ou refúgio' },
     { valor: 'logistica', rotulo: 'Logística' }
   ];
 
   const TIPOS_MOMENTO = [
     { valor: 'partida', rotulo: 'Partida' },
+    { valor: 'estrada', rotulo: 'Estrada' },
     { valor: 'paragem', rotulo: 'Paragem' },
     { valor: 'visita', rotulo: 'Visita' },
     { valor: 'refeicao', rotulo: 'Refeição' },
@@ -80,7 +83,7 @@
       return '<div class="faixa" style="padding-top:24px">' +
           UI.campoFoto({
             rotulo: 'Fotografia da etapa', id: 'ent-foto-etapa', acao: 'foto', remover: 'tirarFoto',
-            valor: d.imagem && d.imagem.dataUrl ? d.imagem.dataUrl : '',
+            valor: d.imagem ? (d.imagem.dataUrl || d.imagem.foto || '') : '',
             nota: 'É a capa que o convidado vê. Sem ela, fica um desenho.'
           }) +
           '<div class="pilha-2" style="margin-top:24px">' +
@@ -296,11 +299,11 @@
       return '<div class="faixa" style="padding-top:24px">' +
           UI.campoFoto({
             rotulo: 'Fotografia da paragem', id: 'ent-foto-poi', acao: 'foto', remover: 'tirarFoto',
-            valor: poi.imagem && poi.imagem.dataUrl ? poi.imagem.dataUrl : '',
+            valor: poi.imagem ? (poi.imagem.dataUrl || poi.imagem.foto || '') : '',
             nota: 'Sem fotografia, é gerado um desenho da região.'
           }) +
           '<div class="pilha-2" style="margin-top:24px">' +
-            UI.campo({ rotulo: 'Nome', nome: 'nome', valor: poi.nome, placeholder: 'Passo Falzarego' }) +
+            UI.campo({ rotulo: 'Nome', nome: 'nome', valor: poi.nome, placeholder: 'Passo di San Boldo' }) +
             UI.campo({ rotulo: 'Local', nome: 'local', valor: poi.local, placeholder: '2105 m' }) +
             UI.campo({ rotulo: 'Tipo', nome: 'tipo', valor: poi.tipo, tipo: 'lista', opcoes: TIPOS_POI }) +
           '</div>' +

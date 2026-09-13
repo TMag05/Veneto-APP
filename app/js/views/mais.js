@@ -137,8 +137,8 @@
           }).join('') + '</div>' +
 
           '<div class="lista" style="margin-top:24px">' +
-            UI.linhaLista({ titulo: 'Carregar passeio de exemplo', nota: 'Quatro etapas, maqueta de Cortina', icone: 'juntar', acao: 'exemplo' }) +
-            UI.linhaLista({ titulo: 'Repor tudo', nota: 'Apaga o passeio e o estado local', icone: 'fechar', acao: 'repor' }) +
+            UI.linhaLista({ titulo: 'Carregar passeio de exemplo', nota: 'O passeio real, com pessoas de exemplo', icone: 'juntar', acao: 'exemplo' }) +
+            UI.linhaLista({ titulo: 'Repor tudo', nota: 'Volta ao passeio de origem e apaga o estado local', icone: 'fechar', acao: 'repor' }) +
           '</div>' +
         '</div>' +
 
@@ -177,7 +177,7 @@
 
       exemplo: function () {
         UI.abrirFolha('Carregar exemplo',
-          '<p class="corpo-ui silencioso">Substitui o que está na app por um passeio de quatro etapas, com participantes e contactos. É a maqueta de Cortina, anterior à rota real — não é o roadbook de 2026.</p>' +
+          '<p class="corpo-ui silencioso">Repõe o passeio de 2026 e junta-lhe participantes e contactos de exemplo, para dar vida ao mapa. Não são pessoas reais.</p>' +
           '<button class="botao botao--principal botao--largo" style="margin-top:24px" type="button" id="btn-exemplo">Carregar</button>');
         document.getElementById('btn-exemplo').addEventListener('click', function () {
           UI.fecharFolha();

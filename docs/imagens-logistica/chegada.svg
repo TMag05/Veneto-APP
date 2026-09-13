@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1600" width="1200" height="1600">
+  <defs>
+    <linearGradient id="bgChegada" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1c1712"/>
+      <stop offset="100%" stop-color="#100d0a"/>
+    </linearGradient>
+    <radialGradient id="glowChegada" cx="72%" cy="28%" r="55%">
+      <stop offset="0%" stop-color="#D9915F" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#D9915F" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="1600" fill="url(#bgChegada)"/>
+  <rect width="1200" height="1600" fill="url(#glowChegada)"/>
+  <!-- arco de chegada, sugere trajetória de voo / horizonte -->
+  <path d="M -100 980 Q 600 700 1300 980" fill="none" stroke="#D9915F" stroke-width="2" stroke-opacity="0.55"/>
+  <path d="M -100 1080 Q 600 840 1300 1080" fill="none" stroke="#D9915F" stroke-width="1.2" stroke-opacity="0.3"/>
+  <circle cx="860" cy="470" r="10" fill="#D9915F" fill-opacity="0.9"/>
+  <line x1="600" y1="1200" x2="600" y2="1600" stroke="#D9915F" stroke-width="1" stroke-opacity="0.12"/>
+</svg>

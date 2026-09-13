@@ -166,9 +166,9 @@
           UI.h(m.alterado.antes.replace(':', 'h')) + '. ' + UI.h(m.alterado.razao) + '.</p>' : '') +
         (m.nota ? '<p class="corpo-editorial"' + (m.alterado ? ' style="margin-top:12px"' : '') + '>' + UI.h(m.nota) + '</p>' : '');
       return '<div class="capa">' +
-          UI.foto(x.dia.imagem, 'foto--32 capa__imagem') +
+          UI.foto(Programa.imagemDoMomento(x.dia, x.i), 'foto--32 capa__imagem') +
           '<div class="capa__texto">' +
-            '<p class="capa__data num">' + UI.h(m.hora) + (m.fim ? ' – ' + UI.h(m.fim) : '') + '</p>' +
+            '<p class="capa__data num">' + UI.h(UI.horario(m)) + '</p>' +
             '<h1 class="capa-titulo">' + UI.h(m.titulo) + '</h1>' +
             (m.local ? '<p class="subtitulo" style="margin-top:8px">' + UI.h(m.local) + '</p>' : '') +
           '</div>' +

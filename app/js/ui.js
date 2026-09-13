@@ -76,6 +76,9 @@ window.UI = (function () {
     const de = POIS[deId], para = POIS[paraId];
     if (!de || !para) return { km: 0, min: 0 };
     const reta = haversine(de, para);
+    /* Dois momentos no mesmo sítio — o Sacrario e o Rifugio Bassano,
+       o hotel e o seu terraço — não são um troço. */
+    if (reta < 0.5) return { km: 0, min: 0 };
     const montanha = de.tipo === 'estrada' || para.tipo === 'estrada';
     const fator = montanha ? 2.1 : 1.42;
     const km = Math.max(4, Math.round(reta * fator));
@@ -90,18 +93,28 @@ window.UI = (function () {
   }
 
   /* ---------------------------------------------------------
-     Navegação por etapas
-     Troços curtos para que o Google Maps não substitua a rota
-     panorâmica por autoestrada. Âncoras a curar por rota.
+     Navegação de recurso, troço a troço
+     O grupo segue os batedores; isto só serve quem se afastar da
+     caravana. Cada troço é um link, com âncoras que obrigam o Maps
+     a passar pela estrada do passeio e não pela mais rápida.
+
+     Âncoras da rota de 2026, lidas do programa: a Strada Cadorna
+     para subir ao Grappa; San Boldo pelo lado de Trichiana no dia
+     2 (desce-se pelos túneis até Tovena) e ao contrário no dia 4;
+     o planalto do Cansiglio pelo Alpago. Por confirmar com a
+     organização — os troços do dia 3 pelos vales ainda não têm.
      --------------------------------------------------------- */
 
+  const TRICHIANA = [46.0489, 12.1782];
+  const TOVENA = [45.9793, 12.1751];
+
   const ANCORAS = {
-    'asolo>grappa': [[45.8438, 11.8382], [45.8615, 11.8092]],
-    'grappa>bassano': [[45.8285, 11.7602]],
-    'valdobbiadene>follina': [[45.9295, 12.0645]],
-    'asolo>possagno': [[45.8218, 11.8908]],
-    'maser>vicenza': [[45.7108, 11.7305]],
-    'soave>valpolicella': [[45.4680, 11.0180]]
+    'tempio-canoviano>sacrario-del-monte-grappa': [[45.8477, 11.7440]],
+    'sacrario-del-monte-grappa>passo-di-san-boldo': [TRICHIANA],
+    'passo-di-san-boldo>molinetto-della-croda': [TOVENA],
+    'hotel-villa-soligo>passo-di-san-boldo': [TOVENA],
+    'passo-di-san-boldo>la-casera': [TRICHIANA],
+    'la-casera>rifugio-citta-di-vittorio-veneto': [[46.0969, 12.3620], [46.0666, 12.4054]]
   };
 
   function linkMaps(deId, paraId) {
@@ -166,7 +179,20 @@ window.UI = (function () {
   /* O fundo de uma imagem: fotografia real se existir, desenho se não. */
   function imagemDe(spec, proporcao) {
     if (spec && spec.dataUrl) return "url('" + spec.dataUrl + "')";
+    /* Fotografia do sítio, servida com a app (assets/fotos/). */
+    if (spec && spec.foto) return "url('" + spec.foto + "')";
+    /* Gráfico de logística, desenhado com as cores de tokens.css. */
+    if (spec && spec.grafico) return Imagens.fundoGrafico(spec.grafico);
     return Imagens.fundo((spec && spec.semente) || 'v', (spec && spec.variante) || 'paisagem', proporcao || 1.5);
+  }
+
+  /* A hora de um momento, como se lê: início e fim, só o fim
+     («até às 10:00»), só o início, ou ainda por confirmar. */
+  function horario(m) {
+    if (m.hora && m.fim) return m.hora + ' – ' + m.fim;
+    if (m.hora) return m.hora;
+    if (m.fim) return 'Até às ' + m.fim;
+    return 'A confirmar';
   }
 
   function distintivo(texto, variante) {
@@ -361,7 +387,7 @@ window.UI = (function () {
     minutos: minutos, horaAgora: horaAgora, plural: plural, duracao: duracao,
     troco: troco, haversine: haversine, linkMaps: linkMaps, linkLocal: linkLocal,
     gpx: gpx, descarregar: descarregar,
-    foto: foto, imagemDe: imagemDe, distintivo: distintivo, linhaLista: linhaLista, carrosEm: carrosEm,
+    foto: foto, imagemDe: imagemDe, horario: horario, distintivo: distintivo, linhaLista: linhaLista, carrosEm: carrosEm,
     campo: campo, ligarCampos: ligarCampos, coordenadas: coordenadas,
     reduzirImagem: reduzirImagem, campoFoto: campoFoto,
     abrirFolha: abrirFolha, fecharFolha: fecharFolha, partilhar: partilhar,

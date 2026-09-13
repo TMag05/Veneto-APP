@@ -1118,8 +1118,19 @@ a { color: var(--verde); text-decoration: none; }
   margin: 0 auto;
   z-index: 0;
   pointer-events: none;
+  background-color: var(--calce);
+  background-size: cover;
+  background-position: center;
 }
-.hoje-dia__fundo svg { display: block; width: 100%; height: 100%; }
+/* Véu de leitura: escurece em cima, onde assenta o título, e em baixo,
+   onde assentam os cartões; o meio fica para a fotografia. */
+.hoje-dia__fundo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom,
+    var(--veu-forte) 0%, var(--veu-leve) 32%, var(--veu-leve) 50%, var(--veu-forte) 82%, var(--veu-cheio) 100%);
+}
 
 .hoje-dia__data {
   margin: 0 0 6px;

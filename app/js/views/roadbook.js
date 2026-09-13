@@ -37,8 +37,16 @@
     nav: 'roadbook',
     semCabecalho: true,
     html: function () {
+      /* O roadbook abre com uma estrada: a primeira paragem de estrada
+         com fotografia; sem nenhuma, a primeira fotografia do passeio;
+         sem nenhuma, o desenho. */
+      const temFoto = function (i) { return i && (i.foto || i.dataUrl); };
+      const estrada = Object.keys(POIS).map(function (id) { return POIS[id]; })
+        .find(function (p) { return p.tipo === 'estrada' && temFoto(p.imagem); });
+      const foto = estrada ? estrada.imagem
+        : DADOS.dias.map(function (d) { return d.imagem; }).find(temFoto);
       const capa = '<div class="capa">' +
-          UI.foto({ semente: 'roadbook', variante: 'paisagem' }, 'foto--32 capa__imagem') +
+          UI.foto(foto || { semente: 'roadbook', variante: 'paisagem' }, 'foto--32 capa__imagem') +
           '<div class="capa__texto">' +
             '<h1 class="capa-titulo">Roadbook</h1>';
 

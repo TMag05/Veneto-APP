@@ -12,19 +12,40 @@
 (function () {
 
   const TIPOS_MOMENTO = {
-    partida: 'Partida', paragem: 'Paragem', visita: 'Visita',
+    partida: 'Partida', estrada: 'Estrada', paragem: 'Paragem', visita: 'Visita',
     refeicao: 'Refeição', prova: 'Prova', logistica: 'Logística'
   };
+
+  /* O troço desde a paragem anterior, ou nada se o sítio é o mesmo. */
+  function trocoAte(dia, m, i) {
+    const de = m.poi && POIS[m.poi] ? poiAnterior(dia.momentos, i) : null;
+    if (!de || de === m.poi) return null;
+    const t = UI.troco(de, m.poi);
+    return t.km > 0 ? { de: de, km: t.km, min: t.min } : null;
+  }
+
+  /* Já começou? Sem hora de início mas com fim («até às 10:00») é
+     porque está a decorrer; sem hora nenhuma, ainda está por vir. */
+  function comecou(m) {
+    if (!m.hora) return !!m.fim;
+    return UI.horaAgora() >= UI.minutos(m.hora);
+  }
+
+  /* «A seguir, às 18:00» — ou só «A seguir» se a hora não está fechada. */
+  function rotuloSeguinte(rotulo, s) {
+    if (s.hora) return rotulo + ', às ' + s.hora;
+    if (s.fim) return rotulo + ', até às ' + s.fim;
+    return rotulo;
+  }
 
   /* O momento em si: hora, o que acontece, onde, a alteração, a nota
      e o ritmo desde a paragem anterior. Serve à página do momento e
      aos capítulos do roadbook. */
   function corpoMomento(dia, m, i, rotulo, nivel) {
     const tag = nivel || 'h3';
-    const de = m.poi && POIS[m.poi] ? poiAnterior(dia.momentos, i) : null;
-    const t = de && de !== m.poi ? UI.troco(de, m.poi) : null;
+    const t = trocoAte(dia, m, i);
     return '<div class="capitulo__cab num">' +
-        '<span class="capitulo__hora">' + UI.h(m.hora) + (m.fim ? ' – ' + UI.h(m.fim) : '') + '</span>' +
+        '<span class="capitulo__hora">' + UI.h(UI.horario(m)) + '</span>' +
         '<span class="capitulo__tipo">' + UI.h(rotulo !== undefined ? rotulo : (TIPOS_MOMENTO[m.tipo] || '')) + '</span>' +
       '</div>' +
       '<' + tag + ' class="capitulo__titulo">' + UI.h(m.titulo) + '</' + tag + '>' +
@@ -32,7 +53,7 @@
       (m.alterado ? '<p class="corpo-ui capitulo__nota">' + UI.distintivo('Alterado', 'rosso') + ' Era às ' +
         UI.h(m.alterado.antes.replace(':', 'h')) + '. ' + UI.h(m.alterado.razao) + '.</p>' : '') +
       (m.nota ? '<p class="corpo-ui silencioso capitulo__nota">' + UI.h(m.nota) + '</p>' : '') +
-      (t ? '<p class="capitulo__ritmo num">' + t.km + ' km desde ' + UI.h(POIS[de].nome) + ' · ' + UI.duracao(t.min) + '</p>' : '');
+      (t ? '<p class="capitulo__ritmo num">' + t.km + ' km desde ' + UI.h(POIS[t.de].nome) + ' · ' + UI.duracao(t.min) + '</p>' : '');
   }
 
   /* O momento a partir do endereço #/momento/dia/n. */
@@ -49,7 +70,7 @@
     if (!s) return '';
     return '<div class="faixa"><div class="lista">' +
       UI.linhaLista({
-        titulo: (rotulo || 'A seguir') + ', às ' + s.hora,
+        titulo: rotuloSeguinte(rotulo || 'A seguir', s),
         nota: [s.titulo, s.local].filter(Boolean).join(' · '),
         href: '#/momento/' + dia.id + '/' + (i + 1)
       }) +
@@ -78,8 +99,8 @@
 
     return '<a class="' + classes.join(' ') + '" href="#/momento/' + dia.id + '/' + i + '">' +
       '<span class="momento__horas">' +
-        '<span class="momento__hora num">' + UI.h(m.hora) + '</span>' +
-        (m.fim ? '<span class="meta num momento__fim">' + UI.h(m.fim) + '</span>' : '') +
+        '<span class="momento__hora num">' + UI.h(m.hora || '—') + '</span>' +
+        (m.fim ? '<span class="meta num momento__fim">' + (m.hora ? '' : 'até ') + UI.h(m.fim) + '</span>' : '') +
       '</span>' +
       '<span class="momento__corpo">' + corpo + '</span>' +
       '<span class="momento__seta">' + Icone('seta', 20) + '</span>' +
@@ -90,7 +111,7 @@
      ambiente, não instrução: o grupo segue a caravana. */
   function blocos(dia, comEstadoTemporal) {
     const atual = comEstadoTemporal ? indiceAtual(dia) : -1;
-    const jaComecou = atual >= 0 && UI.horaAgora() >= UI.minutos(dia.momentos[atual].hora);
+    const jaComecou = atual >= 0 && comecou(dia.momentos[atual]);
 
     return '<div class="programa">' + dia.momentos.map(function (m, i) {
       let est = 'futuro';
@@ -98,8 +119,7 @@
         if (atual < 0 || i < atual) est = 'passado';
         else if (i === atual) est = jaComecou ? 'agora' : 'seguinte';
       }
-      const de = m.poi && POIS[m.poi] ? poiAnterior(dia.momentos, i) : null;
-      const t = de && de !== m.poi ? UI.troco(de, m.poi) : null;
+      const t = trocoAte(dia, m, i);
       return (t ? '<p class="ritmo num">' + t.km + ' km · ' + UI.duracao(t.min) + '</p>' : '') +
         bloco(dia, m, i, est);
     }).join('') + '</div>';
@@ -115,13 +135,28 @@
     return null;
   }
 
-  /* Qual é o momento em curso — ou o próximo, se estivermos entre dois. */
+  /* A hora em que começa o próximo momento com hora marcada. */
+  function proximoInicio(momentos, i) {
+    for (let n = i + 1; n < momentos.length; n++) {
+      if (momentos[n].hora) return UI.minutos(momentos[n].hora);
+    }
+    return null;
+  }
+
+  /* Qual é o momento em curso — ou o próximo, se estivermos entre dois.
+     Sem fim marcado, um momento dura uma hora, mas nunca para lá do
+     início do seguinte; sem hora nenhuma, fica à espera até ao
+     próximo momento que a tenha. */
   function indiceAtual(dia) {
     const agora = UI.horaAgora();
-    for (let i = 0; i < dia.momentos.length; i++) {
-      const m = dia.momentos[i];
-      const ini = UI.minutos(m.hora);
-      const fim = m.fim ? UI.minutos(m.fim) : ini + 60;
+    const ms = dia.momentos;
+    for (let i = 0; i < ms.length; i++) {
+      const m = ms[i];
+      const seg = proximoInicio(ms, i);
+      let fim;
+      if (m.fim) fim = UI.minutos(m.fim);
+      else if (m.hora) fim = Math.min(UI.minutos(m.hora) + 60, seg === null ? Infinity : seg);
+      else fim = seg === null ? 24 * 60 : seg;
       if (agora < fim) return i;
     }
     return -1;
@@ -129,64 +164,65 @@
 
   /* ---------------------------------------------------------
      Durante o passeio — o momento em curso
-     A paisagem fica parada atrás; por cima, um só cartão: o que
-     está a acontecer agora. Tocar abre a página do momento.
+     Atrás, parada, a imagem do momento: a fotografia do sítio, ou
+     o gráfico de logística; por cima, um só cartão com o que está
+     a acontecer agora. Tocar abre a página do momento.
      --------------------------------------------------------- */
 
-  function paisagem() {
-    return '<svg viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' +
-      '<defs>' +
-        '<linearGradient id="ceuI" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2B3E55"/><stop offset=".46" stop-color="#7E8FA0"/><stop offset="1" stop-color="#D8C3AE"/></linearGradient>' +
-        '<linearGradient id="farI" x1="0" y1=".2" x2="0" y2="1"><stop offset="0" stop-color="#E9C3A4"/><stop offset=".45" stop-color="#A98D8B"/><stop offset="1" stop-color="#6E6570"/></linearGradient>' +
-        '<linearGradient id="nearI" x1="0" y1=".3" x2="0" y2="1"><stop offset="0" stop-color="#55505C"/><stop offset="1" stop-color="#25242C"/></linearGradient>' +
-        '<linearGradient id="veuI" x1="0" y1=".26" x2="0" y2="1"><stop offset="0" stop-color="#101216" stop-opacity="0"/><stop offset=".54" stop-color="#101216" stop-opacity=".46"/><stop offset="1" stop-color="#101216" stop-opacity=".95"/></linearGradient>' +
-        '<linearGradient id="topoI" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#101216" stop-opacity=".4"/><stop offset="1" stop-color="#101216" stop-opacity="0"/></linearGradient>' +
-      '</defs>' +
-      '<rect width="390" height="844" fill="url(#ceuI)"/>' +
-      '<path d="M-10 844 L-10 452 L34 318 L62 352 L92 342 L138 262 L172 306 L204 296 L258 380 L300 300 L336 344 L368 330 L400 352 L400 844 Z" fill="url(#farI)"/>' +
-      '<path d="M-10 844 L-10 574 L44 470 L80 512 L114 500 L164 434 L204 486 L242 472 L296 552 L342 476 L400 528 L400 844 Z" fill="url(#nearI)"/>' +
-      '<path d="M-10 844 L-10 660 Q 110 632 200 650 Q 300 670 400 640 L400 844 Z" fill="#1A1C20"/>' +
-      '<rect width="390" height="844" fill="url(#veuI)"/>' +
-      '<rect width="390" height="180" fill="url(#topoI)"/>' +
-    '</svg>';
+  /* A imagem de um momento: a sua própria, a do sítio onde acontece.
+     Sem sítio — o autocarro para o jantar, um troço de estrada — é a
+     do sítio de onde o grupo vem; na estrada, a do sítio para onde
+     vai, a não ser que seja o regresso ao hotel. Por fim, a do dia. */
+  function imagemDoMomento(dia, i) {
+    const ms = dia.momentos;
+    const m = i >= 0 ? ms[i] : null;
+    if (!m) return dia.imagem;
+    if (m.imagem) return m.imagem;
+    if (m.poi && POIS[m.poi]) return POIS[m.poi].imagem;
+    if (m.tipo === 'estrada') {
+      for (let n = i + 1; n < ms.length; n++) {
+        const p = ms[n].poi && POIS[ms[n].poi];
+        if (p) { if (p.tipo !== 'hotel') return p.imagem; break; }
+      }
+    }
+    const ant = poiAnterior(ms, i);
+    return ant ? POIS[ant].imagem : dia.imagem;
   }
 
   /* O cartão do momento. Agora, se já começou; a seguir, se o grupo
      está entre dois momentos — na estrada, a caminho dele. */
   function cartaoAgora(dia, i) {
     const m = dia.momentos[i];
-    const jaComecou = UI.horaAgora() >= UI.minutos(m.hora);
-    const de = m.poi && POIS[m.poi] ? poiAnterior(dia.momentos, i) : null;
-    const t = de && de !== m.poi ? UI.troco(de, m.poi) : null;
+    const t = trocoAte(dia, m, i);
 
     return '<a class="agora" href="#/momento/' + dia.id + '/' + i + '">' +
       '<span class="agora__cab num">' +
-        '<span class="agora__estado">' + (jaComecou ? 'Agora' : 'A seguir') + '</span>' +
-        '<span class="agora__hora">' + UI.h(m.hora) + (m.fim ? ' – ' + UI.h(m.fim) : '') + '</span>' +
+        '<span class="agora__estado">' + (comecou(m) ? 'Agora' : 'A seguir') + '</span>' +
+        '<span class="agora__hora">' + UI.h(UI.horario(m)) + '</span>' +
       '</span>' +
       (m.alterado ? '<span class="agora__alterado">' + UI.distintivo('Alterado', 'rosso') +
         ' Era às ' + UI.h(m.alterado.antes.replace(':', 'h')) + '. ' + UI.h(m.alterado.razao) + '.</span>' : '') +
       '<span class="agora__titulo">' + UI.h(m.titulo) + '</span>' +
       (m.local ? '<span class="agora__local">' + UI.h(m.local) + '</span>' : '') +
-      (t ? '<span class="agora__ritmo num">' + t.km + ' km desde ' + UI.h(POIS[de].nome) + ' · ' + UI.duracao(t.min) + '</span>' : '') +
+      (t ? '<span class="agora__ritmo num">' + t.km + ' km desde ' + UI.h(POIS[t.de].nome) + ' · ' + UI.duracao(t.min) + '</span>' : '') +
       '<span class="agora__seta">' + Icone('seta', 22) + '</span>' +
     '</a>';
   }
 
   function duranteHtml(dia) {
     const i = indiceAtual(dia);
-    const jaComecou = i >= 0 && UI.horaAgora() >= UI.minutos(dia.momentos[i].hora);
+    const m = i >= 0 ? dia.momentos[i] : null;
     const s = i >= 0 ? dia.momentos[i + 1] : null;
 
     return '<div class="hoje-dia">' +
-      '<div class="hoje-dia__fundo">' + paisagem() + '</div>' +
+      '<div class="hoje-dia__fundo" style="background-image:' + UI.imagemDe(imagemDoMomento(dia, i), 0.46) + '"></div>' +
 
       '<div class="hoje-dia__abertura">' +
         '<p class="hoje-dia__data">Dia ' + dia.numero + (dia.data ? ' · ' + UI.dataCurta(dia.data) : '') + '</p>' +
         '<h1 class="hoje-dia__titulo">' + UI.h(dia.titulo || 'Etapa ' + dia.numero) + '</h1>' +
       '</div>' +
 
-      (i >= 0
+      (m
         ? cartaoAgora(dia, i)
         : '<div class="agora agora--fim">' +
             '<span class="agora__estado">Fim do dia</span>' +
@@ -197,7 +233,7 @@
          barra de navegação. */
       (s ? '<div class="hoje-dia__seguinte faixa"><div class="lista">' +
         UI.linhaLista({
-          titulo: (jaComecou ? 'A seguir' : 'Depois') + ', às ' + s.hora,
+          titulo: rotuloSeguinte(comecou(m) ? 'A seguir' : 'Depois', s),
           nota: [s.titulo, s.local].filter(Boolean).join(' · '),
           href: '#/momento/' + dia.id + '/' + (i + 1)
         }) +
@@ -481,6 +517,7 @@
 
   window.Programa = {
     blocos: blocos, capaDia: capaDia, indiceAtual: indiceAtual, poiAnterior: poiAnterior,
-    corpoMomento: corpoMomento, momentoEm: momentoEm, seguinteHtml: seguinteHtml
+    corpoMomento: corpoMomento, momentoEm: momentoEm, seguinteHtml: seguinteHtml,
+    imagemDoMomento: imagemDoMomento
   };
 })();

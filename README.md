@@ -7,7 +7,7 @@ São **duas apps sobre a mesma base de dados**:
 - **A app do convidado** — trinta telemóveis, offline, roadbook editorial. Nasce de [MANIFESTO.md](MANIFESTO.md) e [BRAND-GUIDELINES.md](BRAND-GUIDELINES.md).
 - **A área da organização** — itinerário, participantes e contactos, tudo editável. Nasce do documento do diretor-geral. A comparação entre os dois está em [ENQUADRAMENTO.md](ENQUADRAMENTO.md).
 
-O conteúdo do passeio **não vive em ficheiros**: é criado dentro da app, na área da organização, e aparece de imediato no telemóvel do convidado.
+O conteúdo do passeio **é editado dentro da app**, na área da organização, e aparece de imediato no telemóvel do convidado. O ponto de partida é o passeio real de 2026 — cinco dias, de 1 a 5 de outubro, com hotéis, restaurantes, horas e os textos das paragens —, que vive na semente (`js/semente.js`) até haver servidor: é o que cada telemóvel carrega à primeira abertura.
 
 ---
 
@@ -53,7 +53,7 @@ Três separadores, como no documento, mais os dados do evento. Mesma identidade 
 
 **Itinerário** — etapas com data, título, subtítulo e notas de percurso; reordenáveis. Dentro de cada etapa: as paragens (ordenáveis) e o programa do dia ao minuto. Alterar a hora de um momento marca-o como alterado no telemóvel de toda a gente, com a razão à vista.
 
-**Paragens** — criadas de raiz ou escolhidas de uma **biblioteca de sugestões da região** com coordenadas já preenchidas: primeiro as onze paragens reais de 2026, já com texto (a partir de [docs/pesquisa-locais-passeio-dolomitas-2026.md](docs/pesquisa-locais-passeio-dolomitas-2026.md)); depois os 28 sítios da maqueta de Cortina, que saem quando entrar o itinerário real. Aceita-se um endereço colado do Google Maps: as coordenadas são extraídas automaticamente. Cada paragem tem subtítulo, história em parágrafos e nota prática.
+**Paragens** — criadas de raiz ou escolhidas de uma **biblioteca de sugestões da região** com coordenadas já preenchidas: os dezoito sítios reais de 2026, com fotografia, e texto para os de maior peso (a partir de [docs/pesquisa-locais-passeio-dolomitas-2026.md](docs/pesquisa-locais-passeio-dolomitas-2026.md)). Aceita-se um endereço colado do Google Maps: as coordenadas são extraídas automaticamente. Cada paragem tem subtítulo, história em parágrafos e nota prática.
 
 **Pessoas** — cartão por participante com nome, apelido, data de nascimento, papel, nº do carro, email e fotografia. O bloco do veículo — carta, apólice, matrícula, modelo e cor — só aparece para condutores. Os carros são derivados do nº de equipa: quem partilha o número, partilha o carro.
 
@@ -108,7 +108,7 @@ servidor.js             servidor estático de desenvolvimento
 
 ## Demonstração
 
-Em **Mais › Definições › Demonstração** salta-se entre os dias anteriores, cada etapa e o pós-evento, e carrega-se um **passeio de exemplo** — quatro etapas à volta de Cortina, com participantes e contactos — para mostrar a app sem escrever um itinerário à mão. É uma maqueta anterior à rota real, a substituir pelo itinerário de 2026 assim que chegar `docs/informacao-base-passeio-dolomitas-2026.md`. Serve para demonstrar fora das datas do evento e **não deve existir na versão entregue aos convidados** — apagar a secção `Demonstração` em `js/views/mais.js`, o endereço `#/demo` em `js/app.js` e o campo `demoFase` em `js/store.js`.
+Em **Mais › Definições › Demonstração** salta-se entre os dias anteriores, cada etapa e o pós-evento, e carrega-se um **passeio de exemplo** — o itinerário real de 2026 com participantes e contactos de exemplo por cima, para dar vida ao mapa e à manchete do grupo. Serve para demonstrar fora das datas do evento e **não deve existir na versão entregue aos convidados** — apagar a secção `Demonstração` em `js/views/mais.js`, o endereço `#/demo` em `js/app.js` e o campo `demoFase` em `js/store.js`.
 
 **Num telemóvel, num só toque:** abrir `http://<ip-do-mac>:8123/#/demo/2` carrega o exemplo, faz a entrada como o primeiro participante e põe o relógio no dia 2 (também `#/demo/pre` e `#/demo/pos`). Cada endereço guarda os seus próprios dados — `localhost` no Mac e o IP da rede no telemóvel são dois sítios diferentes —, por isso é assim que se põem dois aparelhos no mesmo estado. O servidor de desenvolvimento regista quem abre a app e com que versão; a versão carregada também aparece no fim do Mais.
 
@@ -118,10 +118,11 @@ Em **Mais › Definições › Demonstração** salta-se entre os dias anteriore
 
 | O quê | Onde | Nota |
 |---|---|---|
-| Coordenadas da biblioteca de sugestões | `semente.js` | Aproximadas ao centro do local — **confirmar antes de publicar os percursos** |
+| Coordenadas dos sítios | `semente.js` | Do OpenStreetMap. A do LO.VE. é a da rua (Via dei Colli, Follina), não a do portão |
+| Horas da chegada | `semente.js` › `roteiro` | O dia 1 não tem horas na proposta (aeroportos, levantamento dos carros, hotel). A app mostra *A confirmar* até a organização as pôr |
 | Distâncias e tempos dos troços | `ui.js` › `troco()` | Linha reta com fator de sinuosidade. Nos passos alpinos erram por defeito; devem vir dos GPX reais |
-| Waypoints âncora | `ui.js` › `ANCORAS` | Ainda são os do Veneto do ano passado. Já só servem o link de recurso do Itinerário; **corrigir para a rota real de 2026** |
-| Fotografias | `imagens.js` | Desenhos de dolomia gerados por hora do dia (alvorada, dia, poente, noite). **A organização já pode carregar fotografias reais** em cada etapa e cada paragem; assim que existem, substituem o desenho |
+| Waypoints âncora | `ui.js` › `ANCORAS` | Da rota real, lidos do programa: a Strada Cadorna para subir ao Grappa, San Boldo por Trichiana e Tovena, o Cansiglio pelo Alpago. **Confirmar com a organização**; o dia 3 pelos vales ainda não tem. Só servem o link de recurso |
+| Fotografias | `assets/fotos/` | Dezasseis fotografias dos sítios: as oficiais de cada local (hotel, restaurantes, museu, ateliê, refúgios) e Pixabay para Veneza e San Boldo, reduzidas a 1600 px e guardadas pelo service worker. Usadas sem créditos, por decisão da organização, que trata da autorização. Os quatro momentos de logística usam os gráficos de `imagens.js`, com as cores de `tokens.css`. A organização pode trocar qualquer uma na sua área |
 | Silhuetas dos carros | `silhuetas.js` › `FORMAS` | Cinco arquétipos. A versão final deve ter um perfil por modelo |
 | Cores de carroçaria | `silhuetas.js` › `CORES` | Nomes reais, hexadecimais aproximados — pedir os códigos à marca |
 | Código de acesso da organização | `js/views/mais.js` | Um código partilhado. Não é autenticação |
@@ -136,10 +137,10 @@ Os oito movimentos de [O Luxo é Atmosfera](PESQUISA-LUXO.html) estão implement
 
 ## Por fazer, por ordem
 
-1. **Sessão fotográfica, ou arquivo licenciado.** É o único movimento que não se resolve com código, e é o de maior efeito.
+1. **Sessão fotográfica do próprio passeio.** As fotografias oficiais dos sítios já estão na app; falta o passeio em si — os carros na estrada, o grupo, a luz de outubro. É o movimento de maior efeito.
 2. **Servidor.** Firestore para conteúdo, chegadas e pedidos; Storage para fotografias; Auth por link mágico; papéis de organização e convidado com regras de segurança a sério; Cloud Messaging para as notificações de alteração de programa.
 3. **Publicação e notificação.** O botão que empurra uma alteração para os telemóveis. Sem isto a regra operacional da secção 4 do manifesto não se cumpre.
-4. **Corrigir os waypoints âncora para a rota real de 2026.** Desceu de prioridade: com batedores, já não sustentam a experiência principal. Mas são o que o link de recurso usa, e para quem se afastar da caravana só serve se apontar para a estrada certa. É trabalho manual, uma vez por rota.
+4. **Confirmar os waypoints âncora com a organização** e acrescentar os do dia 3 pelos vales das Dolomitas. Com batedores, só servem o link de recurso — mas para quem se afastar da caravana só serve se apontar para a estrada certa.
 5. **Revisão da identidade para a rota real.** `Pietra e Vigna` foi deduzida do Veneto — pedra de Istria, verde Veronese, villas palladianas, tipografia aldina — e a rota de 2026 passa a maior parte do tempo precisamente aí. O que a fundamentação ainda não tem são os dois fios que o passeio acrescenta: a Grande Guerra (o Grappa e San Boldo) e a dolomia das Pale di San Martino. A paleta e as regras ficam; a revisão acrescenta, não substitui. Ver [ENQUADRAMENTO.md](ENQUADRAMENTO.md) §4.
 6. **Exportação em PDF** do roadbook (o CSV de participantes já existe).
 

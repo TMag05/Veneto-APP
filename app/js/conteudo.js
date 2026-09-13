@@ -11,6 +11,10 @@
 
 window.Conteudo = (function () {
   const CHAVE = 'passeio.conteudo.v1';
+  /* Versão do formato guardado. Subiu para 2 quando o passeio real
+     entrou na semente: o que os telemóveis tinham guardado era a
+     maqueta de Cortina, e dá lugar ao itinerário de 2026. */
+  const VERSAO_DADOS = 2;
   const ouvintes = [];
 
   let dados = carregar();
@@ -23,21 +27,69 @@ window.Conteudo = (function () {
   function clonar(o) { return JSON.parse(JSON.stringify(o)); }
 
   function base() {
-    return {
-      versao: 1,
+    return montar(SEMENTE.roteiro);
+  }
+
+  /* O passeio a partir da semente: as paragens vêm da biblioteca,
+     pelo nome, e os identificadores são estáveis — o mesmo dia tem o
+     mesmo endereço em todos os telemóveis, que é o que deixa um link
+     do WhatsApp abrir o momento certo. */
+  function montar(r) {
+    const d = {
+      versao: VERSAO_DADOS,
       evento: clonar(SEMENTE.evento),
-      dias: clonar(SEMENTE.dias),
-      pois: clonar(SEMENTE.pois),
-      participantes: clonar(SEMENTE.participantes),
+      dias: [],
+      pois: {},
+      participantes: [],
       contactos: clonar(SEMENTE.contactos),
-      locais: clonar(SEMENTE.locais)
+      locais: (r.locais || []).map(function (l) {
+        return Object.assign({ id: 'l-' + talho(l.nome), telefone: '', morada: '', notas: '' }, clonar(l));
+      })
     };
+
+    const porNome = {};
+    function paragem(nome) {
+      if (porNome[nome]) return porNome[nome];
+      const b = SEMENTE.biblioteca.find(function (x) { return x.nome === nome; });
+      const id = idUnico(nome, d.pois);
+      d.pois[id] = Object.assign({
+        nome: nome, local: '', tipo: 'vila', lat: 0, lng: 0, altitude: 0,
+        subtitulo: '', historia: [], nota: '', revelacao: ''
+      }, clonar(b || {}));
+      if (!d.pois[id].imagem) d.pois[id].imagem = { variante: varianteDe(d.pois[id].tipo), semente: id };
+      porNome[nome] = id;
+      return id;
+    }
+    function local(nome) {
+      const l = d.locais.find(function (x) { return x.nome === nome; });
+      return l ? l.id : '';
+    }
+
+    r.dias.forEach(function (x) {
+      const dia = {
+        id: 'd-' + x.data,
+        data: x.data, titulo: x.titulo, subtitulo: x.subtitulo || '', resumo: x.resumo || '',
+        distancia: 0, duracao: '', hotel: x.hotel ? local(x.hotel) : '',
+        etapas: (x.paragens || []).map(paragem),
+        momentos: x.momentos.map(function (m) {
+          const mo = {
+            hora: m.hora || '', fim: m.fim || '', titulo: m.titulo, local: m.local || '',
+            tipo: m.tipo || 'paragem', poi: m.paragem ? paragem(m.paragem) : '', nota: m.nota || ''
+          };
+          if (m.imagem) mo.imagem = clonar(m.imagem);
+          return mo;
+        })
+      };
+      if (x.imagem) dia.imagem = clonar(x.imagem);
+      d.dias.push(dia);
+    });
+    return d;
   }
 
   function carregar() {
     try {
       const g = JSON.parse(localStorage.getItem(CHAVE));
-      if (g && g.versao === 1) return Object.assign(base(), g);
+      if (g && g.versao === VERSAO_DADOS) return Object.assign(base(), g);
     } catch (e) { /* conteúdo corrompido: recomeça-se da semente */ }
     return base();
   }
@@ -459,7 +511,7 @@ window.Conteudo = (function () {
   function importar(texto) {
     const novo = JSON.parse(texto);
     if (!novo || !novo.evento) throw new Error('Ficheiro sem evento');
-    dados = Object.assign(base(), novo, { versao: 1 });
+    dados = Object.assign(base(), novo, { versao: VERSAO_DADOS });
     guardar();
   }
 
@@ -469,45 +521,14 @@ window.Conteudo = (function () {
   }
 
   /* ---------------------------------------------------------
-     Exemplo — monta um passeio completo a partir da semente,
-     para mostrar a app sem escrever um itinerário à mão.
+     Exemplo — o passeio real, com pessoas de exemplo por cima,
+     para mostrar a app antes de a organização carregar as reais.
      --------------------------------------------------------- */
 
   function carregarExemplo() {
     const ex = SEMENTE.exemplo;
     dados = base();
-    Object.assign(dados.evento, ex.evento);
-
-    /* As paragens vêm da biblioteca, pelo nome. */
-    const porNome = {};
-    function paragem(nome) {
-      if (porNome[nome]) return porNome[nome];
-      const b = SEMENTE.biblioteca.find(function (x) { return x.nome === nome; });
-      const id = idUnico(nome, dados.pois);
-      dados.pois[id] = Object.assign({
-        nome: nome, local: '', tipo: 'vila', lat: 0, lng: 0, altitude: 0,
-        subtitulo: '', historia: [], nota: '', revelacao: ''
-      }, b || {});
-      dados.pois[id].imagem = { variante: varianteDe(dados.pois[id].tipo), semente: id };
-      porNome[nome] = id;
-      return id;
-    }
-
-    ex.dias.forEach(function (d, i) {
-      const id = 'd-' + Date.now().toString(36) + '-' + i;
-      dados.dias.push({
-        id: id,
-        data: d.data, titulo: d.titulo, subtitulo: d.subtitulo, resumo: d.resumo,
-        distancia: 0, duracao: '', hotel: '',
-        etapas: d.paragens.map(paragem),
-        momentos: d.momentos.map(function (m) {
-          return {
-            hora: m.hora, fim: m.fim || '', titulo: m.titulo, local: m.local || '',
-            tipo: m.tipo || 'paragem', poi: m.paragem ? paragem(m.paragem) : '', nota: m.nota || ''
-          };
-        })
-      });
-    });
+    Object.assign(dados.evento, clonar(ex.evento || {}));
 
     /* O grupo espalhado pelo percurso do segundo dia — é o que dá
        vida ao mapa e à manchete de presença. */
@@ -530,14 +551,6 @@ window.Conteudo = (function () {
     ex.contactos.forEach(function (c, i) {
       dados.contactos.push(Object.assign({ id: 'c-ex-' + i, notas: '' }, c));
     });
-
-    ex.locais.forEach(function (l, i) {
-      dados.locais.push(Object.assign({ id: 'l-ex-' + i, notas: '' }, l));
-    });
-
-    /* O hotel do exemplo é o alojamento das etapas com dormida. */
-    const hotel = dados.locais[0];
-    if (hotel) dados.dias.slice(0, -1).forEach(function (d) { d.hotel = hotel.id; });
 
     guardar();
   }

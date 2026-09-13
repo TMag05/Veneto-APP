@@ -326,5 +326,86 @@ window.Imagens = (function () {
     return "url('data:image/svg+xml," + encodeURIComponent(svg(semente, variante, proporcao)) + "')";
   }
 
-  return { fundo: fundo, svg: svg, VARIANTES: VARIANTES };
+  /* ---------------------------------------------------------
+     Gráficos de logística
+     Os quatro momentos que não são paisagem — a chegada, a troca
+     de viatura, a travessia em Veneza e a partida — têm um desenho
+     próprio, reutilizado sempre que o momento se repete. Desenho
+     de docs/imagens-logistica/.
+
+     As cores não estão aqui: lêem-se de tokens.css no momento de
+     desenhar. Um SVG usado como imagem de fundo não vê variáveis
+     CSS, por isso é a folha que as dá, e o desenho acompanha a
+     paleta se ela mudar.
+     --------------------------------------------------------- */
+
+  function token(nome) {
+    return getComputedStyle(document.documentElement).getPropertyValue(nome).trim();
+  }
+
+  const GRAFICOS = {
+    /* Arco de chegada: trajetória de voo, horizonte. */
+    chegada: function (c) {
+      return '<radialGradient id="brilho" cx="72%" cy="28%" r="55%">' +
+          '<stop offset="0" stop-color="' + c.acento + '" stop-opacity="0.22"/>' +
+          '<stop offset="1" stop-color="' + c.acento + '" stop-opacity="0"/></radialGradient>|' +
+        '<rect width="1200" height="1600" fill="url(#brilho)"/>' +
+        '<path d="M -100 980 Q 600 700 1300 980" fill="none" stroke="' + c.acento + '" stroke-width="2" stroke-opacity="0.55"/>' +
+        '<path d="M -100 1080 Q 600 840 1300 1080" fill="none" stroke="' + c.acento + '" stroke-width="1.2" stroke-opacity="0.3"/>' +
+        '<circle cx="860" cy="470" r="10" fill="' + c.acento + '" fill-opacity="0.9"/>' +
+        '<line x1="600" y1="1200" x2="600" y2="1600" stroke="' + c.acento + '" stroke-width="1" stroke-opacity="0.12"/>';
+    },
+    /* Linhas de perspetiva a convergir: a fila de carros, o parque. */
+    'troca-de-viatura': function (c) {
+      return '|' +
+        '<g stroke="' + c.acento + '" stroke-width="1.4" fill="none">' +
+          '<path d="M 60 1500 L 600 760" stroke-opacity="0.5"/>' +
+          '<path d="M 320 1500 L 600 900" stroke-opacity="0.35"/>' +
+          '<path d="M 880 1500 L 600 900" stroke-opacity="0.35"/>' +
+          '<path d="M 1140 1500 L 600 760" stroke-opacity="0.5"/>' +
+        '</g>' +
+        '<circle cx="600" cy="760" r="6" fill="' + c.acento + '" fill-opacity="0.85"/>' +
+        '<line x1="0" y1="1500" x2="1200" y2="1500" stroke="' + c.acento + '" stroke-width="1" stroke-opacity="0.25"/>';
+    },
+    /* Ondulação da laguna e um poste de amarração. */
+    'travessia-veneza': function (c) {
+      return '|' +
+        '<g fill="none" stroke="' + c.acento + '">' +
+          '<path d="M -50 980 Q 250 940 550 980 T 1250 980" stroke-width="1.6" stroke-opacity="0.5"/>' +
+          '<path d="M -50 1060 Q 250 1020 550 1060 T 1250 1060" stroke-width="1.2" stroke-opacity="0.35"/>' +
+          '<path d="M -50 1140 Q 250 1100 550 1140 T 1250 1140" stroke-width="1" stroke-opacity="0.22"/>' +
+        '</g>' +
+        '<rect x="595" y="560" width="10" height="220" fill="' + c.acento + '" fill-opacity="0.6"/>';
+    },
+    /* O arco da chegada, espelhado, a desvanecer. */
+    partida: function (c) {
+      return '<radialGradient id="brilho" cx="28%" cy="72%" r="55%">' +
+          '<stop offset="0" stop-color="' + c.acento + '" stop-opacity="0.18"/>' +
+          '<stop offset="1" stop-color="' + c.acento + '" stop-opacity="0"/></radialGradient>|' +
+        '<rect width="1200" height="1600" fill="url(#brilho)"/>' +
+        '<path d="M -100 620 Q 600 900 1300 620" fill="none" stroke="' + c.acento + '" stroke-width="2" stroke-opacity="0.5"/>' +
+        '<path d="M -100 520 Q 600 760 1300 520" fill="none" stroke="' + c.acento + '" stroke-width="1.2" stroke-opacity="0.28"/>' +
+        '<circle cx="340" cy="1120" r="9" fill="' + c.acento + '" fill-opacity="0.85"/>';
+    }
+  };
+
+  function grafico(nome) {
+    const desenho = GRAFICOS[nome] || GRAFICOS.chegada;
+    const c = { acento: token('--ottone'), cima: token('--istria'), baixo: token('--calce') };
+    /* Cada desenho devolve «defs|corpo»: as definições próprias antes
+       da barra, o traço depois. */
+    const partes = desenho(c).split('|');
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1600" width="1200" height="1600">' +
+      '<defs><linearGradient id="fundo" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0" stop-color="' + c.cima + '"/><stop offset="1" stop-color="' + c.baixo + '"/>' +
+      '</linearGradient>' + partes[0] + '</defs>' +
+      '<rect width="1200" height="1600" fill="url(#fundo)"/>' + partes[1] +
+    '</svg>';
+  }
+
+  function fundoGrafico(nome) {
+    return "url('data:image/svg+xml," + encodeURIComponent(grafico(nome)) + "')";
+  }
+
+  return { fundo: fundo, svg: svg, grafico: grafico, fundoGrafico: fundoGrafico, VARIANTES: VARIANTES };
 })();

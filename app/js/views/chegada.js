@@ -16,10 +16,10 @@
       const nome = e.perfil.nome || 'Bem-vindo';
       const primeiro = nome.split(' ')[0];
 
-      /* Uma fotografia real da primeira etapa, se existir. Se não,
+      /* A primeira fotografia real do passeio, se existir. Se não,
          o poente — que é a hora em que a dolomia se acende. */
-      const dia = DADOS.dias[0];
-      const capa = (dia && dia.imagem && dia.imagem.dataUrl)
+      const dia = DADOS.dias.find(function (d) { return d.imagem && (d.imagem.dataUrl || d.imagem.foto); });
+      const capa = dia
         ? dia.imagem
         : { variante: 'poente', semente: (DADOS.evento.nome || 'chegada') + '-capa' };
 
