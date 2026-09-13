@@ -1108,37 +1108,24 @@ a { color: var(--verde); text-decoration: none; }
 }
 .hoje-dia__fundo svg { display: block; width: 100%; height: 100%; }
 
-.hoje-dia__topo {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--esp-2);
-  padding: calc(env(safe-area-inset-top) + 20px) 24px 14px;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--sobre-foto-medio);
-}
+/* A data assenta por cima do título, como nas capas: nada encostado
+   ao topo do ecrã, onde o Safari desenha a barra de estado por cima. */
 .hoje-dia__data {
+  margin: 0 0 6px;
   font-family: var(--font-editorial);
-  font-size: 18px;
+  font-size: 19px;
   font-variant-numeric: oldstyle-nums;
-  letter-spacing: normal;
-  text-transform: none;
-  color: var(--sobre-foto);
+  color: var(--sobre-foto-medio);
 }
 
 .hoje-dia__abertura {
   position: relative;
   z-index: 1;
-  min-height: 28dvh;
+  min-height: 34dvh;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 0 24px var(--esp-3);
+  padding: calc(env(safe-area-inset-top) + var(--esp-3)) 24px var(--esp-3);
 }
 .hoje-dia__titulo {
   margin: 0;

@@ -166,12 +166,8 @@
     return '<div class="hoje-dia">' +
       '<div class="hoje-dia__fundo">' + paisagem() + '</div>' +
 
-      '<div class="hoje-dia__topo">' +
-        '<span class="hoje-dia__data">' + (dia.data ? UI.dataCurta(dia.data) : '') + '</span>' +
-        '<span>Dia ' + dia.numero + '</span>' +
-      '</div>' +
-
       '<div class="hoje-dia__abertura">' +
+        '<p class="hoje-dia__data">Dia ' + dia.numero + (dia.data ? ' · ' + UI.dataCurta(dia.data) : '') + '</p>' +
         '<h1 class="hoje-dia__titulo">' + UI.h(dia.titulo || 'Etapa ' + dia.numero) + '</h1>' +
         (dia.subtitulo ? '<p class="hoje-dia__sub">' + UI.h(dia.subtitulo) + '</p>' : '') +
         (totais.length ? '<div class="hoje-dia__fila num">' +
