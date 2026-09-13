@@ -28,6 +28,13 @@ http.createServer(function (req, res) {
   let caminho = decodeURIComponent(req.url.split('?')[0]);
   if (caminho === '/') caminho = '/index.html';
 
+  /* Quem abriu a app e com que versão: a página e o app.js, com o ?v=.
+     É o que permite saber se um telemóvel está a receber a última. */
+  if (caminho === '/index.html' || caminho === '/js/app.js') {
+    const quem = String(req.socket.remoteAddress || '').replace(/^::ffff:/, '');
+    console.log(new Date().toTimeString().slice(0, 8) + '  ' + quem + '  ' + req.url);
+  }
+
   const ficheiro = path.join(RAIZ, path.normalize(caminho));
   if (!ficheiro.startsWith(RAIZ)) {
     res.writeHead(403).end('Fora do âmbito');

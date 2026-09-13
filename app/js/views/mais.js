@@ -4,6 +4,15 @@
 
 (function () {
 
+  /* A versão que está de facto carregada, lida do endereço do próprio
+     script — é o ?v= de index.html. Serve para confirmar, num telemóvel,
+     que chegou a última publicação. */
+  function versao() {
+    const s = document.querySelector('script[src*="js/app.js"]');
+    const m = s && s.src.match(/[?&]v=(\d+)/);
+    return m ? m[1] : '';
+  }
+
   Vistas.mais = {
     nav: 'mais',
     semCabecalho: true,
@@ -52,7 +61,7 @@
               : '') +
             UI.linhaLista({ titulo: 'Definições', nota: 'Organização, demonstração', icone: 'definicoes', href: '#/definicoes' }) +
           '</div>' +
-          '<p class="meta" style="margin-top:24px">' + UI.h(DADOS.evento.nome || 'Passeio') + ' · versão de trabalho' +
+          '<p class="meta num" style="margin-top:24px">' + UI.h(DADOS.evento.nome || 'Passeio') + ' · versão de trabalho ' + versao() +
             (fase === 'pre' ? ' · pré-evento' : (fase === 'pos' ? ' · pós-evento' : '')) + '</p>' +
         '</div>';
     }
