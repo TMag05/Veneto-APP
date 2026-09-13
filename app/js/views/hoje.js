@@ -193,16 +193,15 @@
             '<span class="agora__titulo">O programa de hoje terminou.</span>' +
           '</div>') +
 
-      /* O que vem depois e o caminho para o dia inteiro, num só cartão —
-         é ele que assenta em cima da barra de navegação. */
-      '<div class="hoje-dia__seguinte faixa"><div class="lista">' +
-        (s ? UI.linhaLista({
+      /* O que vem depois — é o último cartão, e assenta em cima da
+         barra de navegação. */
+      (s ? '<div class="hoje-dia__seguinte faixa"><div class="lista">' +
+        UI.linhaLista({
           titulo: (jaComecou ? 'A seguir' : 'Depois') + ', às ' + s.hora,
           nota: [s.titulo, s.local].filter(Boolean).join(' · '),
           href: '#/momento/' + dia.id + '/' + (i + 1)
-        }) : '') +
-        UI.linhaLista({ titulo: 'O dia inteiro no roadbook', href: '#/roadbook/' + dia.id }) +
-      '</div></div>' +
+        }) +
+      '</div></div>' : '') +
     '</div>';
   }
 
