@@ -118,7 +118,54 @@
     return null;
   }
 
+  /* ---------------------------------------------------------
+     Versão nova
+     Um separador aberto fica preso à versão com que foi aberto:
+     mudar só o que vem depois do # não pede nada ao servidor. Ao
+     voltar à app e ao mudar de ecrã, pergunta-se que versão está
+     publicada; se for outra, a app recarrega-se. O ecrã e os dados
+     ficam, porque vivem no endereço e no telemóvel.
+     --------------------------------------------------------- */
+
+  const versaoCarregada = (function () {
+    const s = document.querySelector('script[src*="js/app.js"]');
+    const m = s && s.src.match(/[?&]v=(\d+)/);
+    return m ? m[1] : '';
+  })();
+  let ultimaVerificacao = 0;
+
+  function verificarVersao() {
+    const agora = Date.now();
+    if (!versaoCarregada || !navigator.onLine || agora - ultimaVerificacao < 15000) return;
+    ultimaVerificacao = agora;
+
+    fetch('index.html', { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.text() : ''; })
+      .then(function (html) {
+        const m = html.match(/js\/app\.js\?v=(\d+)/);
+        if (!m || m[1] === versaoCarregada) return;
+
+        /* Com service worker, é ele que traz a versão nova; quando toma
+           conta da página, recarrega-a (controllerchange, no arranque). */
+        if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+          navigator.serviceWorker.getRegistration().then(function (reg) { if (reg) reg.update(); });
+          return;
+        }
+
+        /* Sem service worker, recarrega-se — uma vez por versão, para
+           nunca entrar em ciclo. */
+        try {
+          if (sessionStorage.getItem('veneto.versao-pedida') === m[1]) return;
+          sessionStorage.setItem('veneto.versao-pedida', m[1]);
+        } catch (e) { /* sem sessionStorage, tenta-se na mesma */ }
+        location.reload();
+      })
+      .catch(function () { /* sem rede, fica a versão que há */ });
+  }
+
   function navegar() {
+    verificarVersao();
+
     /* #/demo/2 prepara a demonstração num só toque — ver mais.js. */
     const demo = /^#\/demo(?:\/([\w-]+))?$/.exec(location.hash);
     if (demo && window.Demonstracao) {
@@ -303,6 +350,10 @@
 
   window.addEventListener('scroll', atualizarTituloCabecalho, { passive: true });
   window.addEventListener('hashchange', navegar);
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible') verificarVersao();
+  });
+  window.addEventListener('pageshow', function (e) { if (e.persisted) verificarVersao(); });
   window.addEventListener('online', desenharRede);
   window.addEventListener('offline', desenharRede);
 
@@ -342,6 +393,13 @@
   Estado.sincronizar();
 
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    /* Quando um service worker novo toma conta da página, ela ainda
+       corre o código antigo: recarrega-se. Na primeira instalação não
+       havia controlador, e não há nada para trocar. */
+    const havia = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      if (havia) location.reload();
+    });
     window.addEventListener('load', function () {
       navigator.serviceWorker.register('sw.js').catch(function () { /* sem service worker, a app continua a funcionar */ });
     });

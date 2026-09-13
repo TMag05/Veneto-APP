@@ -8,7 +8,7 @@
 /* Subir esta versão sempre que se publica: força a reinstalação do
    cache e é o que faz chegar conteúdo novo aos telemóveis. Deve
    acompanhar o ?v= dos ficheiros em index.html. */
-const VERSAO = 'passeio-v41';
+const VERSAO = 'passeio-v44';
 
 const CONCHA = [
   './',
@@ -75,6 +75,9 @@ self.addEventListener('fetch', function (e) {
 
   const url = new URL(pedido.url);
   if (url.origin !== location.origin) return;
+
+  /* A pergunta "que versão está publicada?" vai sempre à rede. */
+  if (pedido.cache === 'no-store') return;
 
   e.respondWith(
     caches.match(pedido, { ignoreSearch: true }).then(function (resposta) {

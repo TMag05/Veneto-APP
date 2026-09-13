@@ -86,7 +86,7 @@ servidor.js             servidor estático de desenvolvimento
 ```
 
 - **JavaScript simples, sem módulos, sem npm, sem build.** Cada ficheiro é um IIFE carregado por `<script>` em `index.html`, por ordem. Ao criar um ficheiro novo, acrescentá-lo a essa lista na posição certa.
-- **A cada publicação sobe-se o `?v=` de todos os `<link>` e `<script>` de `index.html` e a `VERSAO` de `sw.js`.** Sem isso, o service worker serve o antigo.
+- **A cada publicação sobe-se o `?v=` de todos os `<link>` e `<script>` de `index.html` e a `VERSAO` de `sw.js`.** Sem isso, o service worker serve o antigo. É também esse `?v=` que a app compara com o publicado, ao voltar a ficar à vista e ao mudar de ecrã, para se recarregar sozinha (`verificarVersao` em `app.js`) — um separador aberto não pede nada ao servidor quando só muda o que vem depois do `#`.
 - **`conteudo.js` é a única peça que muda quando houver servidor** — `carregar()` e `guardar()`. Todo o resto lê `DADOS` e `POIS` e não sabe de onde vêm. Manter essa fronteira.
 - **Offline é o estado normal.** Escrita local imediata, fila de sincronização, nunca um erro de rede à vista do convidado. Não existe botão de guardar em lado nenhum.
 - **Cada ecrã tem endereço fixo e partilhável** (`ROTAS` em `app.js`). É isto que permite ao WhatsApp ser o sino e à app ser o arquivo — e é a decisão com maior impacto no sucesso do projeto.
