@@ -118,6 +118,14 @@
   }
 
   function navegar() {
+    /* #/demo/2 prepara a demonstração num só toque — ver mais.js. */
+    const demo = /^#\/demo(?:\/([\w-]+))?$/.exec(location.hash);
+    if (demo && window.Demonstracao) {
+      Demonstracao.preparar(demo[1]);
+      irSubstituindo('#/hoje');
+      return;
+    }
+
     const estado = Estado.get();
 
     if (!estado.autenticado && location.hash !== '#/entrada') {

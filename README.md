@@ -108,7 +108,9 @@ servidor.js             servidor estático de desenvolvimento
 
 ## Demonstração
 
-Em **Mais › Definições › Demonstração** salta-se entre os dias anteriores, cada etapa e o pós-evento, e carrega-se um **passeio de exemplo** — quatro etapas à volta de Cortina, com participantes e contactos — para mostrar a app sem escrever um itinerário à mão. É uma maqueta anterior à rota real, a substituir pelo itinerário de 2026 assim que chegar `docs/informacao-base-passeio-dolomitas-2026.md`. Serve para demonstrar fora das datas do evento e **não deve existir na versão entregue aos convidados** — apagar a secção `Demonstração` em `js/views/mais.js` e o campo `demoFase` em `js/store.js`.
+Em **Mais › Definições › Demonstração** salta-se entre os dias anteriores, cada etapa e o pós-evento, e carrega-se um **passeio de exemplo** — quatro etapas à volta de Cortina, com participantes e contactos — para mostrar a app sem escrever um itinerário à mão. É uma maqueta anterior à rota real, a substituir pelo itinerário de 2026 assim que chegar `docs/informacao-base-passeio-dolomitas-2026.md`. Serve para demonstrar fora das datas do evento e **não deve existir na versão entregue aos convidados** — apagar a secção `Demonstração` em `js/views/mais.js`, o endereço `#/demo` em `js/app.js` e o campo `demoFase` em `js/store.js`.
+
+**Num telemóvel, num só toque:** abrir `http://<ip-do-mac>:8123/#/demo/2` carrega o exemplo, faz a entrada como o primeiro participante e põe o relógio no dia 2 (também `#/demo/pre` e `#/demo/pos`). Cada endereço guarda os seus próprios dados — `localhost` no Mac e o IP da rede no telemóvel são dois sítios diferentes —, por isso é assim que se põem dois aparelhos no mesmo estado. O servidor de desenvolvimento regista quem abre a app e com que versão; a versão carregada também aparece no fim do Mais.
 
 ---
 

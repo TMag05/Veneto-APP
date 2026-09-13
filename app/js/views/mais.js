@@ -13,6 +13,26 @@
     return m ? m[1] : '';
   }
 
+  /* Demonstração por endereço: #/demo/2 põe qualquer telemóvel no mesmo
+     estado — o exemplo carregado, a entrada feita como o primeiro
+     participante, o relógio no dia 2 (ou 'pre', 'pos'). Cada endereço
+     guarda os seus próprios dados; isto evita repetir os passos em cada
+     aparelho. Sai com a secção Demonstração. */
+  function prepararDemo(n) {
+    Conteudo.carregarExemplo();
+    const dia = DADOS.dias[(parseInt(n, 10) || 1) - 1];
+    const ficha = DADOS.participantes[0];
+    Estado.definir({
+      autenticado: true,
+      chegadaVista: true,
+      papel: 'convidado',
+      participanteId: ficha ? ficha.id : '',
+      perfil: { nome: ficha ? DADOS.nomeCompleto(ficha) : 'Convidado', email: '', telefone: '' },
+      demoFase: n === 'pre' || n === 'pos' ? n : (dia ? dia.id : 'auto')
+    });
+  }
+  window.Demonstracao = { preparar: prepararDemo };
+
   Vistas.mais = {
     nav: 'mais',
     semCabecalho: true,

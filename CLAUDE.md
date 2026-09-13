@@ -136,7 +136,7 @@ O código de acesso da organização (`2026`, em `js/views/mais.js`) é uma port
 | Cores de carroçaria | `silhuetas.js` › `CORES` — hexadecimais aproximados |
 | Código da organização | `js/views/mais.js` |
 
-A secção **Demonstração** (`js/views/mais.js`) e o campo `demoFase` (`js/store.js`) **não podem existir na versão entregue aos convidados**.
+A secção **Demonstração** (`js/views/mais.js`, com `Demonstracao.preparar`), o endereço `#/demo/n` (`js/app.js` › `navegar`) e o campo `demoFase` (`js/store.js`) **não podem existir na versão entregue aos convidados**.
 
 ---
 
