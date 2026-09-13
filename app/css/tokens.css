@@ -36,6 +36,11 @@
   /* Texto sobre preenchimento de acento */
   --sobre-acento: #FBF8F2;
 
+  /* Texto e cápsulas sobre fotografia ou paisagem */
+  --sobre-foto: #FBF8F2;
+  --sobre-foto-medio: rgba(251, 248, 242, 0.8);
+  --pastilha-foto: rgba(16, 18, 22, 0.42);
+
   /* Tipografia */
   --font-editorial: "EB Garamond", Georgia, "Times New Roman", serif;
   --font-ui: "Instrument Sans", Inter, system-ui, -apple-system, sans-serif;

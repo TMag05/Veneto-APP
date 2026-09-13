@@ -1,55 +1,62 @@
 /* =========================================================
    Hoje — a âncora de utilização diária
-   Antes do passeio mostra a preparação; durante, o programa
-   vivo; depois, o álbum. É sempre o primeiro ecrã.
+   Antes do passeio mostra a preparação; durante, o dia inteiro
+   em blocos de hora; depois, o álbum. É sempre o primeiro ecrã.
+
+   Durante, o Hoje responde a duas perguntas: o que vai acontecer
+   e a que horas. Tudo o resto — a paragem, a história, a nota
+   prática — está no roadbook, e cada bloco é um atalho para lá.
    ========================================================= */
 
 (function () {
 
-  /* Posição vista no ecrã imersivo — segue o momento real até se
-     tocar para avançar; volta a seguir o relógio ao mudar de dia. */
-  let diaEmVista = null;
-  let indiceManual = null;
-  let folhaAberta = false;
-
-  function indiceMostrado(dia) {
-    if (diaEmVista !== dia.id) { diaEmVista = dia.id; indiceManual = null; folhaAberta = false; }
-    if (indiceManual !== null) return indiceManual;
-    const a = indiceAtual(dia);
-    return a < 0 ? dia.momentos.length - 1 : a;
-  }
-
   /* ---------------------------------------------------------
-     Um momento do programa
+     Um bloco de hora
      --------------------------------------------------------- */
-  function momento(m, estadoTemporal) {
+  function bloco(dia, m, i, est) {
     const classes = ['momento'];
     if (m.alterado) classes.push('momento--alterado');
-    if (estadoTemporal === 'passado') classes.push('momento--passado');
-    if (estadoTemporal === 'agora') classes.push('momento--agora');
+    if (est === 'passado') classes.push('momento--passado');
+    if (est === 'agora' || est === 'seguinte') classes.push('momento--agora');
 
     let corpo = '';
+    if (est === 'agora') corpo += '<span class="momento__estado">Agora</span>';
+    if (est === 'seguinte') corpo += '<span class="momento__estado">A seguir</span>';
+    if (m.alterado) corpo += '<span class="momento__distintivo">' + UI.distintivo('Alterado', 'rosso') + '</span>';
+    corpo += '<span class="momento__titulo">' + UI.h(m.titulo) + '</span>';
+    if (m.local) corpo += '<span class="meta momento__local">' + UI.h(m.local) + '</span>';
     if (m.alterado) {
-      corpo += '<div style="margin-bottom:6px">' + UI.distintivo('Alterado', 'rosso') + '</div>';
-    }
-    corpo += '<h3 class="momento__titulo">' + UI.h(m.titulo) + '</h3>';
-    if (m.local) corpo += '<p class="meta momento__local">' + UI.h(m.local) + '</p>';
-    if (m.alterado) {
-      corpo += '<p class="corpo-ui momento__nota silencioso">Era às ' + UI.h(m.alterado.antes.replace(':', 'h')) +
-        '. ' + UI.h(m.alterado.razao) + '.</p>';
-    }
-    if (m.nota) corpo += '<p class="corpo-ui momento__nota silencioso">' + UI.h(m.nota) + '</p>';
-    if (m.poi && POIS[m.poi] && POIS[m.poi].tipo !== 'logistica') {
-      corpo += '<a class="botao botao--texto" href="#/poi/' + m.poi + '">' + UI.h(POIS[m.poi].nome) + ' &rsaquo;</a>';
+      corpo += '<span class="corpo-ui momento__nota silencioso">Era às ' + UI.h(m.alterado.antes.replace(':', 'h')) +
+        '. ' + UI.h(m.alterado.razao) + '.</span>';
     }
 
-    return '<div class="' + classes.join(' ') + '">' +
-      '<div>' +
-        '<div class="momento__hora num">' + UI.h(m.hora) + '</div>' +
-        (m.fim ? '<div class="meta num momento__fim">' + UI.h(m.fim) + '</div>' : '') +
-      '</div>' +
-      '<div>' + corpo + '</div>' +
-    '</div>';
+    return '<a class="' + classes.join(' ') + '" href="#/roadbook/' + dia.id + '/' + i + '">' +
+      '<span class="momento__horas">' +
+        '<span class="momento__hora num">' + UI.h(m.hora) + '</span>' +
+        (m.fim ? '<span class="meta num momento__fim">' + UI.h(m.fim) + '</span>' : '') +
+      '</span>' +
+      '<span class="momento__corpo">' + corpo + '</span>' +
+      '<span class="momento__seta">' + Icone('seta', 20) + '</span>' +
+    '</a>';
+  }
+
+  /* O dia em blocos. Entre duas paragens, o ritmo do troço — dado
+     ambiente, não instrução: o grupo segue a caravana. */
+  function blocos(dia, comEstadoTemporal) {
+    const atual = comEstadoTemporal ? indiceAtual(dia) : -1;
+    const jaComecou = atual >= 0 && UI.horaAgora() >= UI.minutos(dia.momentos[atual].hora);
+
+    return '<div class="programa">' + dia.momentos.map(function (m, i) {
+      let est = 'futuro';
+      if (comEstadoTemporal) {
+        if (atual < 0 || i < atual) est = 'passado';
+        else if (i === atual) est = jaComecou ? 'agora' : 'seguinte';
+      }
+      const de = m.poi && POIS[m.poi] ? poiAnterior(dia.momentos, i) : null;
+      const t = de && de !== m.poi ? UI.troco(de, m.poi) : null;
+      return (t ? '<p class="ritmo num">' + t.km + ' km · ' + UI.duracao(t.min) + '</p>' : '') +
+        bloco(dia, m, i, est);
+    }).join('') + '</div>';
   }
 
   /* A paragem de onde o grupo vem: o último momento anterior com
@@ -74,29 +81,13 @@
     return -1;
   }
 
-  function programa(dia, comEstadoTemporal, saltar) {
-    const atual = comEstadoTemporal ? indiceAtual(dia) : -1;
-
-    return '<div class="programa">' + dia.momentos.map(function (m, i) {
-      if (saltar !== undefined && i === saltar) return '';
-      let est = 'futuro';
-      if (comEstadoTemporal) {
-        if (atual < 0 || i < atual) est = 'passado';
-        else if (i === atual) est = 'agora';
-      }
-      return momento(m, est);
-    }).join('') + '</div>';
-  }
-
   /* ---------------------------------------------------------
-     O dia é uma coisa de cada vez — o ecrã imersivo do "durante".
-     Um momento em grande sobre a paisagem, o resto do dia
-     convocado por baixo. Tocar na fotografia avança; tocar na
-     pauta abre o dia inteiro.
+     Durante o passeio — o dia inteiro, hora a hora
+     A paisagem fica parada atrás; o dia corre por cima dela.
      --------------------------------------------------------- */
 
-  function fundoImersivo() {
-    return '<svg class="imersivo__fundo" viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' +
+  function paisagem() {
+    return '<svg viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' +
       '<defs>' +
         '<linearGradient id="ceuI" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2B3E55"/><stop offset=".46" stop-color="#7E8FA0"/><stop offset="1" stop-color="#D8C3AE"/></linearGradient>' +
         '<linearGradient id="farI" x1="0" y1=".2" x2="0" y2="1"><stop offset="0" stop-color="#E9C3A4"/><stop offset=".45" stop-color="#A98D8B"/><stop offset="1" stop-color="#6E6570"/></linearGradient>' +
@@ -113,101 +104,42 @@
     '</svg>';
   }
 
-  function imersivoHtml(dia) {
-    const i = indiceMostrado(dia);
-    const m = dia.momentos[i];
-    const seg = dia.momentos[i + 1];
-    const atual = indiceAtual(dia);
-    const poi = m.poi ? POIS[m.poi] : null;
-
-    /* Ritmo do dia, não instrução de condução: o grupo segue em
-       caravana, por isso a distância mede-se da paragem anterior do
-       programa, não do sítio onde cada um marcou a última chegada. */
-    let percurso = '';
-    const de = poiAnterior(dia.momentos, i);
-    if (poi && de && de !== m.poi) {
-      const t = UI.troco(de, m.poi);
-      percurso = t.km + ' km · ' + UI.duracao(t.min);
-    }
-
-    const barras = dia.momentos.map(function (_, n) {
-      const h = n === i ? 20 : (n < i ? 8 : 4);
-      const cor = n === i ? 'var(--ottone)' : (n < i ? 'rgba(237,232,224,.42)' : 'rgba(237,232,224,.18)');
-      return '<span style="background:' + cor + ';height:' + h + 'px"></span>';
-    }).join('');
-
-    const abas = [
-      { rota: '#/hoje', icone: 'hoje', nome: 'Hoje' },
-      { rota: '#/roadbook', icone: 'roadbook', nome: 'Roadbook' },
-      { rota: '#/mapa', icone: 'mapa', nome: 'Mapa' },
-      { rota: '#/galeria', icone: 'galeria', nome: 'Galeria' },
-      { rota: '#/mais', icone: 'mais', nome: 'Mais' }
-    ];
-    const nav = abas.map(function (a) {
-      const ativo = a.nome === 'Hoje';
-      return '<a class="imersivo__nav-item" href="' + a.rota + '"' + (ativo ? ' aria-current="page"' : '') + '>' +
-        IconePuncao(a.icone, ativo) +
-        '<span>' + a.nome + '</span>' +
-      '</a>';
-    }).join('');
-
-    const folha = dia.momentos.map(function (x, n) {
-      return '<div class="imersivo__linha" data-acao="saltarPara" data-valor="' + n + '">' +
-        '<span class="num">' + UI.h(x.hora) + '</span>' +
-        '<span><span class="imersivo__linha-titulo">' + UI.h(x.titulo) + '</span>' +
-        (x.local ? '<span class="imersivo__linha-local">' + UI.h(x.local) + '</span>' : '') + '</span>' +
-      '</div>';
-    }).join('');
-
+  function maisAlto(dia) {
     const altitudes = dia.momentos.map(function (x) { return x.poi && POIS[x.poi] ? POIS[x.poi].altitude : null; }).filter(Boolean);
-    const maisAlto = altitudes.length ? Math.max.apply(null, altitudes) : null;
+    return altitudes.length ? Math.max.apply(null, altitudes) : null;
+  }
 
-    return '<div class="imersivo">' +
-      '<div class="imersivo__topo">' +
-        '<span class="imersivo__data num">' + (dia.data ? UI.dataCurta(dia.data) : 'Dia ' + dia.numero) + '</span>' +
-        '<span class="imersivo__etapa">' + UI.h((dia.titulo || '').toUpperCase()) + '</span>' +
+  function duranteHtml(dia) {
+    const alto = maisAlto(dia);
+    const totais = [
+      dia.distancia ? dia.distancia + ' km' : null,
+      dia.duracao ? dia.duracao + ' ao volante' : null,
+      alto ? alto + ' m' : null,
+      dia.meteo ? dia.meteo.max + '° / ' + dia.meteo.min + '°' : null
+    ].filter(Boolean);
+
+    return '<div class="hoje-dia">' +
+      '<div class="hoje-dia__fundo">' + paisagem() + '</div>' +
+
+      '<div class="hoje-dia__topo">' +
+        '<span class="hoje-dia__data">' + (dia.data ? UI.dataCurta(dia.data) : '') + '</span>' +
+        '<span>Dia ' + dia.numero + '</span>' +
       '</div>' +
 
-      '<div class="imersivo__cena" data-acao="avancar">' +
-        fundoImersivo() +
-        '<span class="imersivo__escurecer"></span>' +
-        '<div class="imersivo__hero">' +
-          '<span class="imersivo__etiqueta">' + (i === atual ? 'Agora' : 'A seguir') +
-            (m.alterado ? ' · alterado' : '') + '</span>' +
-          '<div class="imersivo__hero-fundo">' +
-            '<span class="imersivo__titulo">' + UI.h(m.titulo) + '</span>' +
-            (m.nota ? '<span class="imersivo__nota">' + UI.h(m.nota) + '</span>'
-              : (m.alterado ? '<span class="imersivo__nota">Era às ' + UI.h(m.alterado.antes.replace(':', 'h')) + '. ' + UI.h(m.alterado.razao) + '.</span>' : '')) +
-            '<span class="imersivo__fila num">' +
-              '<span class="imersivo__pastilha imersivo__pastilha--hora">' + UI.h(m.hora) + (m.fim ? '–' + UI.h(m.fim) : '') + '</span>' +
-              (poi && poi.altitude ? '<span class="imersivo__pastilha">' + poi.altitude + ' m</span>' : '') +
-              (percurso ? '<span class="imersivo__pastilha">' + percurso + '</span>' : '') +
-            '</span>' +
-          '</div>' +
-        '</div>' +
+      '<div class="hoje-dia__abertura">' +
+        '<h1 class="hoje-dia__titulo">' + UI.h(dia.titulo || 'Etapa ' + dia.numero) + '</h1>' +
+        (dia.subtitulo ? '<p class="hoje-dia__sub">' + UI.h(dia.subtitulo) + '</p>' : '') +
+        (totais.length ? '<div class="hoje-dia__fila num">' +
+          totais.map(function (t) { return '<span>' + UI.h(t) + '</span>'; }).join('') +
+        '</div>' : '') +
       '</div>' +
 
-      '<div class="imersivo__rodape">' +
-        '<div class="imersivo__pauta" data-acao="abrirDia">' +
-          '<div class="imersivo__barras">' + barras + '</div>' +
-          '<div class="imersivo__seguinte">' +
-            '<span>' + (seg ? 'A seguir, ' + UI.h(seg.titulo) : 'Fim do dia') + '</span>' +
-            '<span>O dia</span>' +
-          '</div>' +
+      '<div class="hoje-dia__cartao">' +
+        '<div class="seccao-cabecalho">' +
+          '<h2 class="etiqueta">O dia, hora a hora</h2>' +
+          '<a class="hoje-dia__atalho" href="#/roadbook/' + dia.id + '">Roadbook</a>' +
         '</div>' +
-        '<div class="imersivo__nav">' + nav + '</div>' +
-      '</div>' +
-      '<div class="imersivo__veu-folha" data-acao="fecharDia" data-aberto="' + (folhaAberta ? 'sim' : 'nao') + '"></div>' +
-      '<div class="imersivo__folha" data-aberto="' + (folhaAberta ? 'sim' : 'nao') + '">' +
-        '<span class="imersivo__puxador"></span>' +
-        '<div class="imersivo__folha-cab" data-acao="fecharDia">' +
-          '<span class="imersivo__folha-titulo">O dia inteiro</span><span>Fechar</span>' +
-        '</div>' +
-        folha +
-        '<div class="imersivo__folha-totais num">' +
-          '<span>' + dia.distancia + ' km</span><span>' + UI.h(dia.duracao) + '</span>' +
-          (maisAlto ? '<span>' + maisAlto + ' m</span>' : '') +
-        '</div>' +
+        blocos(dia, true) +
       '</div>' +
     '</div>';
   }
@@ -412,10 +344,10 @@
      Vistas
      --------------------------------------------------------- */
 
-  /* Imersivo só quando há, de facto, um dia com momentos para
-     mostrar — sem itinerário publicado o convidado continua a
-     ver o estado de espera com o cabeçalho normal. */
-  function imersivo() {
+  /* O dia sobre a paisagem só quando há, de facto, um dia com
+     momentos para mostrar — sem itinerário publicado o convidado
+     continua a ver o estado de espera com o cabeçalho normal. */
+  function comDia() {
     if (Estado.fase() !== 'durante') return false;
     const dia = Estado.diaAtivo();
     return !!(dia && dia.momentos.length);
@@ -423,8 +355,7 @@
 
   Vistas.hoje = {
     nav: 'hoje',
-    semNav: imersivo,
-    semCabecalho: imersivo,
+    semCabecalho: comDia,
     cabecalho: function () {
       const dia = Estado.fase() === 'durante' ? Estado.diaAtivo() : null;
       return {
@@ -442,28 +373,7 @@
       if (!dia) return semItinerario('O programa de hoje ainda não está publicado.');
       if (!dia.momentos.length) return semItinerario('O programa de hoje ainda não está publicado.');
 
-      return imersivoHtml(dia);
-    },
-    acoes: {
-      avancar: function () {
-        const dia = Estado.diaAtivo();
-        if (!dia || !dia.momentos.length) return;
-        indiceManual = (indiceMostrado(dia) + 1) % dia.momentos.length;
-        App.repintar();
-      },
-      abrirDia: function () {
-        folhaAberta = true;
-        App.repintar();
-      },
-      fecharDia: function () {
-        folhaAberta = false;
-        App.repintar();
-      },
-      saltarPara: function (v) {
-        indiceManual = parseInt(v, 10);
-        folhaAberta = false;
-        App.repintar();
-      }
+      return duranteHtml(dia);
     }
   };
 
@@ -479,7 +389,7 @@
       const hoje = Estado.chave(Estado.agora()) === dia.data;
       return capaDia(dia) +
         '<div class="faixa">' + meteo(dia) + '</div>' +
-        '<div class="faixa">' + programa(dia, hoje) + '</div>' +
+        '<div class="faixa">' + blocos(dia, hoje) + '</div>' +
         rodapeDia(dia);
     }
   };
@@ -508,5 +418,5 @@
     }
   };
 
-  window.Programa = { momento: momento, programa: programa, capaDia: capaDia, indiceAtual: indiceAtual, poiAnterior: poiAnterior };
+  window.Programa = { blocos: blocos, capaDia: capaDia, indiceAtual: indiceAtual, poiAnterior: poiAnterior };
 })();

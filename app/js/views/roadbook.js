@@ -1,7 +1,12 @@
 /* =========================================================
    Roadbook — cada dia é um capítulo
-   Há batedores e o grupo segue em caravana: o capítulo conta o
-   que vai acontecer e quando, não o caminho. A distância entre
+   O Hoje diz o que vai acontecer e a que horas; o roadbook é o
+   resto. Cada momento do dia tem aqui a sua secção, com endereço
+   próprio (#/roadbook/dia/n), que é para onde apontam os blocos
+   do Hoje: a paragem, a história, a nota, o ritmo desde a
+   paragem anterior.
+
+   Há batedores e o grupo segue em caravana: a distância entre
    paragens é ritmo, não instrução. O Google Maps fica no fim,
    como recurso para quem se afastar — sempre um troço de cada
    vez, nunca o dia inteiro, que o Maps trocaria a estrada
@@ -9,6 +14,11 @@
    ========================================================= */
 
 (function () {
+
+  const TIPOS = {
+    partida: 'Partida', paragem: 'Paragem', visita: 'Visita',
+    refeicao: 'Refeição', prova: 'Prova', logistica: 'Logística'
+  };
 
   function cartaoDia(d) {
     const troços = Math.max((d.etapas || []).length - 1, 0);
@@ -81,7 +91,7 @@
           '<p class="corpo-editorial">' + UI.h(dia.resumo) + '</p>' +
         '</div>' : '') +
 
-        sequencia(dia) +
+        sequencia(dia, p.momento) +
 
         (alojamento ? '<div class="faixa"><div class="cartao">' +
           '<p class="etiqueta">Alojamento</p>' +
@@ -92,6 +102,13 @@
         '</div></div>' : '') +
 
         recurso(dia);
+    },
+    /* Vindo de um bloco do Hoje, o capítulo abre nesse momento. Só à
+       chegada: um repintar não deve arrancar o convidado de onde está. */
+    montar: function (el, p, chegada) {
+      if (!chegada || p.momento === undefined) return;
+      const alvo = el.querySelector('#momento-' + p.momento);
+      if (alvo) alvo.scrollIntoView({ block: 'start' });
     },
     acoes: {
       gpx: function (diaId) {
@@ -108,25 +125,70 @@
     return '<p class="ritmo num">' + t.km + ' km · ' + UI.duracao(t.min) + '</p>';
   }
 
-  /* O que vai acontecer e quando. Com programa publicado, é o
-     programa — hora, o que se faz, onde. Só com paragens, é a ordem
-     das paragens. Entre duas paragens, o ritmo do troço. */
-  function sequencia(dia) {
+  /* A paragem de um momento, em cartão: fotografia, subtítulo, e o
+     caminho para a história. */
+  function cartaoLocal(id) {
+    const p = POIS[id];
+    const chegou = Estado.chegou(id);
+    const meta = [
+      p.local,
+      p.altitude && String(p.local).indexOf(String(p.altitude)) < 0 ? p.altitude + ' m' : null,
+      chegou ? 'visitado' : null
+    ].filter(Boolean).join(' · ');
+    const convite = p.historia && p.historia.length
+      ? (chegou ? 'Ler a história' : 'A história abre-se à chegada')
+      : 'Ver a paragem';
+
+    return '<a class="cartao-dia capitulo__paragem" href="#/poi/' + id + '">' +
+      UI.foto(p.imagem, 'cartao-dia__foto') +
+      '<span class="cartao-dia__corpo">' +
+        '<span class="cartao-dia__titulo">' + UI.h(p.nome) + '</span>' +
+        (p.subtitulo ? '<span class="cartao-dia__resumo">' + UI.h(p.subtitulo) + '</span>' : '') +
+        (meta ? '<span class="cartao-dia__meta num">' + UI.h(meta) + '</span>' : '') +
+        '<span class="capitulo__convite">' + convite + Icone('seta', 16) + '</span>' +
+      '</span>' +
+    '</a>';
+  }
+
+  /* Um momento, com tudo o que o bloco do Hoje não diz. */
+  function capitulo(dia, m, i, est, alvo) {
+    const poi = m.poi && POIS[m.poi] ? POIS[m.poi] : null;
+    const de = poi ? Programa.poiAnterior(dia.momentos, i) : null;
+    const t = de && de !== m.poi ? UI.troco(de, m.poi) : null;
+
+    return '<section class="capitulo" id="momento-' + i + '" data-estado="' + est + '"' +
+        (alvo ? ' data-alvo="sim"' : '') + '>' +
+      '<div class="capitulo__cab num">' +
+        '<span class="capitulo__hora">' + UI.h(m.hora) + (m.fim ? ' – ' + UI.h(m.fim) : '') + '</span>' +
+        '<span class="capitulo__tipo">' + (est === 'agora' ? 'Agora' : UI.h(TIPOS[m.tipo] || '')) + '</span>' +
+      '</div>' +
+      '<h3 class="capitulo__titulo">' + UI.h(m.titulo) + '</h3>' +
+      (m.local ? '<p class="meta capitulo__local">' + UI.h(m.local) + '</p>' : '') +
+      (m.alterado ? '<p class="corpo-ui capitulo__nota">' + UI.distintivo('Alterado', 'rosso') + ' Era às ' +
+        UI.h(m.alterado.antes.replace(':', 'h')) + '. ' + UI.h(m.alterado.razao) + '.</p>' : '') +
+      (m.nota ? '<p class="corpo-ui silencioso capitulo__nota">' + UI.h(m.nota) + '</p>' : '') +
+      (t ? '<p class="capitulo__ritmo num">' + t.km + ' km desde ' + UI.h(POIS[de].nome) + ' · ' + UI.duracao(t.min) + '</p>' : '') +
+      (poi && poi.tipo !== 'logistica' ? cartaoLocal(m.poi) : '') +
+    '</section>';
+  }
+
+  /* O que vai acontecer, momento a momento, com o detalhe de cada um.
+     Só com paragens, é a ordem das paragens. Entre duas, o ritmo. */
+  function sequencia(dia, alvo) {
     if (dia.momentos.length) {
       const eHoje = Estado.chave(Estado.agora()) === dia.data;
       const atual = eHoje ? Programa.indiceAtual(dia) : -1;
       return '<div class="faixa">' +
         '<div class="seccao-cabecalho"><h2 class="etiqueta">O dia</h2>' +
           (dia.distancia ? '<span class="meta num">' + dia.distancia + ' km</span>' : '') + '</div>' +
-        '<div class="programa">' + dia.momentos.map(function (m, i) {
+        dia.momentos.map(function (m, i) {
           let est = 'futuro';
           if (eHoje) {
             if (atual < 0 || i < atual) est = 'passado';
-            else if (i === atual) est = 'agora';
+            else if (i === atual) est = UI.horaAgora() >= UI.minutos(m.hora) ? 'agora' : 'futuro';
           }
-          const de = m.poi && POIS[m.poi] ? Programa.poiAnterior(dia.momentos, i) : null;
-          return (de && de !== m.poi ? ritmo(de, m.poi) : '') + Programa.momento(m, est);
-        }).join('') + '</div>' +
+          return capitulo(dia, m, i, est, String(i) === String(alvo));
+        }).join('') +
       '</div>';
     }
 

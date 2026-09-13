@@ -14,6 +14,7 @@
     ['preparacao', 'preparacao'],
     ['roadbook', 'roadbook'],
     ['roadbook/:id', 'roadbookDia'],
+    ['roadbook/:id/:momento', 'roadbookDia'],
     ['poi/:id', 'poi'],
     ['mapa', 'mapa'],
     ['participantes', 'participantes'],
@@ -155,9 +156,9 @@
     sincronizarProfundidade();
     vistaAtual = r.vista;
     paramsAtuais = r.params;
-    desenhar();
     elEcra.scrollTop = 0;
     window.scrollTo(0, 0);
+    desenhar(true);
     elEcra.focus({ preventScroll: true });
   }
 
@@ -165,7 +166,9 @@
      estado — a Hoje durante o passeio só é imersiva nessa fase. */
   function ehVerdadeiro(v) { return typeof v === 'function' ? v(paramsAtuais) : v; }
 
-  function desenhar() {
+  /* chegada: true quando se acabou de navegar para o ecrã, false
+     quando só se repinta. A vista usa-o para posicionar uma única vez. */
+  function desenhar(chegada) {
     const vista = window.Vistas[vistaAtual];
     if (!vista) return;
 
@@ -177,7 +180,7 @@
     desenharNav(vista);
     desenharRede();
 
-    if (vista.montar) vista.montar(elEcra, paramsAtuais);
+    if (vista.montar) vista.montar(elEcra, paramsAtuais, chegada === true);
     ligarAcoes();
     atualizarTituloCabecalho();
   }

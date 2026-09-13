@@ -50,7 +50,8 @@ O documento do diretor-geral (`Estrutura-App-Passeio-Dolomitas.docx`) é a espec
 - **Pesos 400 e 500 apenas.** Nunca 600 nem 700.
 - **Cantos redondos, cápsulas e sombra difusa.** Capas a 26px, cartões a 20px, filtros e botões em cápsula, elevação por sombra baixa — não por linha de 1px. (Isto substituiu a regra antiga de `BRAND-GUIDELINES.md` §6.)
 - **Cada separador abre com uma capa** — cartão de fotografia inserido das margens, com o título assente no fundo dela. A capa é o cabeçalho; os separadores de topo não têm outro.
-- **Uma coisa de cada vez.** É a regra do ecrã Hoje e o princípio que governa qualquer ecrã novo.
+- **O Hoje é o dia inteiro, hora a hora; o roadbook é o resto.** Durante o passeio, o Hoje diz o que vai acontecer e a que horas — o dia em blocos de hora sobre a paisagem parada, com o momento em curso assinalado. Cada bloco é um atalho para o seu capítulo no roadbook (`#/roadbook/dia/n`), onde está a paragem, a história, a nota e o ritmo. Os dois ecrãs não se repetem: um é a agenda, o outro o detalhe. Decisão de 13.09.2026, que substituiu o ecrã imersivo de um momento de cada vez.
+- **Uma coisa de cada vez** continua a ser o princípio de qualquer ecrã novo: um propósito por ecrã, sem blocos de igual peso a competir.
 - **A navegação principal usa os cinco punções próprios** de `icones.js`, destacados a cobre. É a única navegação que não usa o conjunto outline geral de 1.5px.
 - **Alvos de 44px, contraste AA no mínimo, AAA no texto principal.** Isto é lido de pé, ao sol, por pessoas acima dos 45 anos. Nenhuma informação passa só por cor.
 - **Movimento discreto:** 200ms. A única exceção é a revelação do álbum, a 600ms.
