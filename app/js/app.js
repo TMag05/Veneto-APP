@@ -16,6 +16,7 @@
     ['roadbook/:id', 'roadbookDia'],
     ['roadbook/:id/:momento', 'roadbookDia'],
     ['poi/:id', 'poi'],
+    ['momento/:dia/:n', 'momento'],
     ['mapa', 'mapa'],
     ['participantes', 'participantes'],
     ['galeria', 'galeria'],

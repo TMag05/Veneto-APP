@@ -4,11 +4,56 @@
    em blocos de hora; depois, o álbum. É sempre o primeiro ecrã.
 
    Durante, o Hoje responde a duas perguntas: o que vai acontecer
-   e a que horas. Tudo o resto — a paragem, a história, a nota
-   prática — está no roadbook, e cada bloco é um atalho para lá.
+   e a que horas. Cada bloco abre a página desse momento — só esse
+   momento, e o sítio onde acontece —, não o roadbook inteiro.
    ========================================================= */
 
 (function () {
+
+  const TIPOS_MOMENTO = {
+    partida: 'Partida', paragem: 'Paragem', visita: 'Visita',
+    refeicao: 'Refeição', prova: 'Prova', logistica: 'Logística'
+  };
+
+  /* O momento em si: hora, o que acontece, onde, a alteração, a nota
+     e o ritmo desde a paragem anterior. Serve à página do momento e
+     aos capítulos do roadbook. */
+  function corpoMomento(dia, m, i, rotulo, nivel) {
+    const tag = nivel || 'h3';
+    const de = m.poi && POIS[m.poi] ? poiAnterior(dia.momentos, i) : null;
+    const t = de && de !== m.poi ? UI.troco(de, m.poi) : null;
+    return '<div class="capitulo__cab num">' +
+        '<span class="capitulo__hora">' + UI.h(m.hora) + (m.fim ? ' – ' + UI.h(m.fim) : '') + '</span>' +
+        '<span class="capitulo__tipo">' + UI.h(rotulo !== undefined ? rotulo : (TIPOS_MOMENTO[m.tipo] || '')) + '</span>' +
+      '</div>' +
+      '<' + tag + ' class="capitulo__titulo">' + UI.h(m.titulo) + '</' + tag + '>' +
+      (m.local ? '<p class="meta capitulo__local">' + UI.h(m.local) + '</p>' : '') +
+      (m.alterado ? '<p class="corpo-ui capitulo__nota">' + UI.distintivo('Alterado', 'rosso') + ' Era às ' +
+        UI.h(m.alterado.antes.replace(':', 'h')) + '. ' + UI.h(m.alterado.razao) + '.</p>' : '') +
+      (m.nota ? '<p class="corpo-ui silencioso capitulo__nota">' + UI.h(m.nota) + '</p>' : '') +
+      (t ? '<p class="capitulo__ritmo num">' + t.km + ' km desde ' + UI.h(POIS[de].nome) + ' · ' + UI.duracao(t.min) + '</p>' : '');
+  }
+
+  /* O momento a partir do endereço #/momento/dia/n. */
+  function momentoEm(diaId, n) {
+    const dia = DADOS.dia(diaId);
+    const i = parseInt(n, 10);
+    if (!dia || isNaN(i) || !dia.momentos[i]) return null;
+    return { dia: dia, m: dia.momentos[i], i: i };
+  }
+
+  /* O que vem depois, para seguir o dia sem voltar ao Hoje. */
+  function seguinteHtml(dia, i) {
+    const s = dia.momentos[i + 1];
+    if (!s) return '';
+    return '<div class="faixa"><div class="lista">' +
+      UI.linhaLista({
+        titulo: 'A seguir, às ' + s.hora,
+        nota: [s.titulo, s.local].filter(Boolean).join(' · '),
+        href: '#/momento/' + dia.id + '/' + (i + 1)
+      }) +
+    '</div></div>';
+  }
 
   /* ---------------------------------------------------------
      Um bloco de hora
@@ -30,7 +75,7 @@
         '. ' + UI.h(m.alterado.razao) + '.</span>';
     }
 
-    return '<a class="' + classes.join(' ') + '" href="#/roadbook/' + dia.id + '/' + i + '">' +
+    return '<a class="' + classes.join(' ') + '" href="#/momento/' + dia.id + '/' + i + '">' +
       '<span class="momento__horas">' +
         '<span class="momento__hora num">' + UI.h(m.hora) + '</span>' +
         (m.fim ? '<span class="meta num momento__fim">' + UI.h(m.fim) + '</span>' : '') +
@@ -418,5 +463,8 @@
     }
   };
 
-  window.Programa = { blocos: blocos, capaDia: capaDia, indiceAtual: indiceAtual, poiAnterior: poiAnterior };
+  window.Programa = {
+    blocos: blocos, capaDia: capaDia, indiceAtual: indiceAtual, poiAnterior: poiAnterior,
+    corpoMomento: corpoMomento, momentoEm: momentoEm, seguinteHtml: seguinteHtml
+  };
 })();

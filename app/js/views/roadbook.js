@@ -1,10 +1,10 @@
 /* =========================================================
    Roadbook — cada dia é um capítulo
-   O Hoje diz o que vai acontecer e a que horas; o roadbook é o
-   resto. Cada momento do dia tem aqui a sua secção, com endereço
-   próprio (#/roadbook/dia/n), que é para onde apontam os blocos
-   do Hoje: a paragem, a história, a nota, o ritmo desde a
-   paragem anterior.
+   O Hoje diz o que vai acontecer e a que horas, e cada bloco abre
+   a página desse momento. O roadbook é o dia inteiro de uma vez,
+   para ler antes ou depois: cada momento com a sua secção e
+   endereço próprio (#/roadbook/dia/n) — a paragem, a nota, o ritmo
+   desde a paragem anterior.
 
    Há batedores e o grupo segue em caravana: a distância entre
    paragens é ritmo, não instrução. O Google Maps fica no fim,
@@ -14,11 +14,6 @@
    ========================================================= */
 
 (function () {
-
-  const TIPOS = {
-    partida: 'Partida', paragem: 'Paragem', visita: 'Visita',
-    refeicao: 'Refeição', prova: 'Prova', logistica: 'Logística'
-  };
 
   function cartaoDia(d) {
     const troços = Math.max((d.etapas || []).length - 1, 0);
@@ -153,21 +148,9 @@
   /* Um momento, com tudo o que o bloco do Hoje não diz. */
   function capitulo(dia, m, i, est, alvo) {
     const poi = m.poi && POIS[m.poi] ? POIS[m.poi] : null;
-    const de = poi ? Programa.poiAnterior(dia.momentos, i) : null;
-    const t = de && de !== m.poi ? UI.troco(de, m.poi) : null;
-
     return '<section class="capitulo" id="momento-' + i + '" data-estado="' + est + '"' +
         (alvo ? ' data-alvo="sim"' : '') + '>' +
-      '<div class="capitulo__cab num">' +
-        '<span class="capitulo__hora">' + UI.h(m.hora) + (m.fim ? ' – ' + UI.h(m.fim) : '') + '</span>' +
-        '<span class="capitulo__tipo">' + (est === 'agora' ? 'Agora' : UI.h(TIPOS[m.tipo] || '')) + '</span>' +
-      '</div>' +
-      '<h3 class="capitulo__titulo">' + UI.h(m.titulo) + '</h3>' +
-      (m.local ? '<p class="meta capitulo__local">' + UI.h(m.local) + '</p>' : '') +
-      (m.alterado ? '<p class="corpo-ui capitulo__nota">' + UI.distintivo('Alterado', 'rosso') + ' Era às ' +
-        UI.h(m.alterado.antes.replace(':', 'h')) + '. ' + UI.h(m.alterado.razao) + '.</p>' : '') +
-      (m.nota ? '<p class="corpo-ui silencioso capitulo__nota">' + UI.h(m.nota) + '</p>' : '') +
-      (t ? '<p class="capitulo__ritmo num">' + t.km + ' km desde ' + UI.h(POIS[de].nome) + ' · ' + UI.duracao(t.min) + '</p>' : '') +
+      Programa.corpoMomento(dia, m, i, est === 'agora' ? 'Agora' : undefined) +
       (poi && poi.tipo !== 'logistica' ? cartaoLocal(m.poi) : '') +
     '</section>';
   }
