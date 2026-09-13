@@ -1095,17 +1095,17 @@ a { color: var(--verde); text-decoration: none; }
    está a acontecer agora. Tocar abre a página do momento.
    --------------------------------------------------------- */
 
-/* Tudo assenta no fundo, logo acima da barra de navegação, com a
-   mesma folga que separa os cartões entre si e a barra do fundo do
-   ecrã. A paisagem fica com o resto. */
+/* O título no alto, à esquerda; os cartões no fundo, logo acima da
+   barra de navegação, com a mesma folga que os separa entre si e a
+   barra do fundo do ecrã. A paisagem fica com o meio. */
 .hoje-dia {
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
   min-height: calc(100dvh - var(--acima-navegacao) - var(--esp-2));
   margin-bottom: calc(var(--esp-2) - var(--esp-4));
 }
+.hoje-dia .agora { margin-top: auto; }
 
 /* Parada no ecrã, dentro da coluna da app. */
 .hoje-dia__fundo {
@@ -1121,8 +1121,6 @@ a { color: var(--verde); text-decoration: none; }
 }
 .hoje-dia__fundo svg { display: block; width: 100%; height: 100%; }
 
-/* A data assenta por cima do título, como nas capas: nada encostado
-   ao topo do ecrã, onde o Safari desenha a barra de estado por cima. */
 .hoje-dia__data {
   margin: 0 0 6px;
   font-family: var(--font-editorial);
@@ -1131,10 +1129,13 @@ a { color: var(--verde); text-decoration: none; }
   color: var(--sobre-foto-medio);
 }
 
+/* No Safari do iOS 26 a página desenha-se por baixo da barra de estado
+   e a área segura pode vir a zero: a folga do topo nunca é menor do que
+   a altura dessa barra, venha o valor que vier. */
 .hoje-dia__abertura {
   position: relative;
   z-index: 1;
-  padding: calc(env(safe-area-inset-top) + var(--esp-3)) 24px var(--esp-3);
+  padding: calc(max(env(safe-area-inset-top), var(--esp-5)) + var(--esp-3)) 24px var(--esp-3);
 }
 .hoje-dia__titulo {
   margin: 0;
