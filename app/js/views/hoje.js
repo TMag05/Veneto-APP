@@ -1,11 +1,12 @@
 /* =========================================================
    Hoje — a âncora de utilização diária
-   Antes do passeio mostra a preparação; durante, o dia inteiro
-   em blocos de hora; depois, o álbum. É sempre o primeiro ecrã.
+   Antes do passeio mostra a preparação; durante, o momento em
+   curso; depois, o álbum. É sempre o primeiro ecrã.
 
-   Durante, o Hoje responde a duas perguntas: o que vai acontecer
-   e a que horas. Cada bloco abre a página desse momento — só esse
-   momento, e o sítio onde acontece —, não o roadbook inteiro.
+   Durante, o Hoje mostra só o que está a acontecer agora — ou o
+   que vem a seguir, se o grupo estiver entre dois momentos. Tocar
+   abre a página desse momento, que é a página do sítio onde
+   acontece. O dia inteiro está no roadbook.
    ========================================================= */
 
 (function () {
@@ -43,12 +44,12 @@
   }
 
   /* O que vem depois, para seguir o dia sem voltar ao Hoje. */
-  function seguinteHtml(dia, i) {
+  function seguinteHtml(dia, i, rotulo) {
     const s = dia.momentos[i + 1];
     if (!s) return '';
     return '<div class="faixa"><div class="lista">' +
       UI.linhaLista({
-        titulo: 'A seguir, às ' + s.hora,
+        titulo: (rotulo || 'A seguir') + ', às ' + s.hora,
         nota: [s.titulo, s.local].filter(Boolean).join(' · '),
         href: '#/momento/' + dia.id + '/' + (i + 1)
       }) +
@@ -127,8 +128,9 @@
   }
 
   /* ---------------------------------------------------------
-     Durante o passeio — o dia inteiro, hora a hora
-     A paisagem fica parada atrás; o dia corre por cima dela.
+     Durante o passeio — o momento em curso
+     A paisagem fica parada atrás; por cima, um só cartão: o que
+     está a acontecer agora. Tocar abre a página do momento.
      --------------------------------------------------------- */
 
   function paisagem() {
@@ -149,19 +151,31 @@
     '</svg>';
   }
 
-  function maisAlto(dia) {
-    const altitudes = dia.momentos.map(function (x) { return x.poi && POIS[x.poi] ? POIS[x.poi].altitude : null; }).filter(Boolean);
-    return altitudes.length ? Math.max.apply(null, altitudes) : null;
+  /* O cartão do momento. Agora, se já começou; a seguir, se o grupo
+     está entre dois momentos — na estrada, a caminho dele. */
+  function cartaoAgora(dia, i) {
+    const m = dia.momentos[i];
+    const jaComecou = UI.horaAgora() >= UI.minutos(m.hora);
+    const de = m.poi && POIS[m.poi] ? poiAnterior(dia.momentos, i) : null;
+    const t = de && de !== m.poi ? UI.troco(de, m.poi) : null;
+
+    return '<a class="agora" href="#/momento/' + dia.id + '/' + i + '">' +
+      '<span class="agora__cab num">' +
+        '<span class="agora__estado">' + (jaComecou ? 'Agora' : 'A seguir') + '</span>' +
+        '<span class="agora__hora">' + UI.h(m.hora) + (m.fim ? ' – ' + UI.h(m.fim) : '') + '</span>' +
+      '</span>' +
+      (m.alterado ? '<span class="agora__alterado">' + UI.distintivo('Alterado', 'rosso') +
+        ' Era às ' + UI.h(m.alterado.antes.replace(':', 'h')) + '. ' + UI.h(m.alterado.razao) + '.</span>' : '') +
+      '<span class="agora__titulo">' + UI.h(m.titulo) + '</span>' +
+      (m.local ? '<span class="agora__local">' + UI.h(m.local) + '</span>' : '') +
+      (t ? '<span class="agora__ritmo num">' + t.km + ' km desde ' + UI.h(POIS[de].nome) + ' · ' + UI.duracao(t.min) + '</span>' : '') +
+      '<span class="agora__seta">' + Icone('seta', 22) + '</span>' +
+    '</a>';
   }
 
   function duranteHtml(dia) {
-    const alto = maisAlto(dia);
-    const totais = [
-      dia.distancia ? dia.distancia + ' km' : null,
-      dia.duracao ? dia.duracao + ' ao volante' : null,
-      alto ? alto + ' m' : null,
-      dia.meteo ? dia.meteo.max + '° / ' + dia.meteo.min + '°' : null
-    ].filter(Boolean);
+    const i = indiceAtual(dia);
+    const jaComecou = i >= 0 && UI.horaAgora() >= UI.minutos(dia.momentos[i].hora);
 
     return '<div class="hoje-dia">' +
       '<div class="hoje-dia__fundo">' + paisagem() + '</div>' +
@@ -169,19 +183,17 @@
       '<div class="hoje-dia__abertura">' +
         '<p class="hoje-dia__data">Dia ' + dia.numero + (dia.data ? ' · ' + UI.dataCurta(dia.data) : '') + '</p>' +
         '<h1 class="hoje-dia__titulo">' + UI.h(dia.titulo || 'Etapa ' + dia.numero) + '</h1>' +
-        (dia.subtitulo ? '<p class="hoje-dia__sub">' + UI.h(dia.subtitulo) + '</p>' : '') +
-        (totais.length ? '<div class="hoje-dia__fila num">' +
-          totais.map(function (t) { return '<span>' + UI.h(t) + '</span>'; }).join('') +
-        '</div>' : '') +
       '</div>' +
 
-      '<div class="hoje-dia__cartao">' +
-        '<div class="seccao-cabecalho">' +
-          '<h2 class="etiqueta">O dia, hora a hora</h2>' +
-          '<a class="hoje-dia__atalho" href="#/roadbook/' + dia.id + '">Roadbook</a>' +
-        '</div>' +
-        blocos(dia, true) +
-      '</div>' +
+      (i >= 0
+        ? cartaoAgora(dia, i) +
+          '<div class="hoje-dia__seguinte">' + seguinteHtml(dia, i, jaComecou ? 'A seguir' : 'Depois') + '</div>'
+        : '<div class="agora agora--fim">' +
+            '<span class="agora__estado">Fim do dia</span>' +
+            '<span class="agora__titulo">O programa de hoje terminou.</span>' +
+          '</div>') +
+
+      '<a class="hoje-dia__atalho" href="#/roadbook/' + dia.id + '">O dia inteiro no roadbook' + Icone('seta', 16) + '</a>' +
     '</div>';
   }
 
