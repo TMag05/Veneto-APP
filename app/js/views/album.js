@@ -19,6 +19,74 @@
       ';background-size:cover;background-position:center"></div>';
   }
 
+  /* ---------------------------------------------------------
+     Descarregar em ficheiro único
+     Os originais, sem passar por servidor nenhum: o telemóvel já
+     os tem. Num computador, depois do passeio, isto é leve.
+     --------------------------------------------------------- */
+
+  function semRepetir(usados, nome) {
+    if (!usados[nome]) { usados[nome] = 1; return nome; }
+    const ponto = nome.lastIndexOf('.');
+    const raiz = ponto > 0 ? nome.slice(0, ponto) : nome;
+    const ext = ponto > 0 ? nome.slice(ponto) : '';
+    usados[nome] += 1;
+    return raiz + '-' + usados[nome] + ext;
+  }
+
+  function reunir(fotos, porPasta) {
+    const usados = {};
+    return fotos.reduce(function (corrente, f) {
+      return corrente.then(function (lista) {
+        return Fotos.ler(f.id).then(function (r) {
+          if (!r || !r.original) return lista;
+          const dia = DADOS.dia(f.dia);
+          const pasta = porPasta && dia ? 'dia-' + dia.numero + '/' : '';
+          /* Dentro da pasta do dia, o nome não repete o dia. */
+          const nome = pasta ? UI.nomeDeFoto(f, r.tipo).replace(/^dia-\d+-?/, '') : UI.nomeDeFoto(f, r.tipo);
+          lista.push({
+            nome: semRepetir(usados, pasta + nome),
+            blob: r.original,
+            data: new Date(f.criado)
+          });
+          return lista;
+        }).catch(function () { return lista; });
+      });
+    }, Promise.resolve([]));
+  }
+
+  function descarregarZip(fotos, nomeZip, porPasta) {
+    const comFicheiro = fotos.filter(function (f) { return !!f.id; });
+    if (!comFicheiro.length) {
+      UI.abrirFolha('Nada para descarregar',
+        '<p class="corpo-ui silencioso">Ainda não há fotografias guardadas neste telemóvel.</p>');
+      return;
+    }
+
+    UI.abrirFolha('A preparar o ficheiro',
+      '<p class="corpo-ui silencioso">' + UI.plural(comFicheiro.length, 'fotografia', 'fotografias') +
+        ', em qualidade original.</p>' +
+      '<p class="meta num" style="margin-top:16px" id="zip-conta">0 de ' + comFicheiro.length + '</p>');
+
+    const conta = document.getElementById('zip-conta');
+    reunir(comFicheiro, porPasta).then(function (lista) {
+      return Zip.criar(lista, function (feitos, total) {
+        if (conta) conta.textContent = feitos + ' de ' + total;
+      });
+    }).then(function (blob) {
+      UI.fecharFolha();
+      UI.descarregar(nomeZip, blob, 'application/zip');
+    }).catch(function (e) {
+      UI.abrirFolha('Ficheiro grande demais',
+        '<p class="corpo-ui silencioso">São fotografias a mais para um ficheiro só. ' +
+        'Descarregue dia a dia.</p>');
+    });
+  }
+
+  function nomeDoPasseio() {
+    return UI.talho(DADOS.evento.nome || 'passeio') || 'passeio';
+  }
+
   Vistas.album = {
     nav: 'galeria',
     cabecalho: { voltar: '#/galeria', titulo: 'Álbum' },
@@ -46,6 +114,11 @@
           '</div>' +
           (d.data ? '<p class="meta" style="margin-bottom:16px">' + UI.dataLonga(d.data) + '</p>' : '') +
           '<div class="grelha-fotos">' + f.map(celula).join('') + '</div>' +
+          (f.some(function (x) { return !!x.id; })
+            ? '<button class="botao botao--texto" style="margin-top:12px" type="button" ' +
+              'data-acao="descarregarDia" data-valor="' + d.id + '">' +
+              Icone('descarregar', 20) + 'Descarregar o dia</button>'
+            : '') +
         '</div>';
       }).join('');
 
@@ -149,9 +222,12 @@
     desmontar: function () { Fotos.libertarTodos(); },
     acoes: {
       descarregar: function () {
-        UI.abrirFolha('Descarregar o álbum',
-          '<p class="corpo-ui silencioso">Na versão final, o descarregamento faz-se a partir do Storage, em ficheiro único e em qualidade original.</p>' +
-          '<p class="meta" style="margin-top:16px">Nesta demonstração o ficheiro não existe.</p>');
+        descarregarZip(Estado.fotos(), nomeDoPasseio() + '-album.zip', true);
+      },
+      descarregarDia: function (diaId) {
+        const d = DADOS.dia(diaId);
+        const fotos = Estado.fotos().filter(function (f) { return f.dia === diaId; });
+        descarregarZip(fotos, nomeDoPasseio() + '-dia-' + (d ? d.numero : '') + '.zip', false);
       }
     }
   };

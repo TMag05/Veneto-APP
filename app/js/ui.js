@@ -301,6 +301,18 @@ window.UI = (function () {
       .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 32);
   }
 
+  /* dia-3-passo-di-san-boldo-14h32.jpg — o nome que a câmara dá não
+     diz nada a ninguém daqui a um ano. */
+  function nomeDeFoto(f, tipo) {
+    const dia = DADOS.dia(f.dia);
+    const poi = f.poi && POIS[f.poi] ? POIS[f.poi].nome : '';
+    const d = new Date(f.criado);
+    const hora = String(d.getHours()).padStart(2, '0') + 'h' + String(d.getMinutes()).padStart(2, '0');
+    const partes = [dia ? 'dia-' + dia.numero : '', talho(poi), hora].filter(Boolean);
+    const ext = String(tipo || '').indexOf('/') > 0 ? tipo.split('/')[1].replace('jpeg', 'jpg') : 'jpg';
+    return partes.join('-') + '.' + ext;
+  }
+
   /* ---------------------------------------------------------
      Fotografias: uma leitura, vários tamanhos
      --------------------------------------------------------- */
@@ -457,7 +469,7 @@ window.UI = (function () {
     gpx: gpx, descarregar: descarregar,
     foto: foto, imagemDe: imagemDe, logo: logo, horario: horario, distintivo: distintivo, linhaLista: linhaLista, carrosEm: carrosEm,
     campo: campo, ligarCampos: ligarCampos, coordenadas: coordenadas,
-    reduzirImagem: reduzirImagem, derivadas: derivadas, campoFoto: campoFoto, talho: talho,
+    reduzirImagem: reduzirImagem, derivadas: derivadas, campoFoto: campoFoto, talho: talho, nomeDeFoto: nomeDeFoto,
     abrirFolha: abrirFolha, fecharFolha: fecharFolha, partilhar: partilhar,
     MESES: MESES
   };

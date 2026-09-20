@@ -22,16 +22,6 @@
     return String(d.getHours()).padStart(2, '0') + 'h' + String(d.getMinutes()).padStart(2, '0');
   }
 
-  /* dia-3-passo-di-san-boldo-14h32.jpg — o nome da câmara não diz
-     nada a ninguém daqui a um ano. */
-  function nomeFicheiro(f, tipo) {
-    const dia = DADOS.dia(f.dia);
-    const poi = f.poi && POIS[f.poi] ? POIS[f.poi].nome : '';
-    const partes = [dia ? 'dia-' + dia.numero : '', UI.talho(poi), hora(f.criado)].filter(Boolean);
-    const ext = String(tipo || '').indexOf('/') > 0 ? tipo.split('/')[1].replace('jpeg', 'jpg') : 'jpg';
-    return partes.join('-') + '.' + ext;
-  }
-
   function podeApagar(f) {
     return !!f.propria || Estado.ehOrganizacao();
   }
@@ -99,7 +89,7 @@
         if (!f) return;
         Fotos.ler(id).then(function (r) {
           if (!r || !r.original) return;
-          UI.descarregar(nomeFicheiro(f, r.tipo), r.original, r.tipo);
+          UI.descarregar(UI.nomeDeFoto(f, r.tipo), r.original, r.tipo);
         });
       },
 
