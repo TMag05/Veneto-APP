@@ -229,9 +229,9 @@ a { color: var(--verde); text-decoration: none; }
 }
 .nav-item__rotulo {
   font-size: 10px;
-  /* O desenho pede 800; a família vai até 700, que é o peso que
-     agora acompanha a app. Acima disso o browser fingia o negrito. */
-  font-weight: 700;
+  /* O desenho do canvas pedia 800. A app tem dois pesos e só dois —
+     400 e 500 — e um terceiro peso aqui lia-se como outra fonte. */
+  font-weight: 500;
   line-height: 1;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -407,7 +407,9 @@ a { color: var(--verde); text-decoration: none; }
   display: block;
   margin-top: 12px;
   font-size: 12px;
-  font-variant-numeric: oldstyle-nums;
+  /* Algarismos antigos só na Garamond. Aqui, na Instrument, davam um
+     desenho estranho ao lado dos tabulares do mesmo tamanho. */
+  font-variant-numeric: tabular-nums;
   color: var(--inchiostro-chiaro);
 }
 
