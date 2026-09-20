@@ -202,8 +202,9 @@ window.Estado = (function () {
   let aSincronizar = false;
   function sincronizar() {
     if (aSincronizar) return;
-    /* As fotografias ficam de fora enquanto não houver Storage: só
-       sobem quando as três chamadas de envio confirmarem. Dar uma
+    enviarFotos();
+    /* As fotografias seguem por Nuvem, cada uma com a sua confirmação:
+       só passam a 'enviado' quando os três tamanhos subirem. Dar uma
        fotografia por enviada sem ninguém a ter recebido é o erro que
        esta reescrita veio corrigir. */
     const pendentes = estado.fila.filter(function (i) { return i.estado === 'pendente' && i.tipo !== 'foto'; });
@@ -226,6 +227,31 @@ window.Estado = (function () {
     return estado.fila.filter(function (i) { return i.estado === 'pendente' && i.tipo !== 'foto'; }).length;
   }
 
+  /* Sobe as que faltam, uma de cada vez para não afogar a ligação.
+     Sem servidor não faz nada e ninguém dá por isso. */
+  let aEnviarFotos = false;
+  function enviarFotos() {
+    if (aEnviarFotos || !Nuvem.ligada() || !navigator.onLine) return;
+    const meta = estado.fotos.find(function (f) { return f.estadoEnvio !== 'enviado'; });
+    if (!meta) return;
+    aEnviarFotos = true;
+    Fotos.ler(meta.id).then(function (registo) {
+      if (!registo) throw new Error('ficheiro perdido');
+      return Nuvem.enviarFoto(registo, meta);
+    }).then(function (caminhos) {
+      Object.assign(meta, caminhos, { estadoEnvio: 'enviado' });
+      estado.fila = estado.fila.filter(function (i) { return !(i.tipo === 'foto' && i.ref === meta.id); });
+      aEnviarFotos = false;
+      guardar();
+      emitir();
+      enviarFotos();
+    }).catch(function () {
+      /* Fica pendente. A próxima ligação volta a tentar — e o caminho
+         é o mesmo, por ser o do ficheiro, por isso repetir não duplica. */
+      aEnviarFotos = false;
+    });
+  }
+
   function fotosPorEnviar() {
     return estado.fotos.filter(function (f) { return f.estadoEnvio !== 'enviado'; }).length;
   }
@@ -234,28 +260,55 @@ window.Estado = (function () {
      Fotografias
      --------------------------------------------------------- */
 
-  /* Recebe o ficheiro tal como saiu da câmara. O original vai
-     inteiro para o arquivo do telemóvel, sem passar por tela nem
-     por compressão; ao lado fica uma miniatura, que é o que a
-     grelha mostra. Aqui só ficam os metadados. */
+  /* Quem é esta pessoa para o servidor. Com contas a sério passa a
+     ser o uid do Auth; até lá, a ficha que a organização criou. */
+  function meuId() {
+    return estado.uid || estado.participanteId || 'eu';
+  }
+
+  /* Travão de comportamento, não de armazenamento: cem fotografias
+     num dia já é muito para trinta pessoas verem. */
+  const LIMITE_DIARIO = 100;
+
+  function contarDoDia(dia) {
+    return estado.fotos.filter(function (f) { return f.dia === dia; }).length;
+  }
+
+  /* Recebe o ficheiro tal como saiu da câmara. O original vai inteiro
+     para o arquivo do telemóvel, sem passar por tela nem por
+     compressão; ao lado ficam os dois tamanhos que se mostram. Aqui
+     só ficam os metadados. */
   function juntarFoto(ficheiro, dia, poi, feito) {
+    if (contarDoDia(dia) >= LIMITE_DIARIO) { if (feito) feito(null, 'limite'); return; }
+
     const id = 'm' + Date.now() + Math.floor(Math.random() * 1000);
-    UI.derivadas(ficheiro, [{ nome: 'mini', lado: 320, qualidade: 0.7 }], function (d) {
-      if (!d) { if (feito) feito(null); return; }
-      Fotos.guardar({
-        id: id,
-        original: ficheiro,
-        mini: d.mini,
-        tipo: ficheiro.type || 'image/jpeg',
-        largura: d.largura,
-        altura: d.altura,
-        criado: Date.now()
-      }).then(function () {
+    const tamanhos = [
+      { nome: 'mini', lado: 320, qualidade: 0.7 },
+      { nome: 'vista', lado: 1600, qualidade: 0.85 }
+    ];
+
+    UI.derivadas(ficheiro, tamanhos, function (d) {
+      if (!d) { if (feito) feito(null, 'leitura'); return; }
+      Fotos.impressao(ficheiro).then(function (sha) {
+        return Fotos.guardar({
+          id: id,
+          original: ficheiro,
+          mini: d.mini,
+          vista: d.vista,
+          sha: sha,
+          tipo: ficheiro.type || 'image/jpeg',
+          largura: d.largura,
+          altura: d.altura,
+          criado: Date.now()
+        }).then(function () { return sha; });
+      }).then(function (sha) {
         estado.fotos.push({
           id: id,
           autor: 'eu',
+          autorId: meuId(),
           dia: dia,
           poi: poi,
+          sha: sha,
           criado: Date.now(),
           largura: d.largura,
           altura: d.altura,
@@ -266,12 +319,20 @@ window.Estado = (function () {
         enfileirar('foto', 'Fotografia' + (poi && POIS[poi] ? ' — ' + POIS[poi].nome : ''), id);
         if (feito) feito(id);
       }).catch(function () {
-        if (feito) feito(null);
+        if (feito) feito(null, 'espaco');
       });
     });
   }
 
+  function foto(id) {
+    return estado.fotos.find(function (f) { return f.id === id; }) || null;
+  }
+
   function apagarFoto(id) {
+    const meta = foto(id);
+    if (meta && meta.estadoEnvio === 'enviado' && Nuvem.ligada()) {
+      Nuvem.apagarFoto(meta).catch(function () { /* fica para a limpeza da organização */ });
+    }
     estado.fotos = estado.fotos.filter(function (f) { return f.id !== id; });
     estado.fila = estado.fila.filter(function (i) { return !(i.tipo === 'foto' && i.ref === id); });
     guardar();
@@ -323,8 +384,10 @@ window.Estado = (function () {
     enfileirar: enfileirar,
     sincronizar: sincronizar,
     pendentes: pendentes,
+    meuId: meuId,
     juntarFoto: juntarFoto,
     apagarFoto: apagarFoto,
+    foto: foto,
     fotosPorEnviar: fotosPorEnviar,
     fotos: fotos,
     pedir: pedir,

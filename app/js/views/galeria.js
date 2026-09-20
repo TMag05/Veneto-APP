@@ -105,14 +105,16 @@
           const dia = diaAtivo ? diaAtivo.id : '';
           const poi = Estado.ultimaChegada();
           let porFazer = ficheiros.length;
-          let falhou = 0;
+          let falhou = 0, noLimite = 0;
           ficheiros.forEach(function (f) {
-            Estado.juntarFoto(f, dia, poi, function (novoId) {
-              if (!novoId) falhou++;
+            Estado.juntarFoto(f, dia, poi, function (novoId, motivo) {
+              if (!novoId) { if (motivo === 'limite') noLimite++; else falhou++; }
               if (--porFazer === 0) {
                 App.repintar();
-                if (falhou) UI.abrirFolha('Não foi possível guardar',
-                  '<p class="corpo-ui silencioso">' + UI.plural(falhou, 'Uma fotografia não coube', 'Algumas fotografias não couberam') +
+                if (noLimite) UI.abrirFolha('Chega por hoje',
+                  '<p class="corpo-ui silencioso">São cem fotografias neste dia, o máximo. Amanhã recomeça.</p>');
+                else if (falhou) UI.abrirFolha('Não foi possível guardar',
+                  '<p class="corpo-ui silencioso">' + (falhou === 1 ? 'Uma fotografia não coube' : 'Algumas fotografias não couberam') +
                   ' no telemóvel. Liberte espaço e tente de novo.</p>');
               }
             });
