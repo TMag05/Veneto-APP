@@ -1,6 +1,6 @@
 # CLAUDE.md — instruções do projeto
 
-App do passeio anual de clientes Aston Martin. Edição de 2026: **Dolomitas** — *Da Grande Guerra à Laguna de Veneza*. Do Monte Grappa às Pale di San Martino, pelas colinas do Prosecco e pelo Cansiglio, até Veneza. Não passa por Cortina.
+App do passeio anual de clientes Aston Martin. Edição de 2026: **Dolomites Grand Tour** — *Da Grande Guerra à Laguna de Veneza*. Do Monte Grappa às Pale di San Martino, pelas colinas do Prosecco e pelo Cansiglio, até Veneza. Não passa por Cortina.
 Este ficheiro é a linha de pensamento do projeto. Ler antes de escrever código.
 
 ---
@@ -45,6 +45,7 @@ O documento do diretor-geral (`Estrutura-App-Passeio-Dolomitas.docx`) é a espec
 
 - **A app é sempre escura.** Não há modo claro, não há escolha de tema, não sobrevive nenhuma cor clara fora dos componentes que já eram escuros por natureza.
 - **A app não veste a marca Aston Martin, veste a região.** A marca está em três sítios e mais nenhum: a assinatura do ecrã de entrada, as silhuetas dos carros e o rodapé do álbum.
+- **O logótipo do passeio** (`assets/img/logo.png`, e a marca sozinha em `logo-marca.png`) vive noutros três: a entrada, a primeira abertura e a capa do álbum. É sempre claro sobre escuro, nunca leva cor de acento nem sombra, e é ele que dá o nome — onde ele está, o nome não se repete em texto. O ícone da app é a montanha sobre `--calce`.
 - **Uma cor de acento por ecrã.** O acento geral é o cobre `--ottone` (#D9915F). O álbum é `--radicchio`, o percurso no mapa é `--verde`, o SOS é o único ecrã inteiramente vermelho — e o único sem fotografia.
 - **Serif conta, sans instrui.** EB Garamond para o editorial, Instrument Sans para a interface, com `tabular-nums` em horas, distâncias e altitudes. Distinção semântica, sem exceções.
 - **Pesos 400 e 500 apenas.** Nunca 600 nem 700.
@@ -80,6 +81,7 @@ app/
   js/silhuetas.js       perfis dos carros em SVG + paleta de carroçaria
   js/imagens.js         desenhos de reserva e os gráficos de logística (cores lidas de tokens.css)
   assets/fotos/         fotografias dos sítios, servidas com a app e guardadas para funcionar offline
+  assets/img/           logótipo do passeio (claro, transparente) e os ícones da app
   js/app.js             encaminhamento, histórico e chrome
   js/views/             ecrãs do convidado; org*.js são a área da organização
 servidor.js             servidor estático de desenvolvimento

@@ -18,7 +18,7 @@
 window.SEMENTE = (function () {
 
   const evento = {
-    nome: 'Dolomitas',
+    nome: 'Dolomites Grand Tour',
     subtitulo: 'Da Grande Guerra à Laguna de Veneza',
     ano: 2026,
     inicio: '2026-10-01',

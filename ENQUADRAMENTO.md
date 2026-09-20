@@ -87,11 +87,11 @@ O silêncio do documento sobre estas funcionalidades é provavelmente sinal de q
 
 ## 4. O destino: a rota real de 2026
 
-**Respondido a 12.09.2026.** O passeio chama-se *Dolomitas — Da Grande Guerra à Laguna de Veneza* e **não passa por Cortina, pelo Falzarego nem pela Gardena**. O exemplo do documento do diretor-geral, e a maqueta que a app construiu a partir dele, partiam de um pressuposto que a rota real desfez.
+**Respondido a 12.09.2026.** O passeio chama-se *Dolomites Grand Tour — Da Grande Guerra à Laguna de Veneza* e **não passa por Cortina, pelo Falzarego nem pela Gardena**. O exemplo do documento do diretor-geral, e a maqueta que a app construiu a partir dele, partiam de um pressuposto que a rota real desfez.
 
 A rota vai de Possagno e do Monte Grappa ao Passo di San Boldo, desce às colinas do Prosecco (Refrontolo, Miane), sobe à Val Canali e às Pale di San Martino, já no Trentino, e acaba pelo Nevegal e pelo Cansiglio em Veneza. As Dolomitas a sério aparecem num dia; o resto é Veneto de colina e pré-Alpes. Fontes: a proposta da Stappando de 27.04.2026 (itinerário dia a dia, hotéis, restaurantes, serviços), `docs/pesquisa-locais-passeio-dolomitas-2026.md` (factos e ganchos dos oito sítios de maior peso) e `docs/imagens-por-paragem.md` (fotografias e gráficos de logística). A organização deu esta informação como definitiva a 13.09.2026.
 
-Decidido com a organização: sai tudo o que é Cortina; o nome fica *Dolomitas*, com o título oficial como subtítulo.
+Decidido com a organização: sai tudo o que é Cortina. A 20.09.2026 chegou o logótipo oficial e com ele o nome: **Dolomites Grand Tour**, com *Da Grande Guerra à Laguna de Veneza* como subtítulo. O logótipo está em `docs/logo/` e na app em `app/assets/img/`.
 
 | | Estado |
 |---|---|

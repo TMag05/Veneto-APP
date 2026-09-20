@@ -147,7 +147,7 @@
         '<div class="faixa" style="padding-top:24px">' +
           '<div class="seccao-cabecalho"><h2 class="etiqueta">Dados do evento</h2></div>' +
           '<div class="pilha-2">' +
-            UI.campo({ rotulo: 'Nome do passeio', nome: 'nome', valor: e.nome, placeholder: 'Dolomitas' }) +
+            UI.campo({ rotulo: 'Nome do passeio', nome: 'nome', valor: e.nome, placeholder: 'Dolomites Grand Tour' }) +
             UI.campo({ rotulo: 'Subtítulo', nome: 'subtitulo', valor: e.subtitulo || '', placeholder: 'Da Grande Guerra à Laguna de Veneza' }) +
             UI.campo({ rotulo: 'Local / base', nome: 'base', valor: e.base, placeholder: 'Onde o grupo dorme' }) +
             '<div class="par-campos">' +

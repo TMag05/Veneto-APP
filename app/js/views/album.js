@@ -113,7 +113,8 @@
 
       return '<div class="album-capa">' +
           '<p class="assinatura-am" style="color:inherit;opacity:0.8">Aston Martin</p>' +
-          '<h1 class="capa-titulo" style="margin-top:32px">' + UI.h(DADOS.evento.nome || 'Passeio') + '<br>' +
+          UI.logo('logo--album', 'margin-top:32px') +
+          '<h1 class="capa-titulo" style="margin-top:20px">' +
             (DADOS.evento.inicio ? DADOS.evento.inicio.slice(0, 4) : DADOS.evento.ano) + '</h1>' +
           '<p class="subtitulo" style="margin-top:12px">' + UI.h(DADOS.evento.subtitulo || UI.intervaloEvento()) + '</p>' +
         '</div>' +

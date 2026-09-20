@@ -29,8 +29,10 @@
         '<div class="chegada__corpo">' +
           '<p class="assinatura-am chegada__passo" style="--atraso:0.2s">Aston Martin</p>' +
 
-          '<h1 class="capa-titulo chegada__titulo chegada__passo" style="--atraso:0.6s">' +
-            UI.h(primeiro) + ',<br>' + UI.h(DADOS.evento.nome || 'o passeio') + '<br>espera por si.</h1>' +
+          UI.logo('logo--chegada chegada__passo', '--atraso:0.5s') +
+
+          '<h1 class="capa-titulo chegada__titulo chegada__passo" style="--atraso:0.9s">' +
+            UI.h(primeiro) + ',<br>o passeio<br>espera por si.</h1>' +
 
           '<p class="chegada__data chegada__passo" style="--atraso:1.1s">' + UI.intervaloEvento() +
             (DADOS.evento.base ? ' · ' + UI.h(DADOS.evento.base) : '') + '</p>' +

@@ -51,7 +51,7 @@ window.Icone = (function () {
 })();
 
 /* =========================================================
-   Punções da navegação — Passeio Dolomitas 2026
+   Punções da navegação — Dolomites Grand Tour 2026
    Cinco ícones desenhados na mesma gramática: grelha de 48, traço
    de 3, pontas e junções redondas, sem preenchimento. A única área
    cheia em todo o conjunto é a bola de entrada da tulipa do

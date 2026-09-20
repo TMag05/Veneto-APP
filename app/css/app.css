@@ -1209,6 +1209,17 @@ a { color: var(--verde); text-decoration: none; }
 
 
 /* ---------------------------------------------------------
+   Logótipo do passeio
+   Um só ficheiro, claro e transparente, sobre o escuro. Não leva
+   cor de acento nem sombra: é a marca, e não se toca.
+   --------------------------------------------------------- */
+
+.logo { display: block; width: 100%; height: auto; }
+.logo--entrada { max-width: 200px; }
+.logo--chegada { max-width: 150px; margin-bottom: var(--esp-3); }
+.logo--album   { max-width: 168px; }
+
+/* ---------------------------------------------------------
    Revelação diária, nos dias antes de partir
    --------------------------------------------------------- */
 

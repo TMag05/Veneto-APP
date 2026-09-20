@@ -186,6 +186,15 @@ window.UI = (function () {
     return Imagens.fundo((spec && spec.semente) || 'v', (spec && spec.variante) || 'paisagem', proporcao || 1.5);
   }
 
+  /* O logótipo do passeio, claro, sobre o escuro. A cor não se toca:
+     é a marca. O nome vive na imagem — o texto alternativo repete-o
+     para quem ouve o ecrã. */
+  function logo(classes, estilo) {
+    return '<img class="logo ' + (classes || '') + '" src="assets/img/logo.png" ' +
+      'width="900" height="900" alt="' + h((window.DADOS && DADOS.evento.nome) || 'Dolomites Grand Tour') + '"' +
+      (estilo ? ' style="' + estilo + '"' : '') + '>';
+  }
+
   /* A hora de um momento, como se lê: início e fim, só o fim
      («até às 10:00»), só o início, ou ainda por confirmar. */
   function horario(m) {
@@ -387,7 +396,7 @@ window.UI = (function () {
     minutos: minutos, horaAgora: horaAgora, plural: plural, duracao: duracao,
     troco: troco, haversine: haversine, linkMaps: linkMaps, linkLocal: linkLocal,
     gpx: gpx, descarregar: descarregar,
-    foto: foto, imagemDe: imagemDe, horario: horario, distintivo: distintivo, linhaLista: linhaLista, carrosEm: carrosEm,
+    foto: foto, imagemDe: imagemDe, logo: logo, horario: horario, distintivo: distintivo, linhaLista: linhaLista, carrosEm: carrosEm,
     campo: campo, ligarCampos: ligarCampos, coordenadas: coordenadas,
     reduzirImagem: reduzirImagem, campoFoto: campoFoto,
     abrirFolha: abrirFolha, fecharFolha: fecharFolha, partilhar: partilhar,

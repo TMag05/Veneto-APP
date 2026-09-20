@@ -14,12 +14,11 @@ Vistas.entrada = (function () {
       '</div>' +
 
       '<div>' +
-        '<h1 class="capa-titulo">' + UI.h(DADOS.evento.nome || 'Passeio') + '.' +
-          (DADOS.dias.length ? '<br>' + UI.plural(DADOS.dias.length, 'dia', 'dias') + '.' : '') + '</h1>' +
+        UI.logo('logo--entrada') +
         (DADOS.evento.subtitulo
-          ? '<p class="subtitulo" style="margin-top:12px">' + UI.h(DADOS.evento.subtitulo) + '</p>' +
-            '<p class="meta num" style="margin-top:8px">' + UI.intervaloEvento() + '</p>'
-          : '<p class="subtitulo" style="margin-top:12px">' + UI.intervaloEvento() + '</p>') +
+          ? '<p class="subtitulo" style="margin-top:22px">' + UI.h(DADOS.evento.subtitulo) + '</p>' : '') +
+        '<p class="meta num" style="margin-top:8px">' + UI.intervaloEvento() +
+          (DADOS.dias.length ? ' · ' + UI.plural(DADOS.dias.length, 'dia', 'dias') : '') + '</p>' +
       '</div>' +
 
       (passo === 'identificacao' ? formIdentificacao() : formCodigo()) +

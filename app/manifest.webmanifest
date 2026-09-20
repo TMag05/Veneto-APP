@@ -1,7 +1,7 @@
 {
-  "name": "Passeio Aston Martin",
-  "short_name": "Passeio",
-  "description": "Roadbook digital do passeio Aston Martin.",
+  "name": "Dolomites Grand Tour",
+  "short_name": "Grand Tour",
+  "description": "Roadbook do Dolomites Grand Tour, o passeio anual de clientes Aston Martin.",
   "lang": "pt-PT",
   "dir": "ltr",
   "start_url": "./index.html#/hoje",
