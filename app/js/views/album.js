@@ -125,15 +125,6 @@
       const kms = DADOS.dias.reduce(function (t, d) { return t + (d.distancia || 0); }, 0);
       const carro = Estado.meuCarro();
       const eu = Estado.euParticipante();
-      const chegadas = Estado.get().chegadas;
-
-      /* Os passos subidos, por altitude. É o que um roadbook regista. */
-      const passos = Object.keys(chegadas)
-        .map(function (id) { return Object.assign({ id: id }, POIS[id]); })
-        .filter(function (p) { return p.nome && p.altitude; })
-        .sort(function (a, b) { return b.altitude - a.altitude; });
-
-      const maisAlto = passos[0] || null;
       const edicao = String(DADOS.evento.inicio || '').slice(0, 4) + '/' +
         String(carro ? carro.equipa : '—').padStart(2, '0');
 
@@ -155,15 +146,10 @@
           '<div class="cert__corpo">' +
             linhaCert('Quilómetros', kms + ' km') +
             linhaCert('Etapas', String(DADOS.dias.length)) +
-            linhaCert('Paragens visitadas', String(Object.keys(chegadas).length)) +
-            (maisAlto ? linhaCert('Ponto mais alto', maisAlto.altitude + ' m') : '') +
             (carro ? linhaCert('Viatura', Silhuetas.modelo(carro.modelo).nome) : '') +
             (carro && carro.matricula ? linhaCert('Matrícula', carro.matricula) : '') +
             linhaCert('Edição', edicao) +
           '</div>' +
-
-          (maisAlto ? '<p class="cert__nota">O ponto mais alto foi ' + UI.h(maisAlto.nome) +
-            ', a ' + maisAlto.altitude + ' metros.</p>' : '') +
 
           (carro ? '<div class="cert__carro">' + Silhuetas.svg(carro.modelo, carro.cor) + '</div>' : '') +
 
@@ -177,22 +163,6 @@
         '</div>' +
       '</div>';
 
-      const passosHtml = passos.length > 1
-        ? '<div class="faixa">' +
-            '<div class="seccao-cabecalho"><h2 class="etiqueta">Por altitude</h2></div>' +
-            '<div class="altitudes">' +
-              passos.map(function (p) {
-                const largura = maisAlto ? Math.max(6, Math.round(p.altitude / maisAlto.altitude * 100)) : 100;
-                return '<div class="altitude">' +
-                  '<span class="altitude__nome">' + UI.h(p.nome) + '</span>' +
-                  '<span class="altitude__barra"><span style="width:' + largura + '%"></span></span>' +
-                  '<span class="altitude__num num">' + p.altitude + ' m</span>' +
-                '</div>';
-              }).join('') +
-            '</div>' +
-          '</div>'
-        : '';
-
       return '<div class="album-capa">' +
           '<p class="assinatura-am" style="color:inherit;opacity:0.8">Aston Martin</p>' +
           UI.logo('logo--album', 'margin-top:32px') +
@@ -202,7 +172,6 @@
         '</div>' +
 
         certidao +
-        passosHtml +
 
         '<div class="faixa">' +
           '<div class="seccao-cabecalho"><h2 class="etiqueta">Fotografias</h2>' +

@@ -224,28 +224,6 @@ window.UI = (function () {
       '</' + tag + '>';
   }
 
-  /* Carros presentes num POI. O meu segue os meus check-ins; os
-     outros seguem o que a organização registou. */
-  function carrosEm(poiId) {
-    const meu = Estado.meuCarro();
-    const euAqui = Estado.chegou(poiId);
-
-    const lista = DADOS.carros.filter(function (c) {
-      if (meu && c.id === meu.id) return euAqui;
-      return c.chegou === poiId;
-    }).map(function (c) {
-      return (meu && c.id === meu.id) ? Object.assign({}, c, { proprio: true }) : c;
-    });
-
-    /* Quem não está na lista da organização aparece na mesma,
-       se marcou chegada. */
-    if (!meu && euAqui) {
-      const e = Estado.eu();
-      lista.push({ id: 'meu', modelo: e.modelo, cor: e.cor, perfis: [e.nome], proprio: true });
-    }
-    return lista;
-  }
-
   /* ---------------------------------------------------------
      Campos de edição — usados na área da organização
      Gravação automática: não há botão de guardar.
@@ -467,7 +445,7 @@ window.UI = (function () {
     minutos: minutos, horaAgora: horaAgora, plural: plural, duracao: duracao,
     troco: troco, haversine: haversine, linkMaps: linkMaps, linkLocal: linkLocal,
     gpx: gpx, descarregar: descarregar,
-    foto: foto, imagemDe: imagemDe, logo: logo, horario: horario, distintivo: distintivo, linhaLista: linhaLista, carrosEm: carrosEm,
+    foto: foto, imagemDe: imagemDe, logo: logo, horario: horario, distintivo: distintivo, linhaLista: linhaLista,
     campo: campo, ligarCampos: ligarCampos, coordenadas: coordenadas,
     reduzirImagem: reduzirImagem, derivadas: derivadas, campoFoto: campoFoto, talho: talho, nomeDeFoto: nomeDeFoto,
     abrirFolha: abrirFolha, fecharFolha: fecharFolha, partilhar: partilhar,

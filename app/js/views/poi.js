@@ -1,33 +1,12 @@
 /* =========================================================
    POI — uma página com história, não um pin
-   A história desbloqueia à chegada. Cria o ritual de abrir a
-   app em cada paragem, que é onde está o conteúdo.
+   A história abre à hora a que o programa chega ao sítio. O grupo
+   anda em caravana: a hora do itinerário sabe onde toda a gente
+   está, e o ritual de abrir a app em cada paragem mantém-se sem
+   ninguém ter de carregar em nada.
    ========================================================= */
 
 (function () {
-
-  function quemEstaAqui(poiId) {
-    return UI.carrosEm(poiId);
-  }
-
-  function horaChegada(poiId) {
-    const t = Estado.get().chegadas[poiId];
-    if (!t) return '';
-    const d = new Date(t);
-    return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
-  }
-
-  /* A imagem vem do arquivo do telemóvel e chega depois do HTML:
-     aqui fica a etiqueta, e Fotos.pintar dá-lhe o endereço. */
-  function celulaFoto(f) {
-    if (!f.id) {
-      return '<div class="grelha-fotos__celula" style="background-image:' +
-        Imagens.fundo(f.semente, f.variante, 1) + ';background-size:cover;background-position:center"></div>';
-    }
-    return '<a class="grelha-fotos__celula" href="#/foto/' + encodeURIComponent(f.id) + '" aria-label="Fotografia">' +
-      '<img data-foto="' + UI.h(f.id) + '" data-tamanho="mini" loading="lazy" decoding="async" alt="">' +
-    '</a>';
-  }
 
   /* A página de um sítio. Aberta a partir de um bloco do Hoje, leva
      por cima o momento que lá acontece (extra.momento) e, no fim, o
@@ -38,12 +17,11 @@
     if (!poi) return '<div class="faixa"><p class="corpo-editorial">Ponto de interesse não encontrado.</p></div>';
     const x = extra || {};
 
-    const chegou = Estado.chegou(p.id);
-    const aqui = quemEstaAqui(p.id);
-    const fotos = Estado.fotos().filter(function (f) { return f.poi === p.id; }).slice(0, 6);
+    /* A história abre à hora a que o programa lá chega. */
+    const aberto = Programa.abertoAgora(p.id);
 
     let historia;
-    if (chegou) {
+    if (aberto) {
       historia = '<div class="faixa revelado">' +
         poi.historia.map(function (t) { return '<p class="corpo-editorial">' + UI.h(t) + '</p>'; }).join('') +
       '</div>';
@@ -56,15 +34,12 @@
           '<div class="promessa__veu"></div>' +
           '<div class="promessa__corpo">' +
             '<p class="promessa__excerto">' + UI.h(primeiro.slice(0, 74).replace(/\s\S*$/, '')) + '…</p>' +
-            '<p class="promessa__linha">A história deste sítio abre-se quando lá chegar.</p>' +
+            '<p class="promessa__linha">A história deste sítio abre-se quando lá chegarmos.</p>' +
           '</div>' +
         '</div>' +
-        '<button class="botao botao--principal botao--largo" style="margin-top:16px" type="button" data-acao="chegar" data-valor="' + p.id + '">Marcar chegada</button>' +
       '</div>';
     } else {
-      historia = '<div class="faixa">' +
-        '<button class="botao botao--principal botao--largo" type="button" data-acao="chegar" data-valor="' + p.id + '">Marcar chegada</button>' +
-      '</div>';
+      historia = '';
     }
 
     return '' +
@@ -77,7 +52,6 @@
           '<span class="meta">' + UI.h(poi.local) + '</span>' +
           (poi.altitude && String(poi.local).indexOf(String(poi.altitude)) < 0
             ? '<span class="meta num">' + poi.altitude + ' m</span>' : '') +
-          (chegou ? '<span class="meta num">chegada às ' + horaChegada(p.id) + '</span>' : '') +
         '</div>' +
       '</div>' +
 
@@ -90,34 +64,16 @@
         '<p class="corpo-ui" style="margin-top:8px">' + UI.h(poi.nota) + '</p>' +
       '</div></div>' : '') +
 
-      (aqui.length ? '<div class="faixa">' +
-        '<div class="seccao-cabecalho"><h2 class="etiqueta">Já aqui</h2>' +
-          '<span class="meta num">' + aqui.length + '</span></div>' +
-        '<div style="display:flex;flex-wrap:wrap;gap:8px">' +
-          aqui.slice(0, 12).map(function (c) {
-            return '<div style="width:64px">' + Silhuetas.svg(c.modelo, c.cor) + '</div>';
-          }).join('') +
-        '</div>' +
-      '</div>' : '') +
-
-      (fotos.length ? '<div class="faixa">' +
-        '<div class="seccao-cabecalho"><h2 class="etiqueta">Fotografias daqui</h2></div>' +
-        '<div class="grelha-fotos">' + fotos.map(celulaFoto).join('') + '</div>' +
-      '</div>' : '') +
-
       (x.seguinte || '') +
 
-      '<div class="barra-inferior">' +
-        '<a class="botao botao--secundario" href="' + UI.linkLocal(p.id) + '" target="_blank" rel="noopener">' +
+      /* Rede de segurança para quem se separe da caravana, não o CTA
+         do ecrã — por isso vive no fim, em linha, e não numa barra
+         permanente por cima do texto. */
+      '<div class="faixa" style="margin-top:32px">' +
+        '<a class="botao botao--texto" href="' + UI.linkLocal(p.id) + '" target="_blank" rel="noopener">' +
           Icone('externo', 20) + 'Abrir no Google Maps</a>' +
       '</div>';
   }
-
-  const acoes = {
-    chegar: function (poiId) {
-      Estado.marcarChegada(poiId);
-    }
-  };
 
   Vistas.poi = {
     nav: 'roadbook',
@@ -130,10 +86,7 @@
         acao: { acao: 'partilhar', icone: 'partilhar', rotulo: 'Partilhar' }
       };
     },
-    html: function (p) { return paginaPoi(p.id); },
-    montar: function (el) { Fotos.pintar(el); },
-    desmontar: function () { Fotos.libertarTodos(); },
-    acoes: acoes
+    html: function (p) { return paginaPoi(p.id); }
   };
 
   /* ---------------------------------------------------------
@@ -185,9 +138,6 @@
         '</div>' +
         (detalhe ? '<div class="faixa" style="margin-top:24px">' + detalhe + '</div>' : '') +
         '<div style="margin-top:24px">' + Programa.seguinteHtml(x.dia, x.i) + '</div>';
-    },
-    montar: function (el) { Fotos.pintar(el); },
-    desmontar: function () { Fotos.libertarTodos(); },
-    acoes: acoes
+    }
   };
 })();

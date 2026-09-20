@@ -106,7 +106,9 @@
           const ficheiros = Array.prototype.slice.call(ent.files || []);
           const diaAtivo = Estado.diaAtivo();
           const dia = diaAtivo ? diaAtivo.id : '';
-          const poi = Estado.ultimaChegada();
+          /* A fotografia guarda o dia e a hora. A paragem saiu com a
+             marcação de chegada: numa caravana o dia já diz onde foi. */
+          const poi = '';
           let porFazer = ficheiros.length;
           let falhou = 0, noLimite = 0;
           ficheiros.forEach(function (f) {

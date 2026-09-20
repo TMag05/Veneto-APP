@@ -15,7 +15,6 @@ window.Estado = (function () {
     /* O carro não é registado pelo convidado: vem da ficha que a
        organização criou, encontrada pelo email na entrada. */
     participanteId: '',
-    chegadas: {},
     /* Só os metadados. A imagem vive em Fotos (IndexedDB). */
     fotos: [],
     pedidos: [],
@@ -41,6 +40,9 @@ window.Estado = (function () {
            original perdeu-se na redução e chamar-lhe original seria
            mentira. Saem, e o arquivo recomeça no ficheiro de origem. */
         e.fotos = (e.fotos || []).filter(function (f) { return f && !f.dataUrl; });
+        /* A marcação de chegada saiu da app: o grupo anda em caravana e
+           chega junto. O que ficou gravado de versões anteriores vai fora. */
+        delete e.chegadas;
         return e;
       }
     } catch (e) { /* estado corrompido: recomeça-se em silêncio */ }
@@ -165,26 +167,11 @@ window.Estado = (function () {
       id: 'eu',
       nome: (p ? DADOS.nomeCompleto(p) : estado.perfil.nome) || 'Convidado',
       modelo: carro ? carro.modelo : 'db12',
-      cor: carro ? carro.cor : 'magnetic',
-      chegou: ultimaChegada()
+      cor: carro ? carro.cor : 'magnetic'
     };
   }
 
   function carroRegistado() { return !!meuCarro(); }
-
-  function ultimaChegada() {
-    const ids = Object.keys(estado.chegadas);
-    if (!ids.length) return null;
-    return ids.sort(function (a, b) { return estado.chegadas[b] - estado.chegadas[a]; })[0];
-  }
-
-  function chegou(poiId) { return !!estado.chegadas[poiId]; }
-
-  function marcarChegada(poiId) {
-    if (estado.chegadas[poiId]) return;
-    estado.chegadas[poiId] = Date.now();
-    enfileirar('chegada', 'Chegada a ' + (POIS[poiId] ? POIS[poiId].nome : poiId));
-  }
 
   /* ---------------------------------------------------------
      Fila offline
@@ -378,9 +365,6 @@ window.Estado = (function () {
     euParticipante: euParticipante,
     meuCarro: meuCarro,
     associarPorEmail: associarPorEmail,
-    chegou: chegou,
-    marcarChegada: marcarChegada,
-    ultimaChegada: ultimaChegada,
     enfileirar: enfileirar,
     sincronizar: sincronizar,
     pendentes: pendentes,

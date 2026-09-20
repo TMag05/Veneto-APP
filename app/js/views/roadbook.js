@@ -132,14 +132,13 @@
      caminho para a história. */
   function cartaoLocal(id) {
     const p = POIS[id];
-    const chegou = Estado.chegou(id);
+    const aberto = Programa.abertoAgora(id);
     const meta = [
       p.local,
-      p.altitude && String(p.local).indexOf(String(p.altitude)) < 0 ? p.altitude + ' m' : null,
-      chegou ? 'visitado' : null
+      p.altitude && String(p.local).indexOf(String(p.altitude)) < 0 ? p.altitude + ' m' : null
     ].filter(Boolean).join(' · ');
     const convite = p.historia && p.historia.length
-      ? (chegou ? 'Ler a história' : 'A história abre-se à chegada')
+      ? (aberto ? 'Ler a história' : 'A história abre-se lá')
       : 'Ver a paragem';
 
     return '<a class="cartao-dia capitulo__paragem" href="#/poi/' + id + '">' +
@@ -191,8 +190,7 @@
           const poi = POIS[id];
           if (!poi) return '';
           const anterior = i > 0 ? dia.etapas[i - 1] : null;
-          const visitado = Estado.chegou(id);
-          return '<div class="etapa" data-visitado="' + (visitado ? 'sim' : 'nao') + '">' +
+          return '<div class="etapa">' +
               '<div class="etapa__marca"></div>' +
               '<div class="etapa__conteudo">' +
                 (anterior && POIS[anterior] ? ritmo(anterior, id) : '') +
@@ -200,7 +198,6 @@
                   '<h3 class="etapa__titulo">' + UI.h(poi.nome) + '</h3>' +
                   '<div class="etapa__meta">' +
                     '<span class="meta">' + UI.h(poi.local) + '</span>' +
-                    (visitado ? '<span class="meta">visitado</span>' : '') +
                   '</div>' +
                 '</a>' +
               '</div>' +

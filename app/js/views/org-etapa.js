@@ -337,7 +337,7 @@
               placeholder: 'Uma frase. Aparece em itálico por baixo do nome' }) +
             UI.campo({ rotulo: 'História', nome: 'historia', valor: (poi.historia || []).join('\n\n'), tipo: 'area', linhas: 8,
               placeholder: 'Dois ou três parágrafos. Separe-os com uma linha em branco.',
-              nota: 'Só abre ao convidado quando ele marca chegada.' }) +
+              nota: 'Abre ao convidado à hora a que o programa chega a esta paragem.' }) +
             UI.campo({ rotulo: 'Nota prática', nome: 'nota', valor: poi.nota,
               placeholder: 'Estacionamento, horários, o que levar' }) +
             UI.campo({ rotulo: 'Revelar em', nome: 'revelacao', valor: poi.revelacao, tipo: 'data',

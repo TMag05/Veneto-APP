@@ -569,7 +569,7 @@ window.Conteudo = (function () {
     Object.assign(dados.evento, clonar(ex.evento || {}));
 
     /* O grupo espalhado pelo percurso do segundo dia — é o que dá
-       vida ao mapa e à manchete de presença. */
+       vida ao mapa e à lista de participantes. */
     const percurso = (dados.dias[1] || dados.dias[0] || { etapas: [] }).etapas;
 
     ex.participantes.forEach(function (p, i) {

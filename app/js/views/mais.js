@@ -204,7 +204,7 @@
 
       repor: function () {
         UI.abrirFolha('Repor tudo',
-          '<p class="corpo-ui silencioso">Apaga o itinerário, os participantes, os contactos, as chegadas e as fotografias guardadas neste telemóvel.</p>' +
+          '<p class="corpo-ui silencioso">Apaga o itinerário, os participantes, os contactos e as fotografias guardadas neste telemóvel.</p>' +
           '<button class="botao botao--rosso botao--largo" style="margin-top:24px" type="button" id="btn-repor">Repor</button>');
         document.getElementById('btn-repor').addEventListener('click', function () {
           UI.fecharFolha();

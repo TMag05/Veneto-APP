@@ -309,7 +309,7 @@ window.SEMENTE = (function () {
   /* ---------------------------------------------------------
      Demonstração
      Pessoas e contactos de exemplo, postos por cima do passeio
-     real para dar vida ao mapa e à manchete do grupo. Não são
+     real para dar vida ao mapa e à lista de participantes. Não são
      participantes reais — esses entram na área da organização.
      --------------------------------------------------------- */
   const exemplo = {

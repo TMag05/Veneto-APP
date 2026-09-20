@@ -1,7 +1,7 @@
 /* =========================================================
-   Mapa — base monocromática, carros a cores reais
-   Sem tracking contínuo: em web app o iOS deixa de reportar
-   posição com o ecrã bloqueado. A presença vem dos check-ins.
+   Mapa — o desenho do percurso de cada dia
+   Sem posições e sem presença: o grupo anda em caravana, chega
+   junto e pára junto, e por isso não há nada para validar aqui.
    O enquadramento é o do dia escolhido, não o da região.
    ========================================================= */
 
@@ -75,9 +75,8 @@
       const p = POIS[id];
       if (!p) return '';
       const x = px(E, p), y = py(E, p);
-      const visitado = Estado.chegou(id);
       return '<rect x="' + (x - 7).toFixed(1) + '" y="' + (y - 7).toFixed(1) + '" width="14" height="14" ' +
-        'fill="' + (visitado ? 'var(--verde)' : 'var(--intonaco)') + '" stroke="#0D0F11" stroke-width="2"/>';
+        'fill="var(--verde)" stroke="#0D0F11" stroke-width="2"/>';
     }).join('');
   }
 
@@ -91,8 +90,8 @@
     '</svg>';
   }
 
-  /* Etiquetas e carros vão por cima, em HTML, para respeitarem
-     a escala tipográfica em vez de escalarem com o SVG. */
+  /* As etiquetas vão por cima, em HTML, para respeitarem a escala
+     tipográfica em vez de escalarem com o SVG. */
   function sobreposicao(E, dia) {
     const vistos = {};
     const pontos = [];
@@ -102,7 +101,7 @@
       vistos[id] = true;
       const p = POIS[id];
       if (!p) return;
-      pontos.push({ id: id, poi: p, x: px(E, p), y: py(E, p), carros: UI.carrosEm(id) });
+      pontos.push({ id: id, poi: p, x: px(E, p), y: py(E, p) });
     });
 
     /* As etiquetas empilham-se por linhas até não se tocarem.
@@ -111,21 +110,6 @@
     const LINHA = 19;
     const colocadas = [];
     pontos.sort(function (a, b) { return a.y - b.y || a.x - b.x; });
-
-    /* Os carros sobem a partir do próprio ponto — para fora do sítio
-       onde estão, não para dentro. Reserva-se esse espaço antes de
-       colocar etiquetas, para a de uma paragem vizinha não lhe cair
-       em cima. */
-    const CARRO_L = 40 / 335 * L;
-    pontos.forEach(function (q) {
-      if (!q.carros.length) return;
-      const n = q.carros.length;
-      const altura = 10 + (n > 1 ? 23 : 14) + (n > 2 ? 15 : 0);
-      const linhas = Math.ceil(altura / LINHA);
-      for (let k = 1; k <= linhas; k++) {
-        colocadas.push({ x0: q.x - CARRO_L / 2, x1: q.x + CARRO_L / 2, y: q.y, linha: -k });
-      }
-    });
 
     pontos.forEach(function (q) {
       /* Largura estimada da etiqueta, em unidades do viewBox. */
@@ -160,68 +144,9 @@
         'style="left:' + esq.toFixed(2) + '%;top:calc(' + topo.toFixed(2) + '% + ' + desvio + 'px);transform:' + q.alinhamento + '">' +
         '<span class="mapa-etiqueta__nome">' + UI.h(q.poi.nome) + '</span>' +
       '</a>';
-
-      const carros = q.carros;
-      if (carros.length) {
-        s += '<div class="mapa-carros" style="left:' + esq.toFixed(2) + '%;top:' + topo.toFixed(2) + '%">' +
-          carros.slice(0, 2).map(function (c, i) {
-            return '<div class="mapa-carro" style="margin-top:' + (i ? -5 : 0) + 'px">' + Silhuetas.svg(c.modelo, c.cor, { rodas: false }) + '</div>';
-          }).join('') +
-          (carros.length > 2 ? '<span class="meta num mapa-carros__mais">+' + (carros.length - 2) + '</span>' : '') +
-        '</div>';
-      }
     });
 
     return s;
-  }
-
-  /* Quando vários carros marcam chegada ao mesmo sítio, isso é
-     notícia — e uma manchete lê-se antes de qualquer lista. */
-  function manchete(dia) {
-    let melhor = null;
-    const vistos = {};
-    dia.etapas.forEach(function (id) {
-      if (vistos[id]) return;
-      vistos[id] = true;
-      const n = UI.carrosEm(id).length;
-      if (n >= 2 && (!melhor || n > melhor.n)) melhor = { id: id, n: n };
-    });
-    if (!melhor) return '';
-    const poi = POIS[melhor.id];
-    return '<div class="faixa" style="padding-top:24px">' +
-      '<a class="manchete" href="#/poi/' + melhor.id + '">' +
-        '<span class="manchete__texto">' + UI.plural(melhor.n, 'carro já', 'carros já') + ' ' +
-          (poi.tipo === 'estrada' ? 'no' : 'em') + ' ' + UI.h(poi.nome) + '.</span>' +
-      '</a>' +
-    '</div>';
-  }
-
-  function presenca(dia) {
-    const grupos = [];
-    dia.etapas.forEach(function (id) {
-      if (grupos.some(function (g) { return g.id === id; })) return;
-      const carros = UI.carrosEm(id);
-      if (carros.length) grupos.push({ id: id, carros: carros });
-    });
-    if (!grupos.length) return '';
-
-    return '<div class="faixa">' +
-      '<div class="seccao-cabecalho"><h2 class="etiqueta">Onde está o grupo</h2>' +
-        '<span class="meta num">' + DADOS.carros.length + ' carros</span></div>' +
-      grupos.reverse().map(function (g) {
-        return '<div class="presenca-grupo">' +
-          '<div class="presenca-grupo__cabeca">' +
-            '<a class="presenca-grupo__nome" href="#/poi/' + g.id + '" style="color:inherit">' + UI.h(POIS[g.id].nome) + '</a>' +
-            '<span class="meta num">' + UI.plural(g.carros.length, 'carro', 'carros') + '</span>' +
-          '</div>' +
-          '<div class="presenca-grupo__carros">' +
-            g.carros.map(function (c) {
-              return '<span title="' + UI.h(c.perfis.join(' e ')) + '">' + Silhuetas.svg(c.modelo, c.cor, { rodas: false }) + '</span>';
-            }).join('') +
-          '</div>' +
-        '</div>';
-      }).join('') +
-    '</div>';
   }
 
   let diaVisivel = null;
@@ -245,7 +170,7 @@
       diaVisivel = dia.id;
       const E = enquadrar(dia);
 
-      return capa + manchete(dia) +
+      return capa +
         '<div class="faixa" style="padding-top:16px;padding-bottom:16px">' +
           '<div class="escolhas">' + DADOS.dias.map(function (d) {
             return '<button class="escolha" type="button" data-acao="dia" data-valor="' + d.id + '" ' +
@@ -257,9 +182,7 @@
 
         '<div class="mapa-legenda">' +
           '<span class="mapa-legenda__item"><span style="width:12px;height:12px;background:var(--verde);display:block"></span>' +
-            '<span class="meta">visitado</span></span>' +
-          '<span class="mapa-legenda__item"><span style="width:12px;height:12px;background:var(--intonaco);border:1.5px solid #0D0F11;display:block"></span>' +
-            '<span class="meta">por visitar</span></span>' +
+            '<span class="meta">paragem</span></span>' +
           '<span class="mapa-legenda__item"><span style="width:18px;height:0;border-top:3px solid var(--verde);display:block"></span>' +
             '<span class="meta">percurso</span></span>' +
         '</div>' +
@@ -270,8 +193,6 @@
           (dia.distancia ? '<p class="meta num" style="margin-top:12px">' + dia.distancia + ' km · ' + UI.h(dia.duracao) + '</p>' : '') +
           '<a class="botao botao--secundario botao--largo" style="margin-top:24px" href="#/roadbook/' + dia.id + '">Abrir o roadbook deste dia</a>' +
         '</div>' +
-
-        presenca(dia) +
 
         '<div class="faixa">' +
           UI.linhaLista({ titulo: 'Lista de participantes', nota: DADOS.carros.length + ' carros', icone: 'pessoas', href: '#/participantes' }) +

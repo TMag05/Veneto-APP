@@ -515,8 +515,33 @@
     }
   };
 
+  /* A história de uma paragem abre quando o grupo lá chega, segundo o
+     programa. O grupo anda em caravana: a hora do itinerário sabe onde
+     toda a gente está melhor do que um toque no ecrã — e funciona num
+     vale sem rede, que é onde estas estradas passam. */
+  function abertoAgora(poiId) {
+    if (!poiId) return false;
+    const hoje = Estado.chave(Estado.agora());
+    const agora = UI.horaAgora();
+
+    return DADOS.dias.some(function (d) {
+      if (!d.data || d.data > hoje) return false;
+      const naEtapa = d.etapas.indexOf(poiId) >= 0;
+      const momentos = d.momentos.filter(function (m) { return m.poi === poiId; });
+      if (!naEtapa && !momentos.length) return false;
+
+      /* Dia passado: está tudo aberto. */
+      if (d.data < hoje) return true;
+
+      /* Hoje: abre à hora do momento. Sem hora marcada, abre com o dia. */
+      if (!momentos.length) return true;
+      return momentos.some(function (m) { return !m.hora || agora >= UI.minutos(m.hora); });
+    });
+  }
+
   window.Programa = {
     blocos: blocos, capaDia: capaDia, indiceAtual: indiceAtual, poiAnterior: poiAnterior,
+    abertoAgora: abertoAgora,
     corpoMomento: corpoMomento, momentoEm: momentoEm, seguinteHtml: seguinteHtml,
     imagemDoMomento: imagemDoMomento
   };
