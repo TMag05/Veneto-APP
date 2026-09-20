@@ -295,6 +295,7 @@
       if (!poi) return '<div class="faixa" style="padding-top:24px"><p class="corpo-editorial">Paragem não encontrada.</p></div>';
 
       const usadaEm = DADOS.dias.filter(function (d) { return (d.etapas || []).indexOf(p.id) >= 0; });
+      const chegada = poi.chegada || {};
 
       return '<div class="faixa" style="padding-top:24px">' +
           UI.campoFoto({
@@ -345,6 +346,23 @@
           '</div>' +
         '</div>' +
 
+        '<div class="faixa" style="margin-top:32px">' +
+          '<div class="seccao-cabecalho"><h2 class="etiqueta">À chegada</h2></div>' +
+          '<p class="corpo-ui silencioso">O que o convidado precisa de saber depois de parar ali. ' +
+            'O que ficar em branco não aparece.</p>' +
+          '<div class="pilha-2" style="margin-top:16px">' +
+            UI.campo({ rotulo: 'Estacionamento', nome: 'ch_estacionamento', valor: chegada.estacionamento,
+              placeholder: 'Onde se deixam os carros' }) +
+            UI.campo({ rotulo: 'Quem recebe', nome: 'ch_recebe', valor: chegada.recebe,
+              placeholder: 'Quem espera o grupo, e onde' }) +
+            '<div class="par-campos">' +
+              UI.campo({ rotulo: 'Casas de banho', nome: 'ch_wc', valor: chegada.wc, placeholder: 'Se existirem' }) +
+              UI.campo({ rotulo: 'Voltar aos carros', nome: 'ch_regresso', valor: chegada.regresso, tipo: 'hora' }) +
+            '</div>' +
+            UI.campo({ rotulo: 'Nota', nome: 'ch_nota', valor: chegada.nota, placeholder: 'Uma frase, se for preciso' }) +
+          '</div>' +
+        '</div>' +
+
         '<div class="faixa">' +
           '<p class="meta">' + (usadaEm.length
             ? 'Usada em: ' + usadaEm.map(function (d) { return UI.h(d.titulo || 'etapa ' + d.numero); }).join(', ')
@@ -373,6 +391,12 @@
             Conteudo.atualizarPoi(p.id, { lat: c.lat, lng: c.lng });
             campo.value = '';
           }
+          return;
+        }
+        if (nome.indexOf('ch_') === 0) {
+          const c = {};
+          c[nome.slice(3)] = valor;
+          Conteudo.atualizarChegada(p.id, c);
           return;
         }
         const patch = {};

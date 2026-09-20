@@ -813,20 +813,77 @@ a { color: var(--verde); text-decoration: none; }
 }
 
 /* ---------------------------------------------------------
+   À chegada — o que fazer depois de parar
+   Informação, não desenho: uma linha por campo, sem cor de
+   acento e sem moldura própria.
+   --------------------------------------------------------- */
+
+.chegada-lista { margin-top: var(--esp-2); display: flex; flex-direction: column; gap: 12px; }
+.chegada-linha { display: flex; flex-direction: column; gap: 2px; }
+.chegada-linha__rot { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--inchiostro-chiaro); }
+.chegada-linha__val { font-size: 16px; line-height: 1.35; color: var(--inchiostro); }
+
+/* ---------------------------------------------------------
    Estradas — o desenho do traçado
    Uma cor só: o verde do percurso. Nada mais entra aqui.
    --------------------------------------------------------- */
 
-.estrada { display: block; width: 100%; height: auto; overflow: visible; }
+.estrada {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--estrada-chapa);
+  border-radius: var(--raio-cartao);
+  padding: var(--esp-2);
+  box-sizing: border-box;
+}
 .estrada__traco {
   fill: none;
-  stroke: var(--verde);
+  stroke: var(--estrada-tinta);
   stroke-width: var(--traco-estrada);
   stroke-linecap: round;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
 }
-.estrada--capa .estrada__traco { stroke-width: var(--traco-estrada-capa); }
+.estrada--capa .estrada__traco, .estrada--grande .estrada__traco { stroke-width: var(--traco-estrada-capa); }
+
+/* A capa do separador é o traçado. O desenho ocupa o que sobra por
+   cima do título — não passa por baixo dele, que é o que obrigaria
+   a um véu e apagaria metade do traço. */
+.capa--estrada {
+  background: var(--estrada-chapa);
+  min-height: 340px;
+  justify-content: space-between;
+  gap: var(--esp-2);
+}
+.capa--estrada::after { display: none; }
+.capa--estrada .estrada {
+  flex: 1;
+  min-height: 0;
+  background: none;
+  border-radius: 0;
+  padding: 0;
+}
+
+/* Uma estrada na lista do dia: o traço à esquerda, o nome à direita. */
+.estrada-cartao {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  align-items: center;
+  gap: var(--esp-2);
+  padding: 12px 0;
+  border-bottom: 1px solid var(--borda);
+  color: var(--inchiostro);
+}
+.estrada-cartao .estrada { padding: 8px; border-radius: var(--raio-foto); }
+.estrada-cartao__corpo { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+.estrada--grande { margin: 0; }
+
+.estrada-dados { display: flex; flex-direction: column; gap: 10px; }
+.estrada-dado { display: flex; align-items: baseline; justify-content: space-between; gap: var(--esp-2); }
+.estrada-dado__rot { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--inchiostro-chiaro); }
+.estrada-dado__val { font-size: 17px; color: var(--inchiostro); }
 
 /* ---------------------------------------------------------
    Galeria

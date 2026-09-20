@@ -55,8 +55,9 @@ window.Conteudo = (function () {
       const id = idUnico(nome, d.pois);
       d.pois[id] = Object.assign({
         nome: nome, local: '', tipo: 'vila', lat: 0, lng: 0, altitude: 0,
-        subtitulo: '', historia: [], nota: '', revelacao: ''
+        subtitulo: '', historia: [], nota: '', revelacao: '', chegada: chegadaVazia()
       }, clonar(b || {}));
+      d.pois[id].chegada = Object.assign(chegadaVazia(), d.pois[id].chegada || {});
       if (!d.pois[id].imagem) d.pois[id].imagem = { variante: varianteDe(d.pois[id].tipo), semente: id };
       porNome[nome] = id;
       return id;
@@ -344,10 +345,24 @@ window.Conteudo = (function () {
       nota: c.nota || '',
       /* Data em que a paragem se revela no briefing. Vazia = já visível. */
       revelacao: c.revelacao || '',
+      chegada: Object.assign(chegadaVazia(), c.chegada || {}),
       imagem: c.imagem || { variante: varianteDe(c.tipo), semente: id }
     };
     guardar();
     return id;
+  }
+
+  /* O que fazer quando se pára ali: onde se deixam os carros, quem
+     espera o grupo, e a que horas se volta. Campos vazios não
+     aparecem ao convidado — isto é informação, não é desenho. */
+  function chegadaVazia() {
+    return { estacionamento: '', recebe: '', wc: '', regresso: '', nota: '' };
+  }
+
+  function atualizarChegada(id, patch) {
+    if (!dados.pois[id]) return;
+    dados.pois[id].chegada = Object.assign(chegadaVazia(), dados.pois[id].chegada, patch);
+    guardar();
   }
 
   function atualizarPoi(id, patch) {
@@ -597,6 +612,7 @@ window.Conteudo = (function () {
 
     criarDia: criarDia, atualizarDia: atualizarDia, removerDia: removerDia, moverDia: moverDia,
     criarPoi: criarPoi, atualizarPoi: atualizarPoi, removerPoi: removerPoi,
+    atualizarChegada: atualizarChegada,
     juntarParagem: juntarParagem, removerParagem: removerParagem, moverParagem: moverParagem,
 
     criarMomento: criarMomento, atualizarMomento: atualizarMomento, removerMomento: removerMomento,

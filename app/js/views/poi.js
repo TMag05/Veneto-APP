@@ -8,6 +8,33 @@
 
 (function () {
 
+  /* O que fazer depois de parar ali. Vive no alto da página porque é
+     o momento em que o convidado abre mesmo o telemóvel. O que a
+     organização não preencheu não desenha nada — nem rótulo, nem
+     espaço reservado. */
+  function aChegada(poi) {
+    const c = poi.chegada || {};
+    const linhas = [
+      ['Estacionamento', c.estacionamento, false],
+      ['Quem recebe', c.recebe, false],
+      ['Casas de banho', c.wc, false],
+      ['Voltar aos carros', c.regresso ? c.regresso.replace(':', 'h') : '', true]
+    ].filter(function (l) { return !!l[1]; });
+
+    if (!linhas.length && !c.nota) return '';
+
+    return '<div class="faixa"><div class="cartao">' +
+      '<p class="etiqueta">À chegada</p>' +
+      (linhas.length ? '<div class="chegada-lista">' + linhas.map(function (l) {
+        return '<div class="chegada-linha">' +
+          '<span class="chegada-linha__rot">' + UI.h(l[0]) + '</span>' +
+          '<span class="chegada-linha__val' + (l[2] ? ' num' : '') + '">' + UI.h(l[1]) + '</span>' +
+        '</div>';
+      }).join('') + '</div>' : '') +
+      (c.nota ? '<p class="corpo-ui' + (linhas.length ? ' silencioso" style="margin-top:16px"' : '"') + '>' + UI.h(c.nota) + '</p>' : '') +
+    '</div></div>';
+  }
+
   /* A página de um sítio. Aberta a partir de um bloco do Hoje, leva
      por cima o momento que lá acontece (extra.momento) e, no fim, o
      que vem a seguir (extra.seguinte). */
@@ -56,6 +83,8 @@
       '</div>' +
 
       (x.momento || '') +
+
+      aChegada(poi) +
 
       historia +
 

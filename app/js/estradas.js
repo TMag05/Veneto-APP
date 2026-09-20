@@ -25,6 +25,8 @@ window.ESTRADAS = (function () {
       nome: 'Passo di San Boldo',
       subtitulo: 'La Strada dei 100 Giorni',
       dias: [2, 4],
+      /* A própria estrada é paragem do programa, nos dois dias. */
+      paragem: 'passo-di-san-boldo',
       estado: 'confirmado',
       viewBox: '0 0 1000 792',
       traco:
@@ -71,6 +73,8 @@ window.ESTRADAS = (function () {
       nome: 'Strada Cadorna',
       subtitulo: 'A subida a Cima Grappa',
       dias: [2],
+      /* «Acesso pela Strada Cadorna» — pesquisa §1. */
+      paragem: 'sacrario-del-monte-grappa',
       estado: 'por confirmar',
       dados: {},
       nota: 'Estrada militar mandada abrir pelo general Cadorna, concluída em 1917.'
@@ -81,6 +85,8 @@ window.ESTRADAS = (function () {
       nome: 'Val Canali',
       subtitulo: 'A subida às Pale di San Martino',
       dias: [3],
+      /* «Localizado na Val Canali» — pesquisa §6. */
+      paragem: 'chalet-piereni',
       estado: 'por confirmar',
       dados: {},
       nota: 'O vale que separa o Lagorai das Pale di San Martino.'
@@ -91,6 +97,7 @@ window.ESTRADAS = (function () {
       nome: 'Os vales das Dolomitas',
       subtitulo: 'A tarde do terceiro dia',
       dias: [3],
+      paragem: '',
       estado: 'por confirmar',
       dados: {},
       nota: 'Três horas e meia de estrada que a proposta ainda não nomeia.'
@@ -101,6 +108,8 @@ window.ESTRADAS = (function () {
       nome: 'Altopiano del Cansiglio',
       subtitulo: 'A subida ao Monte Pizzoc',
       dias: [4],
+      /* O rifúgio está no Monte Pizzoc, no Cansiglio — pesquisa §8. */
+      paragem: 'rifugio-citta-di-vittorio-veneto',
       estado: 'por confirmar',
       dados: {},
       nota: 'O bosque de faias que Veneza guardou desde 1420 para fazer os remos do Arsenale.'
@@ -115,6 +124,16 @@ window.ESTRADAS = (function () {
   }
 
   function por(id) { return TRACOS[id] || null; }
+
+  /* A estrada que conduz a uma paragem, nesse dia. */
+  function paraParagem(numero, poiId) {
+    return doDia(numero).find(function (e) { return e.paragem === poiId; }) || null;
+  }
+
+  /* As que ficam sem sítio na sequência do dia — os vales sem nome. */
+  function soltas(numero) {
+    return doDia(numero).filter(function (e) { return !e.paragem; });
+  }
 
   /* Só as que têm traçado é que se desenham. */
   function desenhavel(e) { return !!(e && e.traco && e.viewBox); }
@@ -131,5 +150,5 @@ window.ESTRADAS = (function () {
     '</svg>';
   }
 
-  return { TRACOS: TRACOS, doDia: doDia, por: por, desenhavel: desenhavel, svg: svg };
+  return { TRACOS: TRACOS, doDia: doDia, por: por, paraParagem: paraParagem, soltas: soltas, desenhavel: desenhavel, svg: svg };
 })();

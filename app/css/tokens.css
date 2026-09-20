@@ -66,6 +66,12 @@
   --raio-controlo: 12px;
   --raio-pill: 999px;
 
+  /* Os traçados assentam sempre sobre escuro, como a fotografia: a
+     chapa e a tinta não mudam de tema. No claro, o verde escurecido
+     desapareceria contra a chapa — e a chapa clara desfaria o traço. */
+  --estrada-chapa: #101216;
+  --estrada-tinta: #6E9A7C;
+
   /* Espessura do traço de uma estrada. Não escala com o desenho —
      vector-effect segura-a em pixels — para o mesmo traçado se ler
      grande numa capa e pequeno numa lista. */
