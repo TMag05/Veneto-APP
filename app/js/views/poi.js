@@ -17,6 +17,18 @@
     return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
   }
 
+  /* A imagem vem do arquivo do telemóvel e chega depois do HTML:
+     aqui fica a etiqueta, e Fotos.pintar dá-lhe o endereço. */
+  function celulaFoto(f) {
+    if (!f.id) {
+      return '<div class="grelha-fotos__celula" style="background-image:' +
+        Imagens.fundo(f.semente, f.variante, 1) + ';background-size:cover;background-position:center"></div>';
+    }
+    return '<a class="grelha-fotos__celula" href="#/foto/' + encodeURIComponent(f.id) + '" aria-label="Fotografia">' +
+      '<img data-foto="' + UI.h(f.id) + '" data-tamanho="mini" loading="lazy" decoding="async" alt="">' +
+    '</a>';
+  }
+
   /* A página de um sítio. Aberta a partir de um bloco do Hoje, leva
      por cima o momento que lá acontece (extra.momento) e, no fim, o
      que vem a seguir (extra.seguinte). */
@@ -90,11 +102,7 @@
 
       (fotos.length ? '<div class="faixa">' +
         '<div class="seccao-cabecalho"><h2 class="etiqueta">Fotografias daqui</h2></div>' +
-        '<div class="grelha-fotos">' + fotos.map(function (f) {
-          return '<div class="grelha-fotos__celula" style="background-image:' +
-            (f.dataUrl ? "url('" + f.dataUrl + "')" : Imagens.fundo(f.semente, f.variante, 1)) +
-            ';background-size:cover;background-position:center"></div>';
-        }).join('') + '</div>' +
+        '<div class="grelha-fotos">' + fotos.map(celulaFoto).join('') + '</div>' +
       '</div>' : '') +
 
       (x.seguinte || '') +
@@ -123,6 +131,8 @@
       };
     },
     html: function (p) { return paginaPoi(p.id); },
+    montar: function (el) { Fotos.pintar(el); },
+    desmontar: function () { Fotos.libertarTodos(); },
     acoes: acoes
   };
 
@@ -176,6 +186,8 @@
         (detalhe ? '<div class="faixa" style="margin-top:24px">' + detalhe + '</div>' : '') +
         '<div style="margin-top:24px">' + Programa.seguinteHtml(x.dia, x.i) + '</div>';
     },
+    montar: function (el) { Fotos.pintar(el); },
+    desmontar: function () { Fotos.libertarTodos(); },
     acoes: acoes
   };
 })();
