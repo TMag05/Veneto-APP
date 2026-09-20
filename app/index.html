@@ -8,14 +8,17 @@
 
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#121417">
+<!-- O tema guardado aplica-se antes da folha de estilo, para o ecrã
+     não piscar escuro antes de ficar claro. O resto é app.js. -->
+<script>try{var e=JSON.parse(localStorage.getItem('veneto.estado.v1'));if(e&&e.tema==='claro'){document.documentElement.dataset.tema='claro';document.querySelector('meta[name="theme-color"]').content='#F7F4EE';}}catch(x){}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Grand Tour">
 <link rel="apple-touch-icon" href="assets/img/icone-180.png">
 
-<link rel="stylesheet" href="assets/fonts/fonts.css?v=56">
-<link rel="stylesheet" href="css/tokens.css?v=56">
-<link rel="stylesheet" href="css/app.css?v=56">
+<link rel="stylesheet" href="assets/fonts/fonts.css?v=60">
+<link rel="stylesheet" href="css/tokens.css?v=60">
+<link rel="stylesheet" href="css/app.css?v=60">
 </head>
 <body>
 
@@ -28,28 +31,28 @@
 <div id="folha" class="folha" hidden aria-modal="true" role="dialog"></div>
 <div id="estado-rede" class="estado-rede" hidden aria-live="polite"></div>
 
-<script src="js/silhuetas.js?v=56"></script>
-<script src="js/icones.js?v=56"></script>
-<script src="js/imagens.js?v=56"></script>
-<script src="js/semente.js?v=56"></script>
-<script src="js/ui.js?v=56"></script>
-<script src="js/conteudo.js?v=56"></script>
-<script src="js/store.js?v=56"></script>
-<script src="js/views/entrada.js?v=56"></script>
-<script src="js/views/chegada.js?v=56"></script>
-<script src="js/views/hoje.js?v=56"></script>
-<script src="js/views/roadbook.js?v=56"></script>
-<script src="js/views/poi.js?v=56"></script>
-<script src="js/views/mapa.js?v=56"></script>
-<script src="js/views/galeria.js?v=56"></script>
-<script src="js/views/concierge.js?v=56"></script>
-<script src="js/views/carro.js?v=56"></script>
-<script src="js/views/album.js?v=56"></script>
-<script src="js/views/mais.js?v=56"></script>
-<script src="js/views/org.js?v=56"></script>
-<script src="js/views/org-etapa.js?v=56"></script>
-<script src="js/views/org-pessoas.js?v=56"></script>
-<script src="js/views/org-contactos.js?v=56"></script>
-<script src="js/app.js?v=56"></script>
+<script src="js/silhuetas.js?v=60"></script>
+<script src="js/icones.js?v=60"></script>
+<script src="js/imagens.js?v=60"></script>
+<script src="js/semente.js?v=60"></script>
+<script src="js/ui.js?v=60"></script>
+<script src="js/conteudo.js?v=60"></script>
+<script src="js/store.js?v=60"></script>
+<script src="js/views/entrada.js?v=60"></script>
+<script src="js/views/chegada.js?v=60"></script>
+<script src="js/views/hoje.js?v=60"></script>
+<script src="js/views/roadbook.js?v=60"></script>
+<script src="js/views/poi.js?v=60"></script>
+<script src="js/views/mapa.js?v=60"></script>
+<script src="js/views/galeria.js?v=60"></script>
+<script src="js/views/concierge.js?v=60"></script>
+<script src="js/views/carro.js?v=60"></script>
+<script src="js/views/album.js?v=60"></script>
+<script src="js/views/mais.js?v=60"></script>
+<script src="js/views/org.js?v=60"></script>
+<script src="js/views/org-etapa.js?v=60"></script>
+<script src="js/views/org-pessoas.js?v=60"></script>
+<script src="js/views/org-contactos.js?v=60"></script>
+<script src="js/app.js?v=60"></script>
 </body>
 </html>

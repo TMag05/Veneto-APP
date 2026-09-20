@@ -23,7 +23,9 @@ window.Estado = (function () {
     chegadaVista: false,
     demoFase: 'auto',
     album: false,
-    papel: 'convidado'
+    papel: 'convidado',
+    /* 'escuro' (o de origem) ou 'claro'. Escolhe-se em Mais. */
+    tema: 'escuro'
   };
 
   let estado = carregar();

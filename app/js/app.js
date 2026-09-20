@@ -347,6 +347,21 @@
     alvo.dataset.visivel = (window.scrollY || document.documentElement.scrollTop) > 72 ? 'sim' : 'nao';
   }
 
+  /* ---------------------------------------------------------
+     Tema
+     Escuro de origem, claro para se ler ao sol. A escolha é de
+     quem lê e vive no estado local; a folha de tokens faz o resto,
+     e a barra do browser acompanha a cor do fundo.
+     --------------------------------------------------------- */
+
+  function aplicarTema() {
+    const tema = Estado.get().tema === 'claro' ? 'claro' : 'escuro';
+    document.documentElement.dataset.tema = tema;
+    const cor = getComputedStyle(document.documentElement).getPropertyValue('--calce').trim();
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta && cor) meta.setAttribute('content', cor);
+  }
+
   window.addEventListener('scroll', atualizarTituloCabecalho, { passive: true });
   window.addEventListener('hashchange', navegar);
   document.addEventListener('visibilitychange', function () {
@@ -368,6 +383,7 @@
   });
 
   Estado.subscrever(function () {
+    aplicarTema();
     if (!vistaAtual) return;
     /* A entrada não deve ficar no histórico depois de autenticar. */
     if (vistaAtual === 'entrada' && Estado.get().autenticado) {
@@ -388,6 +404,7 @@
      Arranque
      --------------------------------------------------------- */
 
+  aplicarTema();
   navegar();
   Estado.sincronizar();
 

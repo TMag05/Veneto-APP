@@ -36,6 +36,9 @@
   Vistas.mais = {
     nav: 'mais',
     semCabecalho: true,
+    acoes: {
+      tema: function (t) { Estado.definir({ tema: t === 'claro' ? 'claro' : 'escuro' }); }
+    },
     html: function () {
       const e = Estado.get();
       const fase = Estado.fase();
@@ -68,6 +71,18 @@
             UI.linhaLista({ titulo: 'O que levar', nota: UI.plural(DADOS.levar.length, 'item', 'itens'), icone: 'documento', href: '#/preparacao' }) +
             UI.linhaLista({ titulo: 'Arquivo', nota: 'Álbum e roadbook', icone: 'galeria', href: '#/arquivo' }) +
           '</div>' +
+        '</div>' +
+
+        '<div class="faixa">' +
+          '<div class="seccao-cabecalho"><h2 class="etiqueta">Aspeto</h2></div>' +
+          '<div class="escolhas">' +
+            ['escuro', 'claro'].map(function (t) {
+              return '<button class="escolha" type="button" data-acao="tema" data-valor="' + t + '" ' +
+                'aria-pressed="' + ((e.tema || 'escuro') === t ? 'true' : 'false') + '">' +
+                (t === 'escuro' ? 'Escuro' : 'Claro') + '</button>';
+            }).join('') +
+          '</div>' +
+          '<p class="meta" style="margin-top:12px">O claro lê-se melhor ao sol; o escuro, à noite.</p>' +
         '</div>' +
 
         '<div class="faixa">' +

@@ -18,7 +18,13 @@
 
   /* Linhas e preenchimentos translúcidos */
   --borda: rgba(237, 232, 224, 0.10);
+  --borda-forte: rgba(237, 232, 224, 0.18);
   --pill: rgba(237, 232, 224, 0.07);
+  --preenchimento: rgba(237, 232, 224, 0.06);
+  --mapa-fundo: #191C20;
+  /* Chapa por baixo dos nomes no mapa, e o tinto do acento */
+  --chapa: rgba(18, 20, 23, 0.86);
+  --acento-suave: rgba(217, 145, 95, 0.14);
 
   /* Texto */
   --inchiostro: #EDE8E0;
@@ -33,8 +39,11 @@
   --radicchio: #C08494;
   --ottone: #D9915F;
 
-  /* Texto sobre preenchimento de acento */
-  --sobre-acento: #FBF8F2;
+  /* Texto sobre preenchimento de acento. No escuro os acentos são
+     cores claras — cobre, salmão, radicchio — e por isso a tinta por
+     cima deles é escura: com o quase-branco ficava em 2.4:1, abaixo
+     do mínimo desta app. No claro é ao contrário. */
+  --sobre-acento: #15171B;
 
   /* Texto e cápsulas sobre fotografia ou paisagem */
   --sobre-foto: #FBF8F2;
@@ -81,4 +90,55 @@
   /* Do fundo do ecrã ao topo da barra de navegação, que flutua a
      --esp-2 do fundo. É a linha onde assenta o que fica por cima dela. */
   --acima-navegacao: calc(env(safe-area-inset-bottom) + var(--esp-2) + var(--alt-navegacao));
+}
+
+/* =========================================================
+   Tema claro — pedra de Istria à luz do dia
+   A app nasceu só escura; o claro entrou a 20.09.2026, por
+   decisão da organização, para se ler ao sol. Os valores são os
+   de BRAND-GUIDELINES.md §4, com o cobre escurecido para
+   #9A5526: o cobre da noite tem 2.3:1 sobre a calcária e não
+   passaria. Só muda o material; a forma e o ritmo não mudam.
+
+   O que assenta sobre fotografia — véus, pastilhas, o texto das
+   capas — não muda de tema: a fotografia é escura nos dois.
+   ========================================================= */
+
+:root[data-tema="claro"] {
+  /* Superfícies */
+  --calce: #F7F4EE;
+  --istria: #FCFAF6;
+  --intonaco: #EFEAE1;
+  --pietra: #E0D9CD;
+  --pietra-forte: #CFC6B6;
+
+  /* Linhas e preenchimentos translúcidos */
+  --borda: rgba(30, 27, 24, 0.12);
+  --borda-forte: rgba(30, 27, 24, 0.16);
+  --pill: rgba(30, 27, 24, 0.06);
+  --preenchimento: rgba(30, 27, 24, 0.05);
+  --mapa-fundo: #EFEAE1;
+  --chapa: rgba(252, 250, 246, 0.92);
+  --acento-suave: rgba(154, 85, 38, 0.12);
+
+  /* Texto — tinta aldina */
+  --inchiostro: #1E1B18;
+  --inchiostro-medio: #6B6459;
+  /* Os guidelines dão #736B5D, que passa sobre a calcária mas desce a
+     4.39:1 nas zonas recuadas. Escurecido para passar em todas. */
+  --inchiostro-chiaro: #6B6356;
+
+  /* Acentos */
+  --verde: #3B4A3E;
+  --verde-chiaro: #6E8069;
+  --rosso: #8A4034;
+  --radicchio: #6B2E3E;
+  --ottone: #9A5526;
+
+  /* Os acentos são escuros: a tinta por cima deles é clara */
+  --sobre-acento: #FBF8F2;
+
+  /* Elevação — mais discreta sobre papel */
+  --sombra-cartao: 0 16px 36px -26px rgba(30, 27, 24, 0.5);
+  --sombra-folha: 0 -18px 42px -30px rgba(30, 27, 24, 0.5);
 }

@@ -26,7 +26,7 @@ Quando dois documentos se contradizem, vale esta ordem:
 2. **`README.md`** — o estado atual, as decisões em vigor e a lista do que é provisório.
 3. **`ENQUADRAMENTO.md`** — o âmbito acordado, a comparação com o documento do diretor-geral e as perguntas ainda por responder.
 4. **`MANIFESTO.md`** — os princípios. O *porquê* de tudo. Continua válido, tirando as fases que saíram do âmbito (§5 FASE 1).
-5. **`BRAND-GUIDELINES.md`** — o argumento cultural e a disciplina. **Os valores concretos das §4, §6 e §12 estão desatualizados** (descrevem uma app clara, ortogonal e sem sombras). O código está certo; o documento é que está por atualizar. Ler pelas regras, não pelos hexadecimais.
+5. **`BRAND-GUIDELINES.md`** — o argumento cultural e a disciplina. A **§4 voltou a valer**: é de lá que vem a paleta do tema claro. As **§6 e §12 continuam desatualizadas** (descrevem uma app ortogonal e sem sombras). O código está certo; o documento é que está por atualizar nessas duas.
 6. **`PESQUISA-LUXO.html`** — os oito movimentos do luxo. Sete estão implementados; o que falta é fotografia real.
 
 O documento do diretor-geral (`Estrutura-App-Passeio-Dolomitas.docx`) é a especificação da área da organização, não da app inteira.
@@ -43,10 +43,10 @@ O documento do diretor-geral (`Estrutura-App-Passeio-Dolomitas.docx`) é a espec
 
 ## 4. Regras de identidade que não se negoceiam
 
-- **A app é sempre escura.** Não há modo claro, não há escolha de tema, não sobrevive nenhuma cor clara fora dos componentes que já eram escuros por natureza.
+- **Escura de origem, clara à escolha.** A app abre escura e assim fica, a não ser que o convidado escolha o claro em **Mais › Aspeto**. A escolha é dele e fica no telemóvel (`Estado.tema`). Decisão de 20.09.2026, que substituiu a regra anterior — "a app é sempre escura". Muda o material, não muda a forma: mesma grelha, mesmo ritmo, mesmas fotografias. O claro é a paleta de `BRAND-GUIDELINES.md` §4, com o cobre escurecido para `#9A5526`, e vive em `tokens.css` sob `:root[data-tema="claro"]` — nenhuma vista sabe qual é o tema.
 - **A app não veste a marca Aston Martin, veste a região.** A marca está em três sítios e mais nenhum: a assinatura do ecrã de entrada, as silhuetas dos carros e o rodapé do álbum.
 - **O logótipo do passeio** (`assets/img/logo.png`, e a marca sozinha em `logo-marca.png`) vive noutros três: a entrada, a primeira abertura e a capa do álbum. É sempre claro sobre escuro, nunca leva cor de acento nem sombra, e é ele que dá o nome — onde ele está, o nome não se repete em texto. O ícone da app é a montanha sobre `--calce`.
-- **Uma cor de acento por ecrã.** O acento geral é o cobre `--ottone` (#D9915F). O álbum é `--radicchio`, o percurso no mapa é `--verde`, o SOS é o único ecrã inteiramente vermelho — e o único sem fotografia.
+- **Uma cor de acento por ecrã.** O acento geral é o cobre — `--ottone`, #D9915F no escuro e #9A5526 no claro. A tinta por cima de um preenchimento de acento é `--sobre-acento`, e também troca com o tema: no escuro os acentos são cores claras e pedem tinta escura. O álbum é `--radicchio`, o percurso no mapa é `--verde`, o SOS é o único ecrã inteiramente vermelho — e o único sem fotografia.
 - **Serif conta, sans instrui.** EB Garamond para o editorial, Instrument Sans para a interface, com `tabular-nums` em horas, distâncias e altitudes. Distinção semântica, sem exceções.
 - **Pesos 400 e 500 apenas.** Nunca 600 nem 700.
 - **Cantos redondos, cápsulas e sombra difusa.** Capas a 26px, cartões a 20px, filtros e botões em cápsula, elevação por sombra baixa — não por linha de 1px. (Isto substituiu a regra antiga de `BRAND-GUIDELINES.md` §6.)
@@ -173,3 +173,4 @@ Sem dependências, sem build. Instalar no telemóvel pelo *Adicionar ao ecrã pr
 4. Entrou alguma cor, raio ou espaçamento fora de `tokens.css`?
 5. Funciona sem rede, e o ecrã tem endereço próprio?
 6. Subiu-se o `?v=` e a `VERSAO` do service worker?
+7. Viu-se nos dois temas? O que assenta sobre fotografia não muda; tudo o resto tem de passar AA nos dois.

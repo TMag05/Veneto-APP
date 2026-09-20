@@ -263,9 +263,9 @@ a { color: var(--verde); text-decoration: none; }
 .botao--principal:active { opacity: 0.86; }
 
 .botao--secundario {
-  background: rgba(237, 232, 224, 0.06);
+  background: var(--preenchimento);
   color: var(--inchiostro);
-  border: 1px solid rgba(237, 232, 224, 0.18);
+  border: 1px solid var(--borda-forte);
 }
 .botao--secundario:active { background: var(--intonaco); }
 
@@ -344,10 +344,10 @@ a { color: var(--verde); text-decoration: none; }
   flex: none;
   min-height: 38px;
   padding: 9px 16px;
-  border: 1px solid rgba(237, 232, 224, 0.18);
+  border: 1px solid var(--borda-forte);
   border-radius: var(--raio-pill);
   background: transparent;
-  color: rgba(237, 232, 224, 0.66);
+  color: var(--inchiostro-medio);
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.08em;
@@ -768,7 +768,7 @@ a { color: var(--verde); text-decoration: none; }
 .mapa-moldura {
   position: relative;
   margin: 12px var(--margem) 0;
-  background: #191C20;
+  background: var(--mapa-fundo);
   border: 1px solid var(--borda);
   border-radius: 22px;
   overflow: hidden;
@@ -812,11 +812,12 @@ a { color: var(--verde); text-decoration: none; }
   pointer-events: auto;
 }
 .mapa-etiqueta__nome {
-  /* Chapa em vez de halo: no escuro, um fundo sólido lê-se melhor
-     por cima da linha do percurso do que um contorno difuso. */
+  /* Chapa em vez de halo: um fundo sólido lê-se melhor por cima da
+     linha do percurso do que um contorno difuso. A chapa acompanha o
+     tema — escura no escuro, clara no claro — e a tinta vem de cima. */
   padding: 4px 9px;
   border-radius: 6px;
-  background: rgba(18, 20, 23, 0.86);
+  background: var(--chapa);
   font-size: 11px;
   font-weight: 500;
   line-height: 1.2;
@@ -1335,7 +1336,7 @@ a { color: var(--verde); text-decoration: none; }
   margin: 14px var(--margem) 0;
   padding: 14px 18px;
   border-radius: var(--raio-linha);
-  background: rgba(217, 145, 95, 0.14);
+  background: var(--acento-suave);
   color: var(--ottone);
 }
 .manchete__texto {
