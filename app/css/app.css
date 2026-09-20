@@ -875,7 +875,7 @@ a { color: var(--verde); text-decoration: none; }
   border-bottom: 1px solid var(--borda);
   color: var(--inchiostro);
 }
-.estrada-cartao .estrada { padding: 8px; border-radius: var(--raio-foto); }
+.estrada-cartao .estrada { padding: var(--esp-1); border-radius: var(--raio-foto); }
 .estrada-cartao__corpo { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 
 .estrada--grande { margin: 0; }
