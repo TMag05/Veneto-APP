@@ -209,6 +209,10 @@
     }
 
     sincronizarProfundidade();
+    /* Sair de um ecrã é o momento de devolver o que ele pediu
+       emprestado — os endereços temporários das fotografias. */
+    const anterior = window.Vistas[vistaAtual];
+    if (anterior && anterior.desmontar && vistaAtual !== r.vista) anterior.desmontar();
     vistaAtual = r.vista;
     paramsAtuais = r.params;
     elEcra.scrollTop = 0;

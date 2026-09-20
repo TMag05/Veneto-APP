@@ -75,6 +75,7 @@ app/
   css/app.css           componentes e ecrãs
   js/semente.js         o passeio de 2026: evento, sítios e itinerário; pessoas de exemplo
   js/conteudo.js        conteúdo editável; publica DADOS e POIS; CRUD e persistência
+  js/fotos.js           arquivo das fotografias do grupo, em IndexedDB
   js/store.js           estado do utilizador, fila offline, papel, relógio da demonstração
   js/ui.js              datas, distâncias, links do Maps, GPX, campos de edição
   js/icones.js          conjunto outline + punções da navegação
@@ -92,6 +93,7 @@ servidor.js             servidor estático de desenvolvimento
 - **Fotografias em `assets/fotos/`,** reduzidas a 1600 px no lado maior e em JPEG de qualidade 72, sem nunca ampliar. Cada uma entra também na `CONCHA` de `sw.js`, para existir sem rede. Um sítio aponta para a sua com `imagem: { foto: 'assets/fotos/…' }`; um momento de logística com `imagem: { grafico: 'chegada' }`.
 - **`conteudo.js` é a única peça que muda quando houver servidor** — `carregar()` e `guardar()`. Todo o resto lê `DADOS` e `POIS` e não sabe de onde vêm. Manter essa fronteira.
 - **Offline é o estado normal.** Escrita local imediata, fila de sincronização, nunca um erro de rede à vista do convidado. Não existe botão de guardar em lado nenhum.
+- **As fotografias do grupo não passam pelo `localStorage`.** O ficheiro sai da câmara e vai inteiro para `js/fotos.js` (IndexedDB, base `veneto-fotos`), sem compressão; ao lado fica uma miniatura de 320 px, que é o que as grelhas mostram. No `localStorage` ficam só os metadados. Uma fotografia só se dá por enviada quando o Storage confirmar — nunca por omissão, nunca por um temporizador. As vistas que mostram fotografias pedem os endereços a `Fotos.pintar` e devolvem-nos em `desmontar`.
 - **Cada ecrã tem endereço fixo e partilhável** (`ROTAS` em `app.js`). É isto que permite ao WhatsApp ser o sino e à app ser o arquivo — e é a decisão com maior impacto no sucesso do projeto.
 - **Voltar é recuar no caminho feito, não subir na hierarquia.** O ecrã-pai declarado só serve quando não há histórico — o caso do link vindo do WhatsApp.
 - **O grupo segue em caravana: a app explica o dia, não indica o caminho.** Há batedores na estrada e os carros seguem-nos. O ecrã Hoje e o Itinerário dizem primeiro o que vai acontecer — paragem, hora, o que se faz ali. A distância e o tempo até à paragem seguinte são ritmo do dia, não instrução de condução, e medem-se de paragem a paragem do programa. O CTA principal de um ecrã nunca é "abrir no Maps".

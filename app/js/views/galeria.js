@@ -1,34 +1,13 @@
 /* =========================================================
    Galeria — sem likes, sem comentários, sem contagens
    A captura abre a câmara nativa para não perder HDR nem
-   modo noturno. O envio fica em fila e nunca falha à vista.
+   modo noturno. O ficheiro fica inteiro no telemóvel, tal como
+   saiu da câmara, e o envio fica em fila.
    ========================================================= */
 
 (function () {
 
   let filtro = 'todos';
-
-  function reduzir(ficheiro, feito) {
-    const leitor = new FileReader();
-    leitor.onload = function () {
-      const img = new Image();
-      img.onload = function () {
-        const max = 1600;
-        let l = img.width, a = img.height;
-        if (Math.max(l, a) > max) {
-          const f = max / Math.max(l, a);
-          l = Math.round(l * f); a = Math.round(a * f);
-        }
-        const tela = document.createElement('canvas');
-        tela.width = l; tela.height = a;
-        tela.getContext('2d').drawImage(img, 0, 0, l, a);
-        feito(tela.toDataURL('image/jpeg', 0.82));
-      };
-      img.onerror = function () { feito(null); };
-      img.src = leitor.result;
-    };
-    leitor.readAsDataURL(ficheiro);
-  }
 
   function autorDe(f) {
     if (f.propria) return Estado.eu();
@@ -36,15 +15,27 @@
     return p ? { nome: p.nome, modelo: p.modelo, cor: p.cor } : { nome: '', modelo: 'db12', cor: 'onyx' };
   }
 
+  /* A imagem vem do arquivo do telemóvel e chega depois do HTML:
+     aqui fica a etiqueta, e Fotos.pintar dá-lhe o endereço. */
+  function imagemDe(f, tamanho) {
+    if (f.id) {
+      return '<img data-foto="' + UI.h(f.id) + '" data-tamanho="' + (tamanho || 'mini') + '" ' +
+        'loading="lazy" decoding="async" alt="">';
+    }
+    return '';
+  }
+
   function fundoDe(f) {
-    return f.dataUrl ? "url('" + f.dataUrl + "')" : Imagens.fundo(f.semente, f.variante, 1);
+    return f.id ? '' : ';background-image:' + Imagens.fundo(f.semente, f.variante, 1) +
+      ';background-size:cover;background-position:center';
   }
 
   function celula(f, i) {
     const a = autorDe(f);
     return '<button class="grelha-fotos__celula" type="button" data-acao="abrir" data-valor="' + i + '" ' +
-      'style="background-image:' + fundoDe(f) + ';background-size:cover;background-position:center" ' +
+      'style="' + fundoDe(f).replace(/^;/, '') + '" ' +
       'aria-label="Fotografia de ' + UI.h(a.nome) + '">' +
+      imagemDe(f) +
       '<span class="grelha-fotos__autor">' + Silhuetas.svg(a.modelo, a.cor, { rodas: false, titulo: a.nome }) + '</span>' +
     '</button>';
   }
@@ -103,6 +94,8 @@
     },
 
     montar: function (el) {
+      Fotos.pintar(el);
+
       ['ent-camara', 'ent-ficheiro'].forEach(function (id) {
         const ent = el.querySelector('#' + id);
         if (!ent) return;
@@ -112,16 +105,25 @@
           const dia = diaAtivo ? diaAtivo.id : '';
           const poi = Estado.ultimaChegada();
           let porFazer = ficheiros.length;
+          let falhou = 0;
           ficheiros.forEach(function (f) {
-            reduzir(f, function (dataUrl) {
-              if (dataUrl) Estado.juntarFoto(dataUrl, dia, poi);
-              porFazer--;
+            Estado.juntarFoto(f, dia, poi, function (novoId) {
+              if (!novoId) falhou++;
+              if (--porFazer === 0) {
+                App.repintar();
+                if (falhou) UI.abrirFolha('Não foi possível guardar',
+                  '<p class="corpo-ui silencioso">' + UI.plural(falhou, 'Uma fotografia não coube', 'Algumas fotografias não couberam') +
+                  ' no telemóvel. Liberte espaço e tente de novo.</p>');
+              }
             });
           });
           ent.value = '';
         });
       });
     },
+
+    /* Os endereços temporários das imagens devolvem-se ao sair. */
+    desmontar: function () { Fotos.libertarTodos(); },
 
     acoes: {
       filtrar: function (id) { filtro = id; App.repintar(); },
@@ -134,15 +136,16 @@
         const poi = f.poi && POIS[f.poi] ? POIS[f.poi].nome : '';
         const dia = DADOS.dia(f.dia);
         UI.abrirFolha(a.nome,
-          '<div class="foto foto--32" style="background-image:' + fundoDe(f) + '"></div>' +
+          '<div class="foto foto--32" style="' + fundoDe(f).replace(/^;/, '') + '">' + imagemDe(f, 'original') + '</div>' +
           '<p class="meta legenda">' + UI.h([poi, dia ? 'Dia ' + dia.numero : ''].filter(Boolean).join(' · ')) + '</p>' +
           (f.propria ? '<button class="botao botao--secundario botao--largo" style="margin-top:24px" type="button" data-acao="apagar" data-valor="' + f.id + '">Remover</button>' : '')
         );
+        Fotos.pintar(document.getElementById('folha'));
         const btn = document.querySelector('[data-acao="apagar"]');
         if (btn) btn.addEventListener('click', function () {
-          const estado = Estado.get();
-          Estado.definir({ fotos: estado.fotos.filter(function (x) { return x.id !== f.id; }) });
+          Estado.apagarFoto(f.id);
           UI.fecharFolha();
+          App.repintar();
         });
       }
     }

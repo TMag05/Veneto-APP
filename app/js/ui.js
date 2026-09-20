@@ -293,28 +293,79 @@ window.UI = (function () {
     });
   }
 
-  /* Reduz uma fotografia antes de a guardar. Sem isto, três fotos
-     enchem o armazenamento local do telemóvel. */
+  /* ---------------------------------------------------------
+     Fotografias: uma leitura, vários tamanhos
+     --------------------------------------------------------- */
+
+  /* Abre o ficheiro uma vez só e devolve-o pronto a desenhar, já
+     com a orientação da câmara aplicada — sem isto as verticais do
+     iPhone saem deitadas na miniatura. createImageBitmap faz as duas
+     coisas; onde não existe, a etiqueta <img> também já roda sozinha.
+     Um HEIC só abre onde o sistema o sabe ler, que é o iPhone; o
+     ficheiro de origem sobe na mesma, tal como veio. */
+  function abrirImagem(ficheiro, feito) {
+    if (window.createImageBitmap) {
+      let p = null;
+      try { p = createImageBitmap(ficheiro, { imageOrientation: 'from-image' }); } catch (e) { p = null; }
+      if (p && p.then) {
+        p.then(function (bm) { feito(bm, bm.width, bm.height); })
+         .catch(function () { porEtiqueta(ficheiro, feito); });
+        return;
+      }
+    }
+    porEtiqueta(ficheiro, feito);
+  }
+
+  function porEtiqueta(ficheiro, feito) {
+    const endereco = URL.createObjectURL(ficheiro);
+    const img = new Image();
+    img.onload = function () { feito(img, img.naturalWidth, img.naturalHeight); URL.revokeObjectURL(endereco); };
+    img.onerror = function () { URL.revokeObjectURL(endereco); feito(null); };
+    img.src = endereco;
+  }
+
+  function fecharImagem(fonte) { if (fonte && fonte.close) fonte.close(); }
+
+  /* Desenha a fotografia já reduzida. O que vai para a tela é sempre
+     o tamanho pequeno, nunca a fotografia inteira: a tela do Safari
+     não passa dos ~16,7 megapixels e uma fotografia de iPhone passa. */
+  function escalar(fonte, largura, altura, maxLado, qualidade, comoBlob, feito) {
+    let l = largura, a = altura;
+    if (Math.max(l, a) > maxLado) {
+      const f = maxLado / Math.max(l, a);
+      l = Math.max(1, Math.round(l * f)); a = Math.max(1, Math.round(a * f));
+    }
+    const tela = document.createElement('canvas');
+    tela.width = l; tela.height = a;
+    tela.getContext('2d').drawImage(fonte, 0, 0, l, a);
+    if (comoBlob) tela.toBlob(function (b) { feito(b); }, 'image/jpeg', qualidade);
+    else feito(tela.toDataURL('image/jpeg', qualidade));
+  }
+
+  /* pedidos: [{ nome, lado, qualidade, blob }]. Devolve um objeto com
+     um campo por pedido, mais a largura e a altura de origem. */
+  function derivadas(ficheiro, pedidos, feito) {
+    abrirImagem(ficheiro, function (fonte, largura, altura) {
+      if (!fonte) { feito(null); return; }
+      const saida = { largura: largura, altura: altura };
+      let porFazer = pedidos.length;
+      if (!porFazer) { fecharImagem(fonte); feito(saida); return; }
+      pedidos.forEach(function (p) {
+        escalar(fonte, largura, altura, p.lado, p.qualidade || 0.82, p.blob !== false, function (r) {
+          saida[p.nome] = r;
+          if (--porFazer === 0) { fecharImagem(fonte); feito(saida); }
+        });
+      });
+    });
+  }
+
+  /* Reduz uma fotografia a uma dataUrl. É o que os campos de
+     fotografia da organização guardam — imagens pequenas, dentro
+     do conteúdo. As do passeio seguem por derivadas(). */
   function reduzirImagem(ficheiro, maxLado, feito) {
-    const leitor = new FileReader();
-    leitor.onload = function () {
-      const img = new Image();
-      img.onload = function () {
-        let l = img.width, a = img.height;
-        if (Math.max(l, a) > maxLado) {
-          const f = maxLado / Math.max(l, a);
-          l = Math.round(l * f); a = Math.round(a * f);
-        }
-        const tela = document.createElement('canvas');
-        tela.width = l; tela.height = a;
-        tela.getContext('2d').drawImage(img, 0, 0, l, a);
-        feito(tela.toDataURL('image/jpeg', 0.82));
-      };
-      img.onerror = function () { feito(null); };
-      img.src = leitor.result;
-    };
-    leitor.onerror = function () { feito(null); };
-    leitor.readAsDataURL(ficheiro);
+    derivadas(ficheiro, [{ nome: 'r', lado: maxLado, qualidade: 0.82, blob: false }], function (d) {
+      feito(d ? d.r : null);
+    });
   }
 
   /* Um campo de fotografia: mostra a que existe, ou convida. */
@@ -398,7 +449,7 @@ window.UI = (function () {
     gpx: gpx, descarregar: descarregar,
     foto: foto, imagemDe: imagemDe, logo: logo, horario: horario, distintivo: distintivo, linhaLista: linhaLista, carrosEm: carrosEm,
     campo: campo, ligarCampos: ligarCampos, coordenadas: coordenadas,
-    reduzirImagem: reduzirImagem, campoFoto: campoFoto,
+    reduzirImagem: reduzirImagem, derivadas: derivadas, campoFoto: campoFoto,
     abrirFolha: abrirFolha, fecharFolha: fecharFolha, partilhar: partilhar,
     MESES: MESES
   };

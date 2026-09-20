@@ -6,6 +6,19 @@
 
 (function () {
 
+  /* A imagem vem do arquivo do telemóvel, que é assíncrono: o HTML
+     deixa a etiqueta pronta e Fotos.pintar dá-lhe o endereço. */
+  function celula(x) {
+    if (x.id) {
+      return '<div class="grelha-fotos__celula">' +
+        '<img data-foto="' + UI.h(x.id) + '" data-tamanho="mini" loading="lazy" decoding="async" alt="">' +
+      '</div>';
+    }
+    return '<div class="grelha-fotos__celula" style="background-image:' +
+      Imagens.fundo(x.semente, x.variante, 1) +
+      ';background-size:cover;background-position:center"></div>';
+  }
+
   Vistas.album = {
     nav: 'galeria',
     cabecalho: { voltar: '#/galeria', titulo: 'Álbum' },
@@ -32,11 +45,7 @@
             '<span class="meta num">' + f.length + '</span>' +
           '</div>' +
           (d.data ? '<p class="meta" style="margin-bottom:16px">' + UI.dataLonga(d.data) + '</p>' : '') +
-          '<div class="grelha-fotos">' + f.map(function (x) {
-            return '<div class="grelha-fotos__celula" style="background-image:' +
-              (x.dataUrl ? "url('" + x.dataUrl + "')" : Imagens.fundo(x.semente, x.variante, 1)) +
-              ';background-size:cover;background-position:center"></div>';
-          }).join('') + '</div>' +
+          '<div class="grelha-fotos">' + f.map(celula).join('') + '</div>' +
         '</div>';
       }).join('');
 
@@ -136,6 +145,8 @@
           '<p class="corpo-editorial italico silencioso">Até para o ano.</p>' +
         '</div>';
     },
+    montar: function (el) { Fotos.pintar(el); },
+    desmontar: function () { Fotos.libertarTodos(); },
     acoes: {
       descarregar: function () {
         UI.abrirFolha('Descarregar o álbum',

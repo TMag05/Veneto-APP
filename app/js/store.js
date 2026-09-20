@@ -7,7 +7,6 @@
 
 window.Estado = (function () {
   const CHAVE = 'veneto.estado.v1';
-  const LIMITE_FOTOS = 30;
 
   const inicial = {
     versao: 1,
@@ -17,6 +16,7 @@ window.Estado = (function () {
        organização criou, encontrada pelo email na entrada. */
     participanteId: '',
     chegadas: {},
+    /* Só os metadados. A imagem vive em Fotos (IndexedDB). */
     fotos: [],
     pedidos: [],
     fila: [],
@@ -35,7 +35,13 @@ window.Estado = (function () {
     try {
       const guardado = JSON.parse(localStorage.getItem(CHAVE));
       if (guardado && guardado.versao === inicial.versao) {
-        return Object.assign({}, inicial, guardado);
+        const e = Object.assign({}, inicial, guardado);
+        /* Até setembro de 2026 a imagem era gravada aqui dentro, em
+           dataUrl e já reduzida. Essas entradas não se convertem: o
+           original perdeu-se na redução e chamar-lhe original seria
+           mentira. Saem, e o arquivo recomeça no ficheiro de origem. */
+        e.fotos = (e.fotos || []).filter(function (f) { return f && !f.dataUrl; });
+        return e;
       }
     } catch (e) { /* estado corrompido: recomeça-se em silêncio */ }
     return JSON.parse(JSON.stringify(inicial));
@@ -45,11 +51,11 @@ window.Estado = (function () {
     try {
       localStorage.setItem(CHAVE, JSON.stringify(estado));
     } catch (e) {
-      /* Quota cheia: descarta-se a fotografia mais antiga e tenta-se de novo. */
-      if (estado.fotos.length) {
-        estado.fotos.shift();
-        try { localStorage.setItem(CHAVE, JSON.stringify(estado)); } catch (e2) { /* desiste */ }
-      }
+      /* Aqui dentro já só há texto: cada fotografia ocupa uns cento e
+         poucos bytes de metadados. Se mesmo assim a quota fechar, o
+         que está em memória fica intacto — apagar a fotografia mais
+         antiga em silêncio, como se fazia antes, é a pior resposta
+         possível a um telemóvel cheio. */
     }
   }
 
@@ -184,8 +190,8 @@ window.Estado = (function () {
      Fila offline
      --------------------------------------------------------- */
 
-  function enfileirar(tipo, resumo) {
-    const item = { id: 'q' + Date.now() + Math.floor(Math.random() * 1000), tipo: tipo, resumo: resumo, criado: Date.now(), estado: 'pendente' };
+  function enfileirar(tipo, resumo, ref) {
+    const item = { id: 'q' + Date.now() + Math.floor(Math.random() * 1000), tipo: tipo, resumo: resumo, ref: ref || '', criado: Date.now(), estado: 'pendente' };
     estado.fila.push(item);
     guardar();
     emitir();
@@ -196,7 +202,11 @@ window.Estado = (function () {
   let aSincronizar = false;
   function sincronizar() {
     if (aSincronizar) return;
-    const pendentes = estado.fila.filter(function (i) { return i.estado === 'pendente'; });
+    /* As fotografias ficam de fora enquanto não houver Storage: só
+       sobem quando as três chamadas de envio confirmarem. Dar uma
+       fotografia por enviada sem ninguém a ter recebido é o erro que
+       esta reescrita veio corrigir. */
+    const pendentes = estado.fila.filter(function (i) { return i.estado === 'pendente' && i.tipo !== 'foto'; });
     if (!pendentes.length || !navigator.onLine) return;
     aSincronizar = true;
     /* Na versão real: escrita em Firestore / Storage com repetição. */
@@ -209,25 +219,64 @@ window.Estado = (function () {
     }, 1400 + Math.random() * 900);
   }
 
+  /* O que a barra de rede conta. As fotografias têm contagem própria
+     — pô-las aqui punha o telemóvel a dizer «a sincronizar» para
+     sempre, e isso seria tão falso como dizer «enviado». */
   function pendentes() {
-    return estado.fila.filter(function (i) { return i.estado === 'pendente'; }).length;
+    return estado.fila.filter(function (i) { return i.estado === 'pendente' && i.tipo !== 'foto'; }).length;
+  }
+
+  function fotosPorEnviar() {
+    return estado.fotos.filter(function (f) { return f.estadoEnvio !== 'enviado'; }).length;
   }
 
   /* ---------------------------------------------------------
      Fotografias
      --------------------------------------------------------- */
 
-  function juntarFoto(dataUrl, dia, poi) {
-    estado.fotos.push({
-      id: 'm' + Date.now(),
-      autor: 'eu',
-      dia: dia,
-      poi: poi,
-      dataUrl: dataUrl,
-      criado: Date.now()
+  /* Recebe o ficheiro tal como saiu da câmara. O original vai
+     inteiro para o arquivo do telemóvel, sem passar por tela nem
+     por compressão; ao lado fica uma miniatura, que é o que a
+     grelha mostra. Aqui só ficam os metadados. */
+  function juntarFoto(ficheiro, dia, poi, feito) {
+    const id = 'm' + Date.now() + Math.floor(Math.random() * 1000);
+    UI.derivadas(ficheiro, [{ nome: 'mini', lado: 320, qualidade: 0.7 }], function (d) {
+      if (!d) { if (feito) feito(null); return; }
+      Fotos.guardar({
+        id: id,
+        original: ficheiro,
+        mini: d.mini,
+        tipo: ficheiro.type || 'image/jpeg',
+        largura: d.largura,
+        altura: d.altura,
+        criado: Date.now()
+      }).then(function () {
+        estado.fotos.push({
+          id: id,
+          autor: 'eu',
+          dia: dia,
+          poi: poi,
+          criado: Date.now(),
+          largura: d.largura,
+          altura: d.altura,
+          tamanho: ficheiro.size || 0,
+          nome: ficheiro.name || '',
+          estadoEnvio: 'pendente'
+        });
+        enfileirar('foto', 'Fotografia' + (poi && POIS[poi] ? ' — ' + POIS[poi].nome : ''), id);
+        if (feito) feito(id);
+      }).catch(function () {
+        if (feito) feito(null);
+      });
     });
-    while (estado.fotos.length > LIMITE_FOTOS) estado.fotos.shift();
-    enfileirar('foto', 'Fotografia' + (poi && POIS[poi] ? ' — ' + POIS[poi].nome : ''));
+  }
+
+  function apagarFoto(id) {
+    estado.fotos = estado.fotos.filter(function (f) { return f.id !== id; });
+    estado.fila = estado.fila.filter(function (i) { return !(i.tipo === 'foto' && i.ref === id); });
+    guardar();
+    emitir();
+    return Fotos.apagar(id).catch(function () { /* já não existia */ });
   }
 
   /* Todas as fotografias, as semeadas e as minhas, mais recentes primeiro. */
@@ -275,9 +324,12 @@ window.Estado = (function () {
     sincronizar: sincronizar,
     pendentes: pendentes,
     juntarFoto: juntarFoto,
+    apagarFoto: apagarFoto,
+    fotosPorEnviar: fotosPorEnviar,
     fotos: fotos,
     pedir: pedir,
     reiniciar: function () {
+      Fotos.limpar().catch(function () { /* nada para limpar */ });
       localStorage.removeItem(CHAVE);
       estado = JSON.parse(JSON.stringify(inicial));
       guardar();
