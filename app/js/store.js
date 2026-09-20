@@ -20,7 +20,6 @@ window.Estado = (function () {
     pedidos: [],
     fila: [],
     chegadaVista: false,
-    demoFase: 'auto',
     album: false,
     papel: 'convidado',
     /* 'escuro' (o de origem) ou 'claro'. Escolhe-se em Mais. */
@@ -74,34 +73,10 @@ window.Estado = (function () {
   function subscrever(fn) { ouvintes.push(fn); }
 
   /* ---------------------------------------------------------
-     Relógio — a demonstração pode saltar de fase
+     Relógio
      --------------------------------------------------------- */
 
-  function agora() {
-    const real = new Date();
-    const fase = estado.demoFase;
-    /* Sem datas de evento não há linha temporal para simular. */
-    if (fase === 'auto' || !DADOS.evento.inicio || !DADOS.evento.fim) return real;
-
-    let dataBase;
-    if (fase === 'pre') dataBase = new Date(DADOS.evento.inicio + 'T00:00:00');
-    else if (fase === 'pos') dataBase = new Date(DADOS.evento.fim + 'T00:00:00');
-    else {
-      const dia = DADOS.dia(fase);
-      dataBase = new Date((dia ? dia.data : DADOS.evento.inicio) + 'T00:00:00');
-    }
-
-    /* Os convidados recebem acesso poucos dias antes de partir. */
-    if (fase === 'pre') dataBase.setDate(dataBase.getDate() - 3);
-    if (fase === 'pos') dataBase.setDate(dataBase.getDate() + 1);
-
-    /* Mantém-se a hora real do dia, dentro de uma janela plausível. */
-    let h = real.getHours();
-    if (h < 8) h = 8 + (real.getMinutes() % 4);
-    if (h > 21) h = 21;
-    dataBase.setHours(h, real.getMinutes(), 0, 0);
-    return dataBase;
-  }
+  function agora() { return new Date(); }
 
   function chave(d) {
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');

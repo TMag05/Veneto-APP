@@ -13,26 +13,6 @@
     return m ? m[1] : '';
   }
 
-  /* Demonstração por endereço: #/demo/2 põe qualquer telemóvel no mesmo
-     estado — o exemplo carregado, a entrada feita como o primeiro
-     participante, o relógio no dia 2 (ou 'pre', 'pos'). Cada endereço
-     guarda os seus próprios dados; isto evita repetir os passos em cada
-     aparelho. Sai com a secção Demonstração. */
-  function prepararDemo(n) {
-    Conteudo.carregarExemplo();
-    const dia = DADOS.dias[(parseInt(n, 10) || 1) - 1];
-    const ficha = DADOS.participantes[0];
-    Estado.definir({
-      autenticado: true,
-      chegadaVista: true,
-      papel: 'convidado',
-      participanteId: ficha ? ficha.id : '',
-      perfil: { nome: ficha ? DADOS.nomeCompleto(ficha) : 'Convidado', email: '', telefone: '' },
-      demoFase: n === 'pre' || n === 'pos' ? n : (dia ? dia.id : 'auto')
-    });
-  }
-  window.Demonstracao = { preparar: prepararDemo };
-
   Vistas.mais = {
     nav: 'mais',
     semCabecalho: true,
@@ -94,7 +74,7 @@
             (Estado.ehOrganizacao()
               ? UI.linhaLista({ titulo: 'Área da organização', nota: 'Itinerário, pessoas, contactos', icone: 'oficina', href: '#/org/itinerario' })
               : '') +
-            UI.linhaLista({ titulo: 'Definições', nota: 'Organização, demonstração', icone: 'definicoes', href: '#/definicoes' }) +
+            UI.linhaLista({ titulo: 'Definições', nota: 'Organização e aspeto', icone: 'definicoes', href: '#/definicoes' }) +
           '</div>' +
           '<p class="meta num" style="margin-top:24px">' + UI.h(DADOS.evento.nome || 'Passeio') + ' · versão de trabalho ' + versao() +
             (fase === 'pre' ? ' · pré-evento' : (fase === 'pos' ? ' · pós-evento' : '')) + '</p>' +
@@ -110,19 +90,10 @@
      porta. A segurança vem com contas no servidor. */
   const CODIGO_ORGANIZACAO = '2026';
 
-  /* Construída a partir do itinerário que existir. */
-  function fases() {
-    return [{ id: 'auto', rotulo: 'Real' }, { id: 'pre', rotulo: 'Pré-evento' }]
-      .concat(DADOS.dias.map(function (d) { return { id: d.id, rotulo: 'Dia ' + d.numero }; }))
-      .concat([{ id: 'pos', rotulo: 'Pós-evento' }]);
-  }
-
   Vistas.definicoes = {
     nav: 'mais',
     cabecalho: { voltar: '#/mais', titulo: 'Definições', tituloSempre: true },
     html: function () {
-      const e = Estado.get();
-
       return '<div class="capa">' +
           UI.foto({ semente: 'definicoes', variante: 'noite' }, 'foto--32 capa__imagem') +
           '<div class="capa__texto">' +
@@ -137,23 +108,6 @@
             (Estado.ehOrganizacao()
               ? UI.linhaLista({ titulo: 'Abrir a área da organização', nota: 'Sessão iniciada', icone: 'oficina', href: '#/org/itinerario' })
               : UI.linhaLista({ titulo: 'Entrar na área da organização', nota: 'Requer código', icone: 'selado', acao: 'entrarOrg' })) +
-          '</div>' +
-        '</div>' +
-
-        '<div class="faixa faixa--recuada" style="margin-top:48px">' +
-          '<h2 class="etiqueta">Demonstração</h2>' +
-          '<p class="corpo-ui silencioso" style="margin-top:8px">Para mostrar a app fora das datas do evento. ' +
-            'Não existe na versão entregue aos convidados.</p>' +
-
-          '<h3 class="etiqueta" style="margin-top:24px">Momento</h3>' +
-          '<div class="escolhas" style="margin-top:12px">' + fases().map(function (f) {
-            return '<button class="escolha" type="button" data-acao="fase" data-valor="' + f.id + '" ' +
-              'aria-pressed="' + (e.demoFase === f.id ? 'true' : 'false') + '">' + f.rotulo + '</button>';
-          }).join('') + '</div>' +
-
-          '<div class="lista" style="margin-top:24px">' +
-            UI.linhaLista({ titulo: 'Carregar passeio de exemplo', nota: 'O passeio real, com pessoas de exemplo', icone: 'juntar', acao: 'exemplo' }) +
-            UI.linhaLista({ titulo: 'Repor tudo', nota: 'Volta ao passeio de origem e apaga o estado local', icone: 'fechar', acao: 'repor' }) +
           '</div>' +
         '</div>' +
 
@@ -186,31 +140,6 @@
           UI.fecharFolha();
           Estado.definir({ papel: 'organizacao' });
           App.ir('#/org/itinerario');
-        });
-      },
-      fase: function (f) { Estado.definir({ demoFase: f }); },
-
-      exemplo: function () {
-        UI.abrirFolha('Carregar exemplo',
-          '<p class="corpo-ui silencioso">Repõe o passeio de 2026 e junta-lhe participantes e contactos de exemplo, para dar vida ao mapa. Não são pessoas reais.</p>' +
-          '<button class="botao botao--principal botao--largo" style="margin-top:24px" type="button" id="btn-exemplo">Carregar</button>');
-        document.getElementById('btn-exemplo').addEventListener('click', function () {
-          UI.fecharFolha();
-          Conteudo.carregarExemplo();
-          Estado.definir({ demoFase: 'auto' });
-          App.ir('#/hoje');
-        });
-      },
-
-      repor: function () {
-        UI.abrirFolha('Repor tudo',
-          '<p class="corpo-ui silencioso">Apaga o itinerário, os participantes, os contactos e as fotografias guardadas neste telemóvel.</p>' +
-          '<button class="botao botao--rosso botao--largo" style="margin-top:24px" type="button" id="btn-repor">Repor</button>');
-        document.getElementById('btn-repor').addEventListener('click', function () {
-          UI.fecharFolha();
-          Conteudo.repor();
-          Estado.reiniciar();
-          location.hash = '#/entrada';
         });
       }
     }

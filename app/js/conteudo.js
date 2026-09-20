@@ -127,10 +127,9 @@ window.Conteudo = (function () {
     dados.participantes.forEach(function (p) {
       const chave = (p.equipa || '').trim() || p.id;
       if (!mapa[chave]) {
-        mapa[chave] = { id: 'eq-' + talho(chave), equipa: chave, modelo: '', cor: '', matricula: '', chegou: null, perfis: [] };
+        mapa[chave] = { id: 'eq-' + talho(chave), equipa: chave, modelo: '', cor: '', matricula: '', perfis: [] };
       }
       mapa[chave].perfis.push(nomeCompleto(p));
-      if (p.chegou) mapa[chave].chegou = p.chegou;
       if (p.papel === 'condutor') {
         mapa[chave].modelo = p.modelo || mapa[chave].modelo;
         mapa[chave].cor = p.cor || mapa[chave].cor;
@@ -474,9 +473,6 @@ window.Conteudo = (function () {
       carta: '',
       apolice: '',
       matricula: '',
-      /* Última paragem onde a equipa marcou chegada. Vem do servidor
-         na versão real; aqui serve o exemplo e a demonstração. */
-      chegou: '',
       modelo: 'db12',
       cor: 'racing'
     });
@@ -568,20 +564,12 @@ window.Conteudo = (function () {
     dados = base();
     Object.assign(dados.evento, clonar(ex.evento || {}));
 
-    /* O grupo espalhado pelo percurso do segundo dia — é o que dá
-       vida ao mapa e à lista de participantes. */
-    const percurso = (dados.dias[1] || dados.dias[0] || { etapas: [] }).etapas;
-
     ex.participantes.forEach(function (p, i) {
-      const passo = percurso.length
-        ? percurso[Math.min(percurso.length - 1, 1 + (i % 3))]
-        : '';
       dados.participantes.push({
         id: 'p-ex-' + i,
         nome: p[0], apelido: p[1], nascimento: '', papel: p[2], equipa: p[3],
         foto: '', telefone: '', email: '',
         carta: '', apolice: '', matricula: p[6] || '',
-        chegou: passo,
         modelo: p[4] || 'db12', cor: p[5] || 'magnetic'
       });
     });
