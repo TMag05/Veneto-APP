@@ -66,6 +66,12 @@
   --raio-controlo: 12px;
   --raio-pill: 999px;
 
+  /* Espessura do traço de uma estrada. Não escala com o desenho —
+     vector-effect segura-a em pixels — para o mesmo traçado se ler
+     grande numa capa e pequeno numa lista. */
+  --traco-estrada: 3px;
+  --traco-estrada-capa: 6px;
+
   /* Elevação — sombra difusa, não contorno */
   --sombra-cartao: 0 18px 44px -24px rgba(0, 0, 0, 0.85);
   --sombra-folha: 0 -20px 50px -28px rgba(0, 0, 0, 0.9);

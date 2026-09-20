@@ -813,6 +813,22 @@ a { color: var(--verde); text-decoration: none; }
 }
 
 /* ---------------------------------------------------------
+   Estradas — o desenho do traçado
+   Uma cor só: o verde do percurso. Nada mais entra aqui.
+   --------------------------------------------------------- */
+
+.estrada { display: block; width: 100%; height: auto; overflow: visible; }
+.estrada__traco {
+  fill: none;
+  stroke: var(--verde);
+  stroke-width: var(--traco-estrada);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.estrada--capa .estrada__traco { stroke-width: var(--traco-estrada-capa); }
+
+/* ---------------------------------------------------------
    Galeria
    --------------------------------------------------------- */
 
