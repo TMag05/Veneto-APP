@@ -30,14 +30,14 @@
       ';background-size:cover;background-position:center';
   }
 
-  function celula(f, i) {
+  function celula(f) {
     const a = autorDe(f);
-    return '<button class="grelha-fotos__celula" type="button" data-acao="abrir" data-valor="' + i + '" ' +
-      'style="' + fundoDe(f).replace(/^;/, '') + '" ' +
-      'aria-label="Fotografia de ' + UI.h(a.nome) + '">' +
-      imagemDe(f) +
-      '<span class="grelha-fotos__autor">' + Silhuetas.svg(a.modelo, a.cor, { rodas: false, titulo: a.nome }) + '</span>' +
-    '</button>';
+    const dentro = imagemDe(f) +
+      '<span class="grelha-fotos__autor">' + Silhuetas.svg(a.modelo, a.cor, { rodas: false, titulo: a.nome }) + '</span>';
+    const estilo = fundoDe(f).replace(/^;/, '');
+    if (!f.id) return '<div class="grelha-fotos__celula" style="' + estilo + '">' + dentro + '</div>';
+    return '<a class="grelha-fotos__celula" href="#/foto/' + encodeURIComponent(f.id) + '" ' +
+      'style="' + estilo + '" aria-label="Fotografia de ' + UI.h(a.nome) + '">' + dentro + '</a>';
   }
 
   function lista() {
@@ -130,26 +130,7 @@
     acoes: {
       filtrar: function (id) { filtro = id; App.repintar(); },
       camara: function () { document.getElementById('ent-camara').click(); },
-      ficheiro: function () { document.getElementById('ent-ficheiro').click(); },
-      abrir: function (i) {
-        const f = lista()[parseInt(i, 10)];
-        if (!f) return;
-        const a = autorDe(f);
-        const poi = f.poi && POIS[f.poi] ? POIS[f.poi].nome : '';
-        const dia = DADOS.dia(f.dia);
-        UI.abrirFolha(a.nome,
-          '<div class="foto foto--32" style="' + fundoDe(f).replace(/^;/, '') + '">' + imagemDe(f, 'original') + '</div>' +
-          '<p class="meta legenda">' + UI.h([poi, dia ? 'Dia ' + dia.numero : ''].filter(Boolean).join(' · ')) + '</p>' +
-          (f.propria ? '<button class="botao botao--secundario botao--largo" style="margin-top:24px" type="button" data-acao="apagar" data-valor="' + f.id + '">Remover</button>' : '')
-        );
-        Fotos.pintar(document.getElementById('folha'));
-        const btn = document.querySelector('[data-acao="apagar"]');
-        if (btn) btn.addEventListener('click', function () {
-          Estado.apagarFoto(f.id);
-          UI.fecharFolha();
-          App.repintar();
-        });
-      }
+      ficheiro: function () { document.getElementById('ent-ficheiro').click(); }
     }
   };
 })();

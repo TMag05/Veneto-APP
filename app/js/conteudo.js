@@ -108,11 +108,7 @@ window.Conteudo = (function () {
 
   function sufixo() { return Math.random().toString(36).slice(2, 6); }
 
-  function talho(t) {
-    return String(t || '').toLowerCase()
-      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 32);
-  }
+  function talho(t) { return UI.talho(t); }
 
   function idUnico(nome, existentes) {
     let raiz = talho(nome) || 'paragem';

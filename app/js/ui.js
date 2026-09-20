@@ -293,6 +293,14 @@ window.UI = (function () {
     });
   }
 
+  /* Um nome reduzido a letras, números e hífenes. Serve de
+     identificador e de nome de ficheiro. */
+  function talho(t) {
+    return String(t || '').toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 32);
+  }
+
   /* ---------------------------------------------------------
      Fotografias: uma leitura, vários tamanhos
      --------------------------------------------------------- */
@@ -449,7 +457,7 @@ window.UI = (function () {
     gpx: gpx, descarregar: descarregar,
     foto: foto, imagemDe: imagemDe, logo: logo, horario: horario, distintivo: distintivo, linhaLista: linhaLista, carrosEm: carrosEm,
     campo: campo, ligarCampos: ligarCampos, coordenadas: coordenadas,
-    reduzirImagem: reduzirImagem, derivadas: derivadas, campoFoto: campoFoto,
+    reduzirImagem: reduzirImagem, derivadas: derivadas, campoFoto: campoFoto, talho: talho,
     abrirFolha: abrirFolha, fecharFolha: fecharFolha, partilhar: partilhar,
     MESES: MESES
   };

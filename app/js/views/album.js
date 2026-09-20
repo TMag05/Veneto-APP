@@ -10,9 +10,9 @@
      deixa a etiqueta pronta e Fotos.pintar dá-lhe o endereço. */
   function celula(x) {
     if (x.id) {
-      return '<div class="grelha-fotos__celula">' +
+      return '<a class="grelha-fotos__celula" href="#/foto/' + encodeURIComponent(x.id) + '" aria-label="Fotografia">' +
         '<img data-foto="' + UI.h(x.id) + '" data-tamanho="mini" loading="lazy" decoding="async" alt="">' +
-      '</div>';
+      '</a>';
     }
     return '<div class="grelha-fotos__celula" style="background-image:' +
       Imagens.fundo(x.semente, x.variante, 1) +

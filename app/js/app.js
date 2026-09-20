@@ -20,6 +20,7 @@
     ['mapa', 'mapa'],
     ['participantes', 'participantes'],
     ['galeria', 'galeria'],
+    ['foto/:id', 'foto'],
     ['concierge', 'concierge'],
     ['contactos', 'contactos'],
     ['sos', 'sos'],

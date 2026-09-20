@@ -20,6 +20,7 @@ window.Icone = (function () {
     alerta: '<path d="M12 3l9 17H3z"/><path d="M12 9v5"/><path d="M12 17.2v.1"/>',
     juntar: '<path d="M12 5v14M5 12h14"/>',
     fechar: '<path d="M6 6l12 12M18 6L6 18"/>',
+    apagar: '<path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/>',
     semrede: '<path d="M3 3l18 18"/><path d="M5 9.5A14 14 0 0110 7"/><path d="M2 6a19 19 0 015-3.2"/><path d="M8.5 13a8 8 0 013-1.7"/><path d="M12 18.5v.1"/><path d="M19.5 9.2A14 14 0 0017 7.4"/>',
     sincronizar: '<path d="M20 12a8 8 0 01-13.7 5.6M4 12a8 8 0 0113.7-5.6"/><path d="M17.7 3v3.4h-3.4M6.3 21v-3.4h3.4"/>',
     selado: '<path d="M5 11h14v9H5z"/><path d="M8 11V7.5a4 4 0 018 0V11"/>',
