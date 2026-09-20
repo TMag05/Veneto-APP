@@ -1,0 +1,58 @@
+/* Regras do Firestore — Dolomites Grand Tour
+
+   POR VERIFICAR. Escritas a 20.09.2026 a partir das decisões da
+   Fase 4, sem projeto onde as correr. Antes de publicar:
+       firebase emulators:start --only firestore
+   e testar os quatro casos que interessam — um convidado a criar
+   com o autorId de outro, um convidado a apagar a fotografia de
+   outro, o admin a apagar qualquer uma, e um anónimo a ler.
+
+   O papel vive em utilizadores/{uid}, escrito à mão na consola, e
+   nunca num campo que o cliente envie. */
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{base}/documents {
+
+    function autenticado() {
+      return request.auth != null;
+    }
+
+    function ehAdmin() {
+      return autenticado()
+        && exists(/databases/$(base)/documents/utilizadores/$(request.auth.uid))
+        && get(/databases/$(base)/documents/utilizadores/$(request.auth.uid)).data.papel == 'admin';
+    }
+
+    /* O papel de cada pessoa. Lê-se; não se escreve da app. */
+    match /utilizadores/{uid} {
+      allow read: if autenticado() && (request.auth.uid == uid || ehAdmin());
+      allow write: if false;
+    }
+
+    /* Uma fotografia: quem a escreve tem de ser quem diz que é, e o
+       caminho no Storage tem de ser o seu. */
+    match /fotos/{id} {
+      allow read: if autenticado();
+
+      allow create: if autenticado()
+        && request.resource.data.autorId == request.auth.uid
+        && request.resource.data.caminhoOriginal is string
+        && request.resource.data.caminhoOriginal.split('/')[2] == request.auth.uid;
+
+      /* Uma fotografia não se corrige: apaga-se e envia-se outra. */
+      allow update: if false;
+
+      allow delete: if autenticado()
+        && (resource.data.autorId == request.auth.uid || ehAdmin());
+    }
+
+    /* O itinerário, as pessoas e os contactos: todos leem, a
+       organização escreve. */
+    match /conteudo/{documento} {
+      allow read: if autenticado();
+      allow write: if ehAdmin();
+    }
+  }
+}

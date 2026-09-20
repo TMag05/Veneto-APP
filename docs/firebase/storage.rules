@@ -1,0 +1,53 @@
+/* Regras do Storage — Dolomites Grand Tour
+
+   POR VERIFICAR, como as do Firestore. O emulador do Storage corre
+   com firebase emulators:start --only storage,firestore — as duas
+   juntas, porque estas regras leem o papel no Firestore.
+
+   Caminho: fotos/{dia}/{idConvidado}/{sha256}-{tamanho}.jpg
+   O idConvidado é o uid: é isso que amarra cada objeto a quem o
+   enviou, sem ser preciso guardar mais nada.
+
+   Apagar os três objetos e o documento do Firestore em conjunto é
+   trabalho do cliente (js/nuvem.js) — as regras dizem quem pode,
+   não garantem que não fique órfão. */
+
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function autenticado() {
+      return request.auth != null;
+    }
+
+    function ehAdmin() {
+      return autenticado()
+        && firestore.exists(/databases/(default)/documents/utilizadores/$(request.auth.uid))
+        && firestore.get(/databases/(default)/documents/utilizadores/$(request.auth.uid)).data.papel == 'admin';
+    }
+
+    match /fotos/{dia}/{idConvidado}/{ficheiro} {
+      allow read: if autenticado();
+
+      /* Quinze megabytes chegam para um HEIC de iPhone com folga.
+         Um ProRAW não passa — e também não é para aqui. */
+      allow create: if autenticado()
+        && request.auth.uid == idConvidado
+        && request.resource.size < 15 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+
+      /* O caminho vem do SHA do ficheiro: o mesmo caminho é sempre o
+         mesmo ficheiro, e por isso não há nada que reescrever. */
+      allow update: if false;
+
+      allow delete: if autenticado()
+        && (request.auth.uid == idConvidado || ehAdmin());
+    }
+
+    /* Tudo o resto fica fechado. */
+    match /{caminho=**} {
+      allow read, write: if false;
+    }
+  }
+}
