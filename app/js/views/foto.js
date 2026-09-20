@@ -13,9 +13,12 @@
 
   function autorDe(f) {
     if (f.propria) return Estado.eu();
+    if (f.autor === 'organizacao') return { nome: DADOS.evento.nome || 'Do passeio', semCarro: true };
     const p = DADOS.participante(f.autor);
     return p ? { nome: DADOS.nomeCompleto(p), modelo: p.modelo, cor: p.cor } : { nome: 'Do grupo', modelo: 'db12', cor: 'onyx' };
   }
+
+  function deAbertura(f) { return !f.propria && f.autor === 'organizacao'; }
 
   function hora(t) {
     const d = new Date(t);
@@ -51,7 +54,7 @@
 
         '<div class="faixa" style="margin-top:20px">' +
           '<div class="foto-autor">' +
-            '<span class="foto-autor__carro">' + Silhuetas.svg(a.modelo, a.cor, { rodas: false, titulo: a.nome }) + '</span>' +
+            (a.semCarro ? '' : '<span class="foto-autor__carro">' + Silhuetas.svg(a.modelo, a.cor, { rodas: false, titulo: a.nome }) + '</span>') +
             '<div>' +
               '<p class="titulo-ui">' + UI.h(a.nome) + '</p>' +
               (linha ? '<p class="meta num">' + UI.h(linha) + '</p>' : '') +
@@ -104,7 +107,10 @@
           '<button class="botao botao--rosso botao--largo" style="margin-top:24px" type="button" id="btn-apagar-foto">Apagar</button>');
         document.getElementById('btn-apagar-foto').addEventListener('click', function () {
           UI.fecharFolha();
-          Estado.apagarFoto(id);
+          /* As de abertura são conteúdo do passeio, não estado de quem
+             as tirou: saem por onde entraram. */
+          if (deAbertura(f)) Conteudo.removerFotoInicial(id);
+          else Estado.apagarFoto(id);
           App.ir('#/galeria');
         });
       }

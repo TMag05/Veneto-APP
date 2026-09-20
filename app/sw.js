@@ -8,7 +8,7 @@
 /* Subir esta versão sempre que se publica: força a reinstalação do
    cache e é o que faz chegar conteúdo novo aos telemóveis. Deve
    acompanhar o ?v= dos ficheiros em index.html. */
-const VERSAO = 'passeio-v66';
+const VERSAO = 'passeio-v70';
 
 const CONCHA = [
   './',
@@ -69,6 +69,7 @@ const CONCHA = [
   './js/views/mais.js',
   './js/views/org.js',
   './js/views/org-etapa.js',
+  './js/views/org-fotos.js',
   './js/views/org-pessoas.js',
   './js/views/org-contactos.js'
 ];

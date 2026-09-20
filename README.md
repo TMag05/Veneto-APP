@@ -97,6 +97,8 @@ app/
     icones.js           conjunto outline de 1.5px + os punções da navegação principal
     imagens.js          imagens de reserva, a substituir por fotografia
     fotos.js            arquivo das fotografias do grupo, em IndexedDB
+    nuvem.js            a fronteira com o servidor, por implementar
+    lib/zip.js          junta ficheiros num .zip, sem os comprimir
     app.js              encaminhamento, histórico e chrome
     views/              ecrãs do convidado; org*.js são a área da organização
   exemplos/veneto/      conteúdo da edição do Veneto, guardado para referência
@@ -127,7 +129,7 @@ Em **Mais › Definições › Demonstração** salta-se entre os dias anteriore
 | Silhuetas dos carros | `silhuetas.js` › `FORMAS` | Cinco arquétipos. A versão final deve ter um perfil por modelo |
 | Cores de carroçaria | `silhuetas.js` › `CORES` | Nomes reais, hexadecimais aproximados — pedir os códigos à marca |
 | Código de acesso da organização | `js/views/mais.js` | Um código partilhado. Não é autenticação |
-| Envio das fotografias | `js/store.js` › `sincronizar()` | O ficheiro fica guardado no telemóvel, inteiro e sem limite de número. O envio espera pelo Storage: até lá a fila diz *pendente* e nunca *enviado* |
+| Envio das fotografias | `js/nuvem.js` | O ficheiro fica guardado no telemóvel, inteiro, com miniatura e vista já geradas e o caminho de destino já calculado. Faltam as quatro funções que falam com o Firebase: até lá a fila diz *pendente* e nunca *enviado* |
 
 ---
 

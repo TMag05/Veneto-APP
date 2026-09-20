@@ -75,7 +75,9 @@ app/
   css/app.css           componentes e ecrãs
   js/semente.js         o passeio de 2026: evento, sítios e itinerário; pessoas de exemplo
   js/conteudo.js        conteúdo editável; publica DADOS e POIS; CRUD e persistência
-  js/fotos.js           arquivo das fotografias do grupo, em IndexedDB
+  js/fotos.js           arquivo das fotografias do grupo, em IndexedDB; impressão e caminhos
+  js/nuvem.js           a fronteira com o servidor — a única peça que o Firebase substitui
+  js/lib/zip.js         junta ficheiros num .zip, sem os comprimir
   js/store.js           estado do utilizador, fila offline, papel, relógio da demonstração
   js/ui.js              datas, distâncias, links do Maps, GPX, campos de edição
   js/icones.js          conjunto outline + punções da navegação
@@ -93,7 +95,9 @@ servidor.js             servidor estático de desenvolvimento
 - **Fotografias em `assets/fotos/`,** reduzidas a 1600 px no lado maior e em JPEG de qualidade 72, sem nunca ampliar. Cada uma entra também na `CONCHA` de `sw.js`, para existir sem rede. Um sítio aponta para a sua com `imagem: { foto: 'assets/fotos/…' }`; um momento de logística com `imagem: { grafico: 'chegada' }`.
 - **`conteudo.js` é a única peça que muda quando houver servidor** — `carregar()` e `guardar()`. Todo o resto lê `DADOS` e `POIS` e não sabe de onde vêm. Manter essa fronteira.
 - **Offline é o estado normal.** Escrita local imediata, fila de sincronização, nunca um erro de rede à vista do convidado. Não existe botão de guardar em lado nenhum.
-- **As fotografias do grupo não passam pelo `localStorage`.** O ficheiro sai da câmara e vai inteiro para `js/fotos.js` (IndexedDB, base `veneto-fotos`), sem compressão; ao lado fica uma miniatura de 320 px, que é o que as grelhas mostram. No `localStorage` ficam só os metadados. Uma fotografia só se dá por enviada quando o Storage confirmar — nunca por omissão, nunca por um temporizador. As vistas que mostram fotografias pedem os endereços a `Fotos.pintar` e devolvem-nos em `desmontar`.
+- **As fotografias do grupo não passam pelo `localStorage`.** O ficheiro sai da câmara e vai inteiro para `js/fotos.js` (IndexedDB, base `veneto-fotos`), sem compressão; ao lado ficam uma miniatura de 320 px e uma vista de 1600 px, geradas no telemóvel numa leitura só, com a orientação da câmara já aplicada. No `localStorage` ficam só os metadados. Uma fotografia só se dá por enviada quando o Storage confirmar — nunca por omissão, nunca por um temporizador. As vistas que mostram fotografias pedem os endereços a `Fotos.pintar` e devolvem-nos em `desmontar`.
+- **Há duas peças que mudam quando houver servidor, e só duas:** `conteudo.js` para o conteúdo e `nuvem.js` para as fotografias. `nuvem.js` declara quatro funções — `ligada`, `enviarFoto`, `apagarFoto`, `fotosDoDia` — e enquanto responder que não está ligada, a fila fica parada, de propósito. Nada fora desse ficheiro conhece o Firestore, o Storage ou o Auth.
+- **O caminho de uma fotografia é `fotos/{dia}/{idConvidado}/{sha256}-{tamanho}.jpg`**, calculado por `Fotos.caminho()`. O SHA-256 é do ficheiro de origem: a mesma fotografia enviada duas vezes cai no mesmo sítio, e por isso a fila pode repetir sem duplicar. Onde não há `crypto.subtle` — pelo IP da rede local, em http — a conta faz-se em JavaScript, no mesmo ficheiro.
 - **Cada ecrã tem endereço fixo e partilhável** (`ROTAS` em `app.js`). É isto que permite ao WhatsApp ser o sino e à app ser o arquivo — e é a decisão com maior impacto no sucesso do projeto.
 - **Voltar é recuar no caminho feito, não subir na hierarquia.** O ecrã-pai declarado só serve quando não há histórico — o caso do link vindo do WhatsApp.
 - **O grupo segue em caravana: a app explica o dia, não indica o caminho.** Há batedores na estrada e os carros seguem-nos. O ecrã Hoje e o Itinerário dizem primeiro o que vai acontecer — paragem, hora, o que se faz ali. A distância e o tempo até à paragem seguinte são ritmo do dia, não instrução de condução, e medem-se de paragem a paragem do programa. O CTA principal de um ecrã nunca é "abrir no Maps".
@@ -141,6 +145,8 @@ O código de acesso da organização (`2026`, em `js/views/mais.js`) é uma port
 | Silhuetas dos carros | `silhuetas.js` › `FORMAS` — cinco arquétipos, não um perfil por modelo |
 | Cores de carroçaria | `silhuetas.js` › `CORES` — hexadecimais aproximados |
 | Código da organização | `js/views/mais.js` |
+| Envio das fotografias | `js/nuvem.js` — as quatro funções por implementar. Até lá a fila diz *pendente* e nunca *enviado* |
+| Fotografias de abertura | `js/views/org-fotos.js` — ficam no telemóvel de quem organiza, como o resto do conteúdo |
 
 A secção **Demonstração** (`js/views/mais.js`, com `Demonstracao.preparar`), o endereço `#/demo/n` (`js/app.js` › `navegar`) e o campo `demoFase` (`js/store.js`) **não podem existir na versão entregue aos convidados**.
 

@@ -11,8 +11,11 @@
 
   function autorDe(f) {
     if (f.propria) return Estado.eu();
+    /* As de abertura são do passeio, não de uma pessoa: não levam
+       silhueta, porque não há carro nenhum por trás delas. */
+    if (f.autor === 'organizacao') return { nome: DADOS.evento.nome || 'Do passeio', semCarro: true };
     const p = DADOS.participante(f.autor);
-    return p ? { nome: p.nome, modelo: p.modelo, cor: p.cor } : { nome: '', modelo: 'db12', cor: 'onyx' };
+    return p ? { nome: p.nome, modelo: p.modelo, cor: p.cor } : { nome: 'Do grupo', modelo: 'db12', cor: 'onyx' };
   }
 
   /* A imagem vem do arquivo do telemóvel e chega depois do HTML:
@@ -33,7 +36,7 @@
   function celula(f) {
     const a = autorDe(f);
     const dentro = imagemDe(f) +
-      '<span class="grelha-fotos__autor">' + Silhuetas.svg(a.modelo, a.cor, { rodas: false, titulo: a.nome }) + '</span>';
+      (a.semCarro ? '' : '<span class="grelha-fotos__autor">' + Silhuetas.svg(a.modelo, a.cor, { rodas: false, titulo: a.nome }) + '</span>');
     const estilo = fundoDe(f).replace(/^;/, '');
     if (!f.id) return '<div class="grelha-fotos__celula" style="' + estilo + '">' + dentro + '</div>';
     return '<a class="grelha-fotos__celula" href="#/foto/' + encodeURIComponent(f.id) + '" ' +

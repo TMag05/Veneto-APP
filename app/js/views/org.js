@@ -122,6 +122,17 @@
           '<button class="botao botao--secundario botao--largo" style="margin-top:24px" type="button" data-acao="novaParagem">' +
             Icone('juntar', 20) + 'Nova paragem</button>' +
           '<button class="botao botao--texto" style="width:100%" type="button" data-acao="sugestoes">Escolher das sugestões da região &rsaquo;</button>' +
+        '</div>' +
+
+        '<div class="faixa">' +
+          '<div class="lista">' +
+            UI.linhaLista({
+              titulo: 'Fotografias de abertura',
+              nota: UI.plural((DADOS.fotosIniciais || []).length, 'fotografia publicada', 'fotografias publicadas'),
+              icone: 'galeria',
+              href: '#/org/fotos'
+            }) +
+          '</div>' +
         '</div>';
     },
     acoes: Object.assign({}, acoesComuns, {
@@ -136,6 +147,39 @@
   /* ---------------------------------------------------------
      Evento — nome, base, datas e cópia de segurança
      --------------------------------------------------------- */
+
+  /* Quanto tempo fica o álbum de pé. Seis meses depois do último
+     dia, por omissão; a data muda-se aqui. O apagamento é um gesto
+     de quem organiza, não um relógio a correr sozinho. */
+  function seccaoArquivo() {
+    const faltam = Conteudo.diasAteApagar();
+    const guardadas = Estado.fotos().length;
+
+    let aviso = '';
+    if (faltam !== null && faltam <= 30) {
+      aviso = '<div class="selado selado--aviso" style="margin-top:16px">' +
+        '<p class="corpo-ui">' +
+          (faltam < 0
+            ? 'A data de apagar já passou.'
+            : (faltam === 0 ? 'O arquivo apaga-se hoje.' : 'Faltam ' + faltam + ' dias para apagar o arquivo.')) +
+        '</p>' +
+        '<p class="meta" style="margin-top:8px">Avise o grupo antes. Depois de apagadas não voltam.</p>' +
+      '</div>';
+    }
+
+    return '<div class="faixa">' +
+      '<div class="seccao-cabecalho"><h2 class="etiqueta">Arquivo</h2></div>' +
+      '<p class="corpo-ui silencioso">As fotografias do grupo ficam disponíveis até esta data. ' +
+        'Passada, apagam-se à mão, a partir daqui.</p>' +
+      '<div class="pilha-2" style="margin-top:16px">' +
+        UI.campo({ rotulo: 'Apagar a partir de', nome: 'apagarEm', valor: Conteudo.apagarEm(), tipo: 'data',
+          nota: 'Seis meses depois do último dia, se não se mudar.' }) +
+      '</div>' +
+      aviso +
+      '<button class="botao botao--texto botao--apagar" style="margin-top:16px" type="button" data-acao="apagarArquivo">' +
+        Icone('apagar', 20) + 'Apagar as fotografias (' + guardadas + ')</button>' +
+    '</div>';
+  }
 
   Vistas.orgEvento = {
     area: 'organizacao',
@@ -190,6 +234,8 @@
           '</div>' +
         '</div>' +
 
+        seccaoArquivo() +
+
         '<div class="faixa">' +
           '<div class="seccao-cabecalho"><h2 class="etiqueta">Cópia de segurança</h2></div>' +
           '<p class="corpo-ui silencioso">Enquanto não há servidor, o conteúdo vive neste telemóvel. Descarregue o ficheiro depois de trabalhar.</p>' +
@@ -238,6 +284,26 @@
     acoes: Object.assign({}, acoesComuns, {
       fotoConcierge: function () { document.getElementById('ent-foto-conc').click(); },
       tirarFotoConcierge: function () { Conteudo.atualizarConcierge({ foto: '' }); },
+
+      apagarArquivo: function () {
+        const n = Estado.fotos().length;
+        if (!n) {
+          UI.abrirFolha('Arquivo vazio', '<p class="corpo-ui silencioso">Não há fotografias para apagar.</p>');
+          return;
+        }
+        UI.abrirFolha('Apagar as fotografias',
+          '<p class="corpo-ui silencioso">Saem ' + UI.plural(n, 'fotografia', 'fotografias') +
+            ' deste telemóvel, as do grupo e as de abertura. Não se recuperam.</p>' +
+          '<p class="meta" style="margin-top:16px">Descarregue o álbum antes, se ainda não o fez.</p>' +
+          '<button class="botao botao--rosso botao--largo" style="margin-top:24px" type="button" id="btn-apagar-arquivo">Apagar tudo</button>');
+        document.getElementById('btn-apagar-arquivo').addEventListener('click', function () {
+          UI.fecharFolha();
+          (DADOS.fotosIniciais || []).slice().forEach(function (f) { Conteudo.removerFotoInicial(f.id); });
+          Estado.get().fotos.slice().forEach(function (f) { Estado.apagarFoto(f.id); });
+          Fotos.limpar().catch(function () {});
+          App.repintar();
+        });
+      },
       exportar: function () {
         const nome = 'passeio-' + (DADOS.evento.nome || 'evento').toLowerCase().replace(/\s+/g, '-') + '.json';
         UI.descarregar(nome, Conteudo.exportar(), 'application/json');

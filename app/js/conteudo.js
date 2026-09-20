@@ -40,6 +40,7 @@ window.Conteudo = (function () {
       evento: clonar(SEMENTE.evento),
       dias: [],
       pois: {},
+      fotosIniciais: [],
       participantes: [],
       contactos: clonar(SEMENTE.contactos),
       locais: (r.locais || []).map(function (l) {
@@ -197,7 +198,7 @@ window.Conteudo = (function () {
       concierge: dados.evento.concierge || { nome: '', papel: '', foto: '', promessa: '' },
       levar: dados.evento.levar || [],
       notas: dados.evento.notas || [],
-      fotosIniciais: [],
+      fotosIniciais: dados.fotosIniciais || [],
 
       dia: function (id) { return dias.find(function (d) { return d.id === id; }) || null; },
       participante: function (id) { return dados.participantes.find(function (p) { return p.id === id; }) || null; },
@@ -214,6 +215,47 @@ window.Conteudo = (function () {
   function atualizarEvento(patch) {
     Object.assign(dados.evento, patch);
     guardar();
+  }
+
+  /* Seis meses depois do último dia. É a data em que a organização
+     apaga as fotografias do grupo — ajustável, e nunca automática:
+     quem apaga trinta álbuns carrega no botão com a mão. */
+  function apagarEmPorOmissao(fim) {
+    if (!fim) return '';
+    const d = new Date(fim + 'T00:00:00');
+    d.setMonth(d.getMonth() + 6);
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function apagarEm() {
+    return dados.evento.apagarEm || apagarEmPorOmissao(dados.evento.fim);
+  }
+
+  /* Dias que faltam até lá. Negativo quando já passou. */
+  function diasAteApagar() {
+    const data = apagarEm();
+    if (!data) return null;
+    const ms = new Date(data + 'T00:00:00') - new Date(Estado.chave(Estado.agora()) + 'T00:00:00');
+    return Math.round(ms / 86400000);
+  }
+
+  /* ---------------------------------------------------------
+     Fotografias de abertura
+     Publicadas antes da revelação de cada dia. O ficheiro vai
+     para o arquivo do telemóvel, como qualquer outra; aqui fica
+     só o registo, que é conteúdo e viaja com o itinerário.
+     --------------------------------------------------------- */
+
+  function juntarFotoInicial(meta) {
+    dados.fotosIniciais = dados.fotosIniciais || [];
+    dados.fotosIniciais.push(meta);
+    guardar();
+  }
+
+  function removerFotoInicial(id) {
+    dados.fotosIniciais = (dados.fotosIniciais || []).filter(function (f) { return f.id !== id; });
+    guardar();
+    Fotos.apagar(id).catch(function () { /* já não existia */ });
   }
 
   function atualizarConcierge(patch) {
@@ -561,6 +603,8 @@ window.Conteudo = (function () {
     vazio: vazio,
 
     atualizarEvento: atualizarEvento, atualizarConcierge: atualizarConcierge,
+    apagarEm: apagarEm, diasAteApagar: diasAteApagar,
+    juntarFotoInicial: juntarFotoInicial, removerFotoInicial: removerFotoInicial,
     reveladas: reveladas, porRevelar: porRevelar, varianteDe: varianteDe,
 
     criarDia: criarDia, atualizarDia: atualizarDia, removerDia: removerDia, moverDia: moverDia,

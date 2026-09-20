@@ -34,6 +34,7 @@
     ['org', 'orgInicio'],
     ['org/evento', 'orgEvento'],
     ['org/itinerario', 'orgItinerario'],
+    ['org/fotos', 'orgFotos'],
     ['org/etapa/:id', 'orgEtapa'],
     ['org/paragem/:id', 'orgParagem'],
     ['org/participantes', 'orgParticipantes'],
