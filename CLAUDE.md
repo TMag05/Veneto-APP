@@ -82,6 +82,7 @@ app/
   js/ui.js              datas, distâncias, links do Maps, GPX, campos de edição
   js/icones.js          conjunto outline + punções da navegação
   js/silhuetas.js       perfis dos carros em SVG + paleta de carroçaria
+  js/estradas.js        traçados das estradas em SVG, projetados do OpenStreetMap
   js/imagens.js         desenhos de reserva e os gráficos de logística (cores lidas de tokens.css)
   assets/fotos/         fotografias dos sítios, servidas com a app e guardadas para funcionar offline
   assets/img/           logótipo do passeio (claro, transparente) e os ícones da app
@@ -101,7 +102,10 @@ servidor.js             servidor estático de desenvolvimento
 - **Cada ecrã tem endereço fixo e partilhável** (`ROTAS` em `app.js`). É isto que permite ao WhatsApp ser o sino e à app ser o arquivo — e é a decisão com maior impacto no sucesso do projeto.
 - **Voltar é recuar no caminho feito, não subir na hierarquia.** O ecrã-pai declarado só serve quando não há histórico — o caso do link vindo do WhatsApp.
 - **O grupo segue em caravana: a app explica o dia, não indica o caminho.** Há batedores na estrada e os carros seguem-nos. O ecrã Hoje e o Itinerário dizem primeiro o que vai acontecer — paragem, hora, o que se faz ali. A distância e o tempo até à paragem seguinte são ritmo do dia, não instrução de condução, e medem-se de paragem a paragem do programa. O CTA principal de um ecrã nunca é "abrir no Maps".
-- **O Google Maps é rede de segurança, troço a troço.** Para quem se atrasar ou se separar da caravana, cada troço entre duas paragens tem o seu link individual, com waypoints âncora — nunca o dia inteiro, que o Maps recalcularia pelo mais rápido e dissolveria a estrada escolhida. Vive no fim do Itinerário, junto com o GPX, não no centro. Decisão de 12.09.2026: `docs/decisao-navegacao-caravana.md`.
+- **Não há marcação de chegada.** Os vinte e cinco carros andam juntos, chegam juntos e param juntos: validar a chegada seria validar o que já é evidente, e dependeria de posição em vales sem cobertura. Saiu a 20.09.2026, com tudo o que vivia dela — a presença no mapa, a manchete do grupo e as contagens da certidão. **A história de uma paragem abre pelo relógio do programa** (`Programa.abertoAgora`), que numa caravana sabe onde está toda a gente melhor do que um toque no ecrã. A identidade pelo carro não desapareceu: mudou de sítio, e vive na primeira abertura, na lista de participantes e na certidão do álbum.
+- **O Google Maps é rede de segurança, e mais nada.** Para quem se atrasar ou se separar da caravana, cada troço entre duas paragens tem o seu link individual, com waypoints âncora — nunca o dia inteiro, que o Maps recalcularia pelo mais rápido e dissolveria a estrada escolhida. Na paragem é uma linha de texto no fim da página, nunca uma barra fixa; no Itinerário vive no fim, junto com o GPX. Decisão de 12.09.2026 (`docs/decisao-navegacao-caravana.md`), com o estatuto revisto a 20.09.2026 quando a marcação de chegada saiu.
+- **O separador das Estradas é o retrato do que se conduz, não uma ferramenta.** Um traço por estrada, sem preenchimento, na cor do percurso (`--verde`), sobre chapa escura que não muda de tema — como a fotografia. Os traçados são geometria real, projetada uma vez do OpenStreetMap e gravada em `js/estradas.js`; a app continua a não fazer um único pedido externo. **Uma estrada sem traçado confirmado entra sem desenho**, só com o nome e a nota: um traço aproximado é uma mentira mais difícil de apanhar do que um número errado. Sem animação — o manifesto dá 200 ms ao movimento e uma só exceção, que é o álbum.
+- **O que fazer à chegada de cada paragem** — estacionamento, quem recebe, casas de banho, hora de voltar aos carros — vive no bloco `chegada` da paragem, editável na área da organização. Campos vazios não desenham nada, nem rótulo nem espaço reservado: isto é informação, e o orçamento gráfico do projeto vai todo para os traçados.
 - **Estados de espera legíveis.** Enquanto a organização não publicar itinerário, o convidado vê um estado de espera — nunca um ecrã partido.
 - **Commits em português, no imperativo, uma linha** — como os que já existem: *"Aplica o sistema de App - Separadores aos quatro separadores"*. Sem prefixos de convenção.
 
@@ -145,21 +149,33 @@ O código de acesso da organização (`2026`, em `js/views/mais.js`) é uma port
 | Silhuetas dos carros | `silhuetas.js` › `FORMAS` — cinco arquétipos, não um perfil por modelo |
 | Cores de carroçaria | `silhuetas.js` › `CORES` — hexadecimais aproximados |
 | Código da organização | `js/views/mais.js` |
+| Traçados das estradas | `js/estradas.js` — só o San Boldo está confirmado. Ver a tabela abaixo |
 | Envio das fotografias | `js/nuvem.js` — as quatro funções por implementar. Até lá a fila diz *pendente* e nunca *enviado* |
 | Fotografias de abertura | `js/views/org-fotos.js` — ficam no telemóvel de quem organiza, como o resto do conteúdo |
 
-A secção **Demonstração** (`js/views/mais.js`, com `Demonstracao.preparar`), o endereço `#/demo/n` (`js/app.js` › `navegar`) e o campo `demoFase` (`js/store.js`) **não podem existir na versão entregue aos convidados**.
+**Traçados por confirmar.** Só se desenha o que estiver confirmado; as outras quatro aparecem no ecrã como entrada de texto, sem desenho:
+
+| Estrada | Dias | Estado |
+|---|---|---|
+| Passo di San Boldo | 2 e 4 | **Confirmado.** Geometria do OpenStreetMap: 796 m medidos, cinco troços marcados como túnel. Bate com a pesquisa — seis curvas, cinco túneis, ~800 m para 100 m de desnível, 10% |
+| Strada Cadorna (subida a Cima Grappa) | 2 | Por confirmar — há mais do que um traçado possível a partir de Possagno |
+| Val Canali (subida às Pale di San Martino) | 3 | Por confirmar |
+| Vales das Dolomitas, tarde do dia 3 | 3 | Desconhecido — três horas e meia sem um único nome na proposta |
+| Altopiano del Cansiglio (subida ao Monte Pizzoc) | 4 | Por confirmar |
+
+A secção **Demonstração**, o endereço `#/demo/n` e o campo `demoFase` **saíram a 20.09.2026** (commit `bc18040`). «Carregar passeio de exemplo» e «Repor tudo» passaram para a área da organização, em Evento › Cópia de segurança. O carregador de exemplo mete pessoas falsas por cima das reais — **deve sair antes da entrega**.
 
 ---
 
 ## 10. Por fazer, por ordem
 
 1. **Sessão fotográfica, ou arquivo licenciado.** As fotografias oficiais dos sítios já estão na app; o que falta é o passeio em si — os carros na estrada, o grupo, a luz de outubro.
-2. **Servidor** — Firestore para conteúdo, chegadas e pedidos; Storage para fotografias; Auth por link mágico; papéis com regras a sério; Cloud Messaging.
-3. **Publicação e notificação** — o botão que empurra uma alteração para os telemóveis. Sem isto, a regra operacional do manifesto §4 não se cumpre.
-4. **Confirmar os waypoints âncora com a organização**, e acrescentar os do dia 3 pelos vales das Dolomitas. Com batedores, só servem o link de recurso — mas para quem se afastar da caravana só serve se apontar para a estrada certa.
-5. **Revisão da identidade para a rota real.** `Pietra e Vigna` foi deduzida do Veneto — pedra, vinha, Veneza — e a rota de 2026 passa a maior parte do tempo precisamente aí: Possagno, as colinas do Prosecco, o Cansiglio, a laguna. O que a fundamentação ainda não tem são os dois fios que o passeio acrescenta: a Grande Guerra (o Grappa e San Boldo) e a dolomia das Pale di San Martino. A paleta e as regras ficam; a revisão acrescenta, não substitui — ver `ENQUADRAMENTO.md` §4.
-6. **Exportação do roadbook em PDF** (o CSV de participantes já existe).
+2. **Pedir à Stappando o traçado real dos quatro troços por confirmar** — a subida a Cima Grappa, a Val Canali, os vales da tarde do dia 3 e a subida ao Cansiglio. Basta o GPX ou o nome das estradas: o traçado projeta-se do OpenStreetMap, como se fez ao San Boldo. Sem isto, quatro das cinco estradas do passeio ficam sem desenho. É a par com a sessão fotográfica.
+3. **Servidor** — Firestore para conteúdo, chegadas e pedidos; Storage para fotografias; Auth por link mágico; papéis com regras a sério; Cloud Messaging.
+4. **Publicação e notificação** — o botão que empurra uma alteração para os telemóveis. Sem isto, a regra operacional do manifesto §4 não se cumpre.
+5. **Confirmar os waypoints âncora com a organização**, e acrescentar os do dia 3 pelos vales das Dolomitas. Com batedores, só servem o link de recurso — mas para quem se afastar da caravana só serve se apontar para a estrada certa.
+6. **Revisão da identidade para a rota real.** `Pietra e Vigna` foi deduzida do Veneto — pedra, vinha, Veneza — e a rota de 2026 passa a maior parte do tempo precisamente aí: Possagno, as colinas do Prosecco, o Cansiglio, a laguna. O que a fundamentação ainda não tem são os dois fios que o passeio acrescenta: a Grande Guerra (o Grappa e San Boldo) e a dolomia das Pale di San Martino. A paleta e as regras ficam; a revisão acrescenta, não substitui — ver `ENQUADRAMENTO.md` §4.
+7. **Exportação do roadbook em PDF** (o CSV de participantes já existe).
 
 ---
 
