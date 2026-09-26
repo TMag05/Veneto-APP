@@ -386,13 +386,6 @@
           '</div>'
         : semItinerario('O itinerário está a ser preparado.')) +
 
-      (DADOS.levar.length ? '<div class="faixa">' +
-        '<div class="seccao-cabecalho"><h2 class="etiqueta">O que levar</h2></div>' +
-        '<div class="lista">' +
-          UI.linhaLista({ titulo: 'Lista de bagagem', nota: UI.plural(DADOS.levar.length, 'item', 'itens'), icone: 'documento', href: '#/preparacao' }) +
-        '</div>' +
-      '</div>' : '') +
-
       (DADOS.carros.length
         ? '<div class="faixa">' +
             '<div class="seccao-cabecalho"><h2 class="etiqueta">Quem vai</h2></div>' +
