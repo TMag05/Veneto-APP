@@ -41,9 +41,20 @@ function fabrica(org) {
   /* Na app instalada no ecrã principal, quem chega quase sempre já
      criou o acesso no browser: no iPhone os dois não partilham a
      sessão. Abre-se logo em «Entrar». */
-  function instalada() {
-    return window.navigator.standalone === true ||
-      (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+  function instalada() { return Instalar.instalada(); }
+
+  /* Fora do ecrã principal, a primeira coisa a fazer é pô-la lá. No
+     iPhone é antes de criar o acesso: a app do ícone não vê a sessão
+     do browser, e o acesso teria de ser feito duas vezes. */
+  function convite() {
+    if (org || !Instalar.noTelemovel() || (modo !== 'criar' && modo !== 'entrar')) return '';
+    return '<div class="lista">' +
+      Instalar.linha(Instalar.noIphone()
+        ? (modo === 'criar'
+            ? 'Antes de criar o acesso. No iPhone, é na app instalada que ele fica.'
+            : 'Antes de entrar. No iPhone, é na app instalada que a sessão fica.')
+        : 'Abre sem rede, como as outras apps.') +
+    '</div>';
   }
 
   function preparar() {
@@ -79,7 +90,9 @@ function fabrica(org) {
           (DADOS.dias.length ? ' · ' + UI.plural(DADOS.dias.length, 'dia', 'dias') : '') + '</p>' +
       '</div>' +
 
-      ({ criar: formCriar, entrar: formEntrar, recuperar: formRecuperar, recuperado: recuperado })[modo]() +
+      '<div class="pilha-3">' + convite() +
+        ({ criar: formCriar, entrar: formEntrar, recuperar: formRecuperar, recuperado: recuperado })[modo]() +
+      '</div>' +
 
       /* A outra porta, no fim e em texto: quem não é da equipa
          não tem de dar por ela. */
@@ -316,6 +329,7 @@ function fabrica(org) {
     html: html,
     montar: montar,
     acoes: {
+      instalar: function () { Instalar.pedir(); },
       tema: function () {
         Estado.definir({ tema: Estado.get().tema === 'claro' ? 'escuro' : 'claro' });
       },

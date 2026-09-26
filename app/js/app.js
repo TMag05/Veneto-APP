@@ -12,6 +12,8 @@
     ['entrada', 'entrada'],
     /* A porta da organização, no fim da entrada. */
     ['organizacao', 'entradaOrg'],
+    /* Os passos para pôr a app no ecrã principal. Abre sem sessão. */
+    ['instalar', 'instalar'],
     ['chegada', 'chegada'],
     ['hoje', 'hoje'],
     ['dia/:id', 'dia'],
@@ -177,6 +179,8 @@
   }
 
   function ehEntrada(vista) { return vista === 'entrada' || vista === 'entradaOrg'; }
+  /* O que se abre sem sessão: a entrada e os passos para instalar. */
+  function semSessao(vista) { return ehEntrada(vista) || vista === 'instalar'; }
 
   /* Para onde vai quem acabou de entrar. A organização não passa
      pela primeira abertura — é a do convidado, com o carro dele — e
@@ -194,7 +198,7 @@
     const org = Estado.ehOrganizacao();
 
     let r = resolver(location.hash);
-    if (!estado.autenticado && (!r || !ehEntrada(r.vista))) {
+    if (!estado.autenticado && (!r || !semSessao(r.vista))) {
       irSubstituindo('#/entrar');
       return;
     }
@@ -207,7 +211,7 @@
       return;
     }
     /* A chegada acontece uma vez por instalação. */
-    if (estado.autenticado && !org && !estado.chegadaVista && r.vista !== 'chegada') {
+    if (estado.autenticado && !org && !estado.chegadaVista && r.vista !== 'chegada' && r.vista !== 'instalar') {
       irSubstituindo('#/chegada');
       return;
     }
@@ -415,7 +419,7 @@
       return;
     }
     /* A sessão acabou — a conta foi apagada, ou saiu-se: volta-se à entrada. */
-    if (!ehEntrada(vistaAtual) && !Estado.get().autenticado) {
+    if (!semSessao(vistaAtual) && !Estado.get().autenticado) {
       UI.fecharFolha();
       /* Quem saiu da área da organização volta à porta dela. */
       const v = window.Vistas[vistaAtual];

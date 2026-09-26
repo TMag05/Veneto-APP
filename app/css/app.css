@@ -1756,6 +1756,49 @@ a { color: var(--verde); text-decoration: none; }
   color: var(--inchiostro);
 }
 
+/* ---------------------------------------------------------
+   Instalar — os passos do browser em que se está
+   --------------------------------------------------------- */
+
+.passos { list-style: none; margin: 0; padding: 0; counter-reset: passo; }
+.passos__passo {
+  counter-increment: passo;
+  display: flex;
+  gap: var(--esp-2);
+  align-items: flex-start;
+}
+.passos__passo + .passos__passo { margin-top: var(--esp-3); }
+.passos__numero {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--raio-pill);
+  background: var(--acento-suave);
+  color: var(--ottone);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 500;
+}
+.passos__numero::before { content: counter(passo); }
+.passos__corpo { padding-top: 4px; }
+/* O símbolo que se procura no ecrã, desenhado como lá aparece. */
+.passos__simbolo {
+  display: inline-grid;
+  place-items: center;
+  vertical-align: -3px;
+  color: var(--ottone);
+}
+.instalar__link {
+  padding: 12px 14px;
+  background: var(--istria);
+  border-radius: var(--raio-controlo);
+  user-select: all;
+  -webkit-user-select: all;
+  word-break: break-all;
+}
+
 /* Palavra-passe com «Mostrar» dentro do campo: para quem escreve
    ao sol, num teclado pequeno, ver o que escreveu poupa um erro. */
 .campo-senha { position: relative; display: block; }

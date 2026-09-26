@@ -17,7 +17,8 @@
     nav: 'mais',
     semCabecalho: true,
     acoes: {
-      tema: function (t) { Estado.definir({ tema: t === 'claro' ? 'claro' : 'escuro' }); }
+      tema: function (t) { Estado.definir({ tema: t === 'claro' ? 'claro' : 'escuro' }); },
+      instalar: function () { Instalar.pedir(); }
     },
     html: function () {
       const e = Estado.get();
@@ -64,6 +65,13 @@
             UI.linhaLista({ titulo: 'Arquivo', nota: 'Álbum e roadbook', icone: 'galeria', href: '#/arquivo' }) +
           '</div>' +
         '</div>' +
+
+        /* Some quando a app já abre do ecrã principal. */
+        (Instalar.instalada()
+          ? ''
+          : '<div class="faixa">' +
+              '<div class="lista">' + Instalar.linha('Abre sem rede, como as outras apps') + '</div>' +
+            '</div>') +
 
         '<div class="faixa">' +
           '<div class="seccao-cabecalho"><h2 class="etiqueta">Aspeto</h2></div>' +
