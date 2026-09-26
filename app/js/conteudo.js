@@ -248,9 +248,12 @@ window.Conteudo = (function () {
     return [p.nome, p.apelido].filter(Boolean).join(' ').trim() || 'Sem nome';
   }
 
-  /* Distância e duração de um dia, somando os troços. */
-  function medirDia(d) {
+  /* Distância e duração de um dia. Com percurso traçado, são as da
+     estrada real; sem ele, somam-se os troços em linha reta. */
+  function medirDia(d, numero) {
     if (!d.etapas || d.etapas.length < 2) return { km: 0, min: 0 };
+    const percurso = window.PERCURSOS ? PERCURSOS.para({ numero: numero, etapas: d.etapas }) : null;
+    if (percurso) return { km: Math.round(percurso.km), min: percurso.minutos };
     let km = 0, min = 0;
     for (let i = 0; i < d.etapas.length - 1; i++) {
       const t = window.UI ? UI.troco(d.etapas[i], d.etapas[i + 1]) : { km: 0, min: 0 };
@@ -263,7 +266,7 @@ window.Conteudo = (function () {
     window.POIS = dados.pois;
 
     const dias = dados.dias.map(function (d, i) {
-      const medida = medirDia(d);
+      const medida = medirDia(d, i + 1);
       return Object.assign({}, d, {
         numero: i + 1,
         distancia: d.distancia || medida.km,

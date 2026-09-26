@@ -39,8 +39,9 @@
     return { latMin: latMin, latMax: latMax, lngMin: lngMin, lngMax: lngMax, A: A };
   }
 
-  function px(E, poi) { return (poi.lng - E.lngMin) / (E.lngMax - E.lngMin) * (L - 2 * PAD) + PAD; }
-  function py(E, poi) { return (E.latMax - poi.lat) / (E.latMax - E.latMin) * (E.A - 2 * PAD) + PAD; }
+  /* A folga vem da caixa: o percurso traçado grava a sua. */
+  function px(E, poi) { const f = E.pad || PAD; return (poi.lng - E.lngMin) / (E.lngMax - E.lngMin) * (L - 2 * f) + f; }
+  function py(E, poi) { const f = E.pad || PAD; return (E.latMax - poi.lat) / (E.latMax - E.latMin) * (E.A - 2 * f) + f; }
 
   /* Curvas de nível sugeridas — textura, não cartografia. */
   function relevo(E, semente) {
@@ -151,6 +152,167 @@
   }
 
   /* ---------------------------------------------------------
+     O retrato de um dia com percurso traçado
+     Em cima, a estrada vista de cima; em baixo, a mesma estrada
+     vista de lado, com as altitudes à direita. Um traço só, na
+     tinta das estradas, sobre a chapa que não muda de tema. O
+     que ainda é dedução vai a tracejado.
+     --------------------------------------------------------- */
+
+  function caixaDe(P) {
+    const c = P.caixa;
+    const A = Number(P.viewBox.split(' ')[3]);
+    return { latMin: c.latMin, latMax: c.latMax, lngMin: c.lngMin, lngMax: c.lngMax, A: A, pad: PERCURSOS.FOLGA };
+  }
+
+  function planta(E, P, dia) {
+    const tracos = P.tracos.map(function (t) {
+      return '<path class="estrada__traco' + (t.estado === 'provavel' ? ' estrada__traco--provavel' : '') + '" d="' + t.d + '"/>';
+    }).join('');
+    const vistos = {};
+    const pontos = dia.etapas.map(function (id) {
+      if (vistos[id] || !POIS[id]) return '';
+      vistos[id] = true;
+      return '<circle class="etapa-ponto" cx="' + px(E, POIS[id]).toFixed(1) + '" cy="' + py(E, POIS[id]).toFixed(1) + '" r="14"/>';
+    }).join('');
+    return '<div class="etapa-planta">' +
+      '<svg viewBox="' + P.viewBox + '" xmlns="http://www.w3.org/2000/svg" role="img" ' +
+        'aria-label="Percurso do dia ' + dia.numero + ', ' + UI.h(dia.titulo) + ', ' + Math.round(P.km) + ' km">' +
+        tracos + pontos +
+      '</svg>' +
+      sobreposicao(E, dia) +
+    '</div>';
+  }
+
+  /* O perfil tem a sua própria escala: 1000 de largura pelos
+     quilómetros do dia, 300 de altura pelos metros. As etiquetas vão
+     em HTML, por cima, como as do mapa. */
+  const PW = 1000, PH = 300;
+
+  function escalaPerfil(P) {
+    const kmTotal = (P.perfil.length - 1) * P.passo;
+    const alto = Math.max.apply(null, P.perfil.concat(P.picos.map(function (p) { return p.altitude; })));
+    /* Folga por cima do ponto mais alto, para o nome dele caber. */
+    const topo = Math.max(500, Math.ceil(alto * 1.3 / 500) * 500);
+    return {
+      kmTotal: kmTotal, topo: topo,
+      x: function (km) { return km / kmTotal * PW; },
+      y: function (m) { return PH - m / topo * PH; }
+    };
+  }
+
+  function caminhoPerfil(P, S, de, ate) {
+    const pts = [];
+    P.perfil.forEach(function (m, i) {
+      const km = i * P.passo;
+      if (km < de - 1e-6 || km > ate + 1e-6) return;
+      pts.push(S.x(km).toFixed(1) + ' ' + S.y(m).toFixed(1));
+    });
+    return pts.length > 1 ? 'M ' + pts.join(' L ') : '';
+  }
+
+  function perfil(P, dia) {
+    const S = escalaPerfil(P);
+    const corte = P.provavelDesde == null ? S.kmTotal : P.provavelDesde;
+
+    let grelha = '', eixo = '';
+    for (let m = 500; m < S.topo; m += 500) {
+      const y = S.y(m);
+      grelha += '<line class="etapa-grelha" x1="0" x2="' + PW + '" y1="' + y.toFixed(1) + '" y2="' + y.toFixed(1) + '"/>';
+      eixo += '<span class="perfil-eixo num" style="top:' + (y / PH * 100).toFixed(2) + '%">' + m + ' m</span>';
+    }
+
+    const certo = caminhoPerfil(P, S, 0, corte);
+    const provavel = corte < S.kmTotal ? caminhoPerfil(P, S, corte, S.kmTotal) : '';
+
+    /* Os pontos altos, pelo quilómetro. Dois perto um do outro — o
+       Rolle e o Valles ficam a treze quilómetros — afastam-se: o
+       primeiro acaba no seu ponto, o segundo começa no dele. */
+    const PERTO = 30; /* largura estimada de uma etiqueta, em % */
+    const lista = P.picos.slice().sort(function (a, b) { return a.km - b.km; }).map(function (p) {
+      const esq = S.x(p.km) / PW * 100;
+      /* O ponto assenta na linha — o modelo de terreno alisa os topos —
+         e a etiqueta diz a altitude oficial. */
+      const terreno = P.perfil[Math.round(p.km / P.passo)];
+      return { p: p, esq: esq, topo: S.y(terreno) / PH * 100, alinha: esq < 20 ? 'inicio' : (esq > 80 ? 'fim' : 'meio') };
+    });
+    for (let i = 1; i < lista.length; i++) {
+      const a = lista[i - 1], b = lista[i];
+      /* Só chocam se também estiverem à mesma altura. */
+      if (b.esq - a.esq < PERTO && Math.abs(b.topo - a.topo) < 22) {
+        if (a.esq >= 20) a.alinha = 'fim';
+        b.alinha = 'inicio';
+      }
+    }
+    const picos = lista.map(function (q) {
+      const pos = 'left:' + q.esq.toFixed(2) + '%;top:' + q.topo.toFixed(2) + '%';
+      return '<span class="perfil-ponto" style="' + pos + '"></span>' +
+        '<span class="perfil-pico perfil-pico--' + q.alinha + '" style="' + pos + '">' +
+          '<span class="perfil-pico__nome">' + UI.h(q.p.nome) + '</span>' +
+          '<span class="perfil-pico__alt num">' + q.p.altitude + ' m</span>' +
+        '</span>';
+    }).join('');
+
+    const maisAlto = P.picos.slice().sort(function (a, b) { return b.altitude - a.altitude; })[0];
+    const rotulo = 'Perfil de altitude do dia ' + dia.numero + ', ' + Math.round(S.kmTotal) + ' km' +
+      (maisAlto ? '. Ponto mais alto: ' + maisAlto.nome + ', ' + maisAlto.altitude + ' m' : '');
+
+    return '<div class="etapa-perfil" data-perfil="' + dia.numero + '">' +
+      '<div class="etapa-perfil__area">' +
+        '<svg viewBox="0 0 ' + PW + ' ' + PH + '" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="' + UI.h(rotulo) + '">' +
+          grelha +
+          (certo ? '<path class="estrada__traco" d="' + certo + '"/>' : '') +
+          (provavel ? '<path class="estrada__traco estrada__traco--provavel" d="' + provavel + '"/>' : '') +
+        '</svg>' +
+        picos +
+        '<span class="perfil-cursor" hidden></span>' +
+      '</div>' +
+      '<div class="etapa-perfil__eixo">' + eixo + '</div>' +
+      '<div class="etapa-perfil__km num"><span>0 km</span><span class="perfil-leitura" aria-live="polite"></span><span>' + Math.round(S.kmTotal) + ' km</span></div>' +
+    '</div>';
+  }
+
+  function retrato(P, dia) {
+    const E = caixaDe(P);
+    const temPerfil = P.picos.length > 0;
+    return '<div class="etapa-retrato">' +
+      planta(E, P, dia) +
+      (temPerfil ? perfil(P, dia) : '') +
+    '</div>' +
+    (P.provavelDesde != null
+      ? '<p class="meta faixa" style="margin-top:var(--esp-1)">A tracejado, a parte do percurso que ainda está por confirmar com a organização.</p>'
+      : '');
+  }
+
+  /* Tocar ou arrastar sobre o perfil lê o quilómetro e a altitude. */
+  function ligarPerfil(el) {
+    const n = Number(el.getAttribute('data-perfil'));
+    const P = PERCURSOS.DIAS[n];
+    if (!P) return;
+    const area = el.querySelector('.etapa-perfil__area');
+    const cursor = el.querySelector('.perfil-cursor');
+    const leitura = el.querySelector('.perfil-leitura');
+    const S = escalaPerfil(P);
+
+    function ler(ev) {
+      const r = area.getBoundingClientRect();
+      const f = Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width));
+      const i = Math.round(f * (P.perfil.length - 1));
+      const m = P.perfil[i];
+      cursor.hidden = false;
+      cursor.style.left = (f * 100).toFixed(2) + '%';
+      cursor.style.top = (S.y(m) / PH * 100).toFixed(2) + '%';
+      leitura.textContent = 'km ' + Math.round(i * P.passo) + ' · ' + m + ' m';
+    }
+    function largar() { cursor.hidden = true; leitura.textContent = ''; }
+
+    area.addEventListener('pointerdown', ler);
+    area.addEventListener('pointermove', ler);
+    area.addEventListener('pointerleave', largar);
+    area.addEventListener('pointercancel', largar);
+  }
+
+  /* ---------------------------------------------------------
      A sequência de um dia
      --------------------------------------------------------- */
 
@@ -221,6 +383,8 @@
     /* As que não conduzem a paragem nenhuma ficam no fim do dia. */
     ESTRADAS.soltas(d.numero).forEach(function (e) { linhas.push(entradaEstrada(e)); });
 
+    const P = PERCURSOS.para(d);
+
     return '<div class="faixa" style="margin-top:32px">' +
         '<div class="seccao-cabecalho">' +
           '<h2 class="titulo-editorial">' + UI.h(d.titulo || 'Dia ' + d.numero) + '</h2>' +
@@ -229,9 +393,10 @@
         '<p class="meta">Dia ' + d.numero + (d.data ? ' · ' + UI.dataLonga(d.data) : '') + '</p>' +
       '</div>' +
 
-      (d.etapas.length > 1
-        ? '<div class="mapa-moldura">' + svgMapa(E, d) + sobreposicao(E, d) + '</div>'
-        : '') +
+      (P ? retrato(P, d)
+        : d.etapas.length > 1
+          ? '<div class="mapa-moldura">' + svgMapa(E, d) + sobreposicao(E, d) + '</div>'
+          : '') +
 
       '<div class="faixa" style="margin-top:16px">' +
         '<div class="lista">' + linhas.join('') + '</div>' +
@@ -246,6 +411,9 @@
   Vistas.etapas = {
     nav: 'etapas',
     semCabecalho: true,
+    montar: function (el) {
+      Array.prototype.forEach.call(el.querySelectorAll('[data-perfil]'), ligarPerfil);
+    },
     html: function () {
       const principal = ESTRADAS.por('san-boldo');
       const capa = '<div class="capa capa--estrada">' +

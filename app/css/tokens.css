@@ -71,12 +71,19 @@
      desapareceria contra a chapa — e a chapa clara desfaria o traço. */
   --estrada-chapa: #101216;
   --estrada-tinta: #6E9A7C;
+  --estrada-escrita: #FBF8F2;
+  --estrada-escrita-media: rgba(251, 248, 242, 0.66);
+  --estrada-grelha: rgba(251, 248, 242, 0.10);
 
   /* Espessura do traço de uma estrada. Não escala com o desenho —
      vector-effect segura-a em pixels — para o mesmo traçado se ler
      grande numa capa e pequeno numa lista. */
   --traco-estrada: 3px;
   --traco-estrada-capa: 6px;
+  /* O perfil de altitude: linha de 2 px. O que ainda é dedução vai
+     a tracejado. */
+  --traco-perfil: 2px;
+  --traco-provavel: 3px 6px;
 
   /* Elevação — sombra difusa, não contorno */
   --sombra-cartao: 0 18px 44px -24px rgba(0, 0, 0, 0.85);

@@ -886,6 +886,98 @@ a { color: var(--verde); text-decoration: none; }
 .estrada-dado__val { font-size: 17px; color: var(--inchiostro); }
 
 /* ---------------------------------------------------------
+   Etapas — o retrato de um dia
+   A estrada vista de cima e, por baixo, vista de lado. A chapa
+   e a escrita não mudam de tema, como as dos traçados.
+   --------------------------------------------------------- */
+
+.etapa-retrato {
+  margin: 12px var(--margem) 0;
+  background: var(--estrada-chapa);
+  border-radius: var(--raio-cartao);
+  color: var(--estrada-escrita);
+  overflow: hidden;
+}
+.etapa-planta { position: relative; }
+.etapa-planta svg { display: block; width: 100%; height: auto; }
+.etapa-ponto {
+  fill: var(--estrada-chapa);
+  stroke: var(--estrada-tinta);
+  stroke-width: var(--traco-estrada);
+  vector-effect: non-scaling-stroke;
+}
+.estrada__traco--provavel { stroke-dasharray: var(--traco-provavel); }
+.etapa-retrato .mapa-etiqueta { color: var(--estrada-escrita); }
+.etapa-retrato .mapa-etiqueta__nome { background: var(--veu-cheio); }
+
+.etapa-perfil {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: var(--esp-1);
+  padding: var(--esp-2);
+}
+.etapa-perfil__area {
+  position: relative;
+  height: 160px;
+  touch-action: pan-y;
+  cursor: crosshair;
+}
+.etapa-perfil__area svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.etapa-perfil .estrada__traco { stroke-width: var(--traco-perfil); }
+.etapa-grelha { stroke: var(--estrada-grelha); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+
+/* As altitudes, de lado. */
+.etapa-perfil__eixo { position: relative; width: 44px; height: 160px; }
+.perfil-eixo {
+  position: absolute;
+  right: 0;
+  transform: translateY(-50%);
+  font-size: 11px;
+  color: var(--estrada-escrita-media);
+  white-space: nowrap;
+}
+.etapa-perfil__km {
+  grid-column: 1;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--esp-1);
+  margin-top: var(--esp-1);
+  font-size: 11px;
+  color: var(--estrada-escrita-media);
+}
+.perfil-leitura { color: var(--estrada-escrita); }
+
+.perfil-ponto, .perfil-cursor {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: var(--raio-pill);
+  background: var(--estrada-tinta);
+  box-shadow: 0 0 0 2px var(--estrada-chapa);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.perfil-cursor { width: 11px; height: 11px; background: var(--estrada-escrita); }
+
+.perfil-pico {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  /* A chapa por baixo: a linha de outro ponto alto pode passar atrás. */
+  padding: 2px 4px;
+  border-radius: 6px;
+  background: var(--estrada-chapa);
+  line-height: 1.2;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.perfil-pico--meio { align-items: center; transform: translate(-50%, calc(-100% - 10px)); }
+.perfil-pico--inicio { align-items: flex-start; transform: translate(-4px, calc(-100% - 10px)); }
+.perfil-pico--fim { align-items: flex-end; transform: translate(calc(-100% + 4px), calc(-100% - 10px)); }
+.perfil-pico__nome { font-size: 11px; color: var(--estrada-escrita-media); }
+.perfil-pico__alt { font-size: 15px; font-weight: 500; color: var(--estrada-escrita); }
+
+/* ---------------------------------------------------------
    Galeria
    --------------------------------------------------------- */
 
