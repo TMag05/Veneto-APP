@@ -272,31 +272,20 @@ window.UI = (function () {
   }
 
   /* ---------------------------------------------------------
-     Escolha do carro — modelo e cor
+     Escolha do carro — o modelo
      A mesma grelha na criação da conta, no carro do convidado e
-     na ficha da organização. Os botões levam data-acao="modelo"
-     e data-acao="cor"; quem os mostra decide o que fazer.
+     na ficha da organização. Os botões levam data-acao="modelo";
+     quem os mostra decide o que fazer.
      --------------------------------------------------------- */
 
-  function escolhaCarro(modelo, cor) {
-    const vista = cor || 'magnetic';
+  function escolhaCarro(modelo) {
     return '<h3 class="etiqueta">Modelo</h3>' +
       '<div class="silhueta-grelha" style="margin-top:12px">' + Silhuetas.MODELOS.map(function (m) {
         return '<button class="silhueta-opcao" type="button" data-acao="modelo" data-valor="' + m.id + '" ' +
           'aria-pressed="' + (m.id === modelo ? 'true' : 'false') + '">' +
-          Silhuetas.svg(m.id, vista) +
+          Silhuetas.svg(m.id) +
           '<span class="silhueta-opcao__nome">' + h(m.nome) + '</span></button>';
-      }).join('') + '</div>' +
-
-      '<h3 class="etiqueta" style="margin-top:32px">Cor</h3>' +
-      '<div class="cores-grelha" style="margin-top:12px">' + Silhuetas.CORES.map(function (c) {
-        return '<button class="cor-opcao" type="button" data-acao="cor" data-valor="' + c.id + '" ' +
-          'aria-pressed="' + (c.id === cor ? 'true' : 'false') + '" style="background:' + c.hex + '" ' +
-          'aria-label="' + h(c.nome) + '"></button>';
-      }).join('') + '</div>' +
-      /* A cor escolhida também se diz por extenso: nenhuma
-         informação passa só por cor. */
-      '<p class="meta" style="margin-top:12px">' + (cor ? h(Silhuetas.cor(cor).nome) : 'Nenhuma cor escolhida') + '</p>';
+      }).join('') + '</div>';
   }
 
   /* Um nome reduzido a letras, números e hífenes. Serve de

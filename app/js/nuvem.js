@@ -36,9 +36,9 @@ window.Nuvem = (function () {
      entrar — uma conta apagada liberta o email para outra.
 
      Uma sessão é { uid, idToken, refreshToken, expira }.
-     Um perfil é { uid, nome, email, modelo, cor, criado }.
+     Um perfil é { uid, nome, email, modelo, criado }.
 
-     criarConta({ nome, email, senha, modelo, cor })
+     criarConta({ nome, email, senha, modelo })
        → { sessao, perfil, perfilPendente }
        perfilPendente é true quando a conta ficou criada mas o
        perfil não chegou ao Firestore; volta-se a publicar
@@ -71,7 +71,6 @@ window.Nuvem = (function () {
       nome: String(d.nome || '').trim(),
       email: normalizar(d.email),
       modelo: d.modelo || '',
-      cor: d.cor || '',
       criado: criado || Date.now()
     };
   }
@@ -164,7 +163,6 @@ window.Nuvem = (function () {
       nome: { stringValue: p.nome },
       email: { stringValue: p.email },
       modelo: { stringValue: p.modelo },
-      cor: { stringValue: p.cor },
       criado: { integerValue: String(p.criado) }
     } };
   }
@@ -174,7 +172,7 @@ window.Nuvem = (function () {
     function t(k) { return f[k] ? (f[k].stringValue || '') : ''; }
     return {
       uid: doc.name.split('/').pop(),
-      nome: t('nome'), email: t('email'), modelo: t('modelo'), cor: t('cor'),
+      nome: t('nome'), email: t('email'), modelo: t('modelo'),
       criado: f.criado ? Number(f.criado.integerValue) : 0
     };
   }
@@ -287,7 +285,7 @@ window.Nuvem = (function () {
   }
 
   function semSegredos(c) {
-    return { uid: c.uid, nome: c.nome, email: c.email, modelo: c.modelo, cor: c.cor, criado: c.criado };
+    return { uid: c.uid, nome: c.nome, email: c.email, modelo: c.modelo, criado: c.criado };
   }
 
   function porEmail(s, email) {
@@ -345,7 +343,7 @@ window.Nuvem = (function () {
         const s = lerSimulado();
         const c = s.contas[sessao.uid];
         if (!c) throw erro('conta-apagada');
-        Object.assign(c, { nome: perfil.nome, modelo: perfil.modelo, cor: perfil.cor });
+        Object.assign(c, { nome: perfil.nome, modelo: perfil.modelo });
         gravarSimulado(s);
       });
     },

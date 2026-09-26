@@ -43,7 +43,7 @@
                 (condutor && condutor.matricula ? '<span class="meta num">' + UI.h(condutor.matricula) + '</span>' : '') +
               '</div>' +
               (condutor ? '<div style="max-width:180px;margin-bottom:12px">' +
-                Silhuetas.svg(condutor.modelo, condutor.cor, { rodas: false }) + '</div>' : '') +
+                Silhuetas.svg(condutor.modelo, { rodas: false }) + '</div>' : '') +
               equipas[k].map(cartao).join('') +
             '</div>';
           }).join('')
@@ -167,7 +167,6 @@
     acoes: {
       foto: function () { document.getElementById('ent-foto').click(); },
       modelo: function (id, el, p) { Conteudo.atualizarParticipante(p.id, { modelo: id }); },
-      cor: function (id, el, p) { Conteudo.atualizarParticipante(p.id, { cor: id }); },
       remover: function (v, el, p) {
         UI.abrirFolha('Remover participante',
           '<p class="corpo-ui silencioso">Apaga a ficha e os dados do veículo associados.</p>' +
@@ -215,7 +214,7 @@
     const ficha = Estado.associarPorEmail(c.email);
     const proprio = c.uid === Estado.get().uid;
     const carro = c.modelo
-      ? Silhuetas.modelo(c.modelo).nome + (c.cor ? ' · ' + Silhuetas.cor(c.cor).nome : '')
+      ? Silhuetas.modelo(c.modelo).nome
       : 'Carro por escolher';
     return '<div class="linha-org">' +
       '<div class="linha-org__corpo">' +
@@ -335,8 +334,8 @@
         UI.campo({ rotulo: 'Nº apólice de seguro', nome: 'apolice', valor: x.apolice, placeholder: 'Número' }) +
       '</div>' +
 
-      '<div style="margin-top:32px">' + UI.escolhaCarro(x.modelo, x.cor) + '</div>' +
-      '<p class="meta" style="margin-top:12px">O convidado escolhe o modelo e a cor ao criar o acesso, e é esse o carro que vê na app. O desta ficha serve a organização.</p>' +
+      '<div style="margin-top:32px">' + UI.escolhaCarro(x.modelo) + '</div>' +
+      '<p class="meta" style="margin-top:12px">O convidado escolhe o modelo ao criar o acesso, e é esse o carro que vê na app. O desta ficha serve a organização.</p>' +
     '</div>';
   }
 })();

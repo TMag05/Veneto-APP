@@ -12,14 +12,14 @@ window.Estado = (function () {
     versao: 1,
     autenticado: false,
     /* A conta do convidado, criada por ele na primeira abertura.
-       O carro é o que declarou: modelo e cor. */
+       O carro é o que declarou: o modelo. */
     uid: '',
     sessao: null,
     perfilPendente: false,
     /* O que a entrada tem para dizer, quando a sessão acabou sem
        ser por escolha de quem a tinha. */
     aviso: '',
-    perfil: { nome: '', email: '', telefone: '', modelo: '', cor: '' },
+    perfil: { nome: '', email: '', telefone: '', modelo: '' },
     /* A ficha da organização com o mesmo email, se existir. Dá a
        matrícula e quem partilha o carro; não é condição de entrada. */
     participanteId: '',
@@ -139,8 +139,8 @@ window.Estado = (function () {
     const daFicha = p ? DADOS.carros.find(function (c) { return c.equipa === (p.equipa || '').trim(); }) : null;
     const conta = estado.perfil;
     if (!conta.modelo) return daFicha || null;
-    if (daFicha) return Object.assign({}, daFicha, { modelo: conta.modelo, cor: conta.cor || daFicha.cor });
-    return { id: 'conta', equipa: '', modelo: conta.modelo, cor: conta.cor || 'magnetic', matricula: '', perfis: [conta.nome] };
+    if (daFicha) return Object.assign({}, daFicha, { modelo: conta.modelo });
+    return { id: 'conta', equipa: '', modelo: conta.modelo, matricula: '', perfis: [conta.nome] };
   }
 
   /* Encontra a ficha pelo email, na entrada. */
@@ -159,8 +159,7 @@ window.Estado = (function () {
     return {
       id: 'eu',
       nome: (p ? DADOS.nomeCompleto(p) : estado.perfil.nome) || 'Convidado',
-      modelo: carro ? carro.modelo : 'db12',
-      cor: carro ? carro.cor : 'magnetic'
+      modelo: carro ? carro.modelo : 'db12'
     };
   }
 
@@ -188,8 +187,7 @@ window.Estado = (function () {
         nome: r.perfil.nome || (ficha ? DADOS.nomeCompleto(ficha) : estado.perfil.nome),
         email: r.perfil.email,
         telefone: estado.perfil.telefone || (ficha ? ficha.telefone || '' : ''),
-        modelo: r.perfil.modelo || '',
-        cor: r.perfil.cor || ''
+        modelo: r.perfil.modelo || ''
       }
     });
     publicarPendente();
@@ -224,7 +222,7 @@ window.Estado = (function () {
 
   function perfilPublico() {
     const p = estado.perfil;
-    return { nome: p.nome, email: p.email, modelo: p.modelo, cor: p.cor, criado: Date.now() };
+    return { nome: p.nome, email: p.email, modelo: p.modelo, criado: Date.now() };
   }
 
   /* O perfil que ficou por gravar no servidor, ou que mudou desde. */

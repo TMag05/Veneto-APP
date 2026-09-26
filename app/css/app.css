@@ -1127,21 +1127,6 @@ a { color: var(--verde); text-decoration: none; }
 .silhueta-opcao[aria-pressed="true"] { border-color: var(--verde); }
 .silhueta-opcao__nome { font-size: 15px; font-weight: 500; margin-top: var(--esp-1); }
 
-.cores-grelha { display: grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: var(--esp-1); }
-.cor-opcao {
-  aspect-ratio: 1 / 1;
-  min-height: 44px;
-  border: 1px solid var(--pietra-forte);
-  border-radius: var(--raio-foto);
-  position: relative;
-}
-.cor-opcao[aria-pressed="true"]::after {
-  content: "";
-  position: absolute;
-  inset: -4px;
-  border: 1px solid var(--verde);
-  border-radius: 6px;
-}
 
 /* ---------------------------------------------------------
    Área da organização

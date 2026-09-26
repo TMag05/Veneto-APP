@@ -40,7 +40,7 @@ Vistas.entrada = (function () {
   function preparar() {
     if (rascunho) return;
     const e = Estado.get();
-    rascunho = { nome: e.perfil.nome || '', email: e.perfil.email || '', senha: '', modelo: e.perfil.modelo || '', cor: e.perfil.cor || '' };
+    rascunho = { nome: e.perfil.nome || '', email: e.perfil.email || '', senha: '', modelo: e.perfil.modelo || '' };
     modo = instalada() && !e.aviso ? 'entrar' : 'criar';
     mensagem = e.aviso ? MENSAGENS[e.aviso] || '' : '';
     aEnviar = false;
@@ -128,7 +128,7 @@ Vistas.entrada = (function () {
       campoSenha(true) +
       '<div>' +
         '<h2 class="etiqueta">Qual é o seu Aston Martin?</h2>' +
-        '<div style="margin-top:24px">' + UI.escolhaCarro(rascunho.modelo, rascunho.cor) + '</div>' +
+        '<div style="margin-top:24px">' + UI.escolhaCarro(rascunho.modelo) + '</div>' +
       '</div>' +
       aviso() +
       principal('Criar acesso', 'A criar o acesso') +
@@ -201,7 +201,7 @@ Vistas.entrada = (function () {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rascunho.email.trim())) return MENSAGENS['email-invalido'];
     if (modo === 'criar' && rascunho.senha.length < 6) return MENSAGENS['senha-curta'];
     if (modo === 'entrar' && !rascunho.senha) return 'Falta a palavra-passe.';
-    if (modo === 'criar' && (!rascunho.modelo || !rascunho.cor)) return 'Escolha o modelo e a cor do carro.';
+    if (modo === 'criar' && !rascunho.modelo) return 'Escolha o modelo do carro.';
     return '';
   }
 
@@ -215,7 +215,7 @@ Vistas.entrada = (function () {
 
     const email = rascunho.email.trim();
     if (modo === 'criar') {
-      Nuvem.criarConta({ nome: rascunho.nome.trim(), email: email, senha: rascunho.senha, modelo: rascunho.modelo, cor: rascunho.cor })
+      Nuvem.criarConta({ nome: rascunho.nome.trim(), email: email, senha: rascunho.senha, modelo: rascunho.modelo })
         .then(entrou, falhou);
     } else if (modo === 'entrar') {
       Nuvem.entrar(email, rascunho.senha).then(entrou, falhou);
@@ -231,7 +231,7 @@ Vistas.entrada = (function () {
   function montar(el) {
     const f = el.querySelector('#form-entrada');
     if (!f) return;
-    /* O que se escreve fica no rascunho: tocar num modelo ou numa cor
+    /* O que se escreve fica no rascunho: tocar num modelo
        repinta o ecrã, e nada do que já estava escrito se perde. */
     f.addEventListener('input', function (e) {
       if (e.target.name && Object.prototype.hasOwnProperty.call(rascunho, e.target.name)) {
@@ -257,7 +257,6 @@ Vistas.entrada = (function () {
         App.repintar();
       },
       modelo: function (valor) { rascunho.modelo = valor; App.repintar(); },
-      cor: function (valor) { rascunho.cor = valor; App.repintar(); },
       /* Troca-se no próprio campo, sem repintar: o teclado fica aberto. */
       verSenha: function (valor, botao) {
         senhaVisivel = !senhaVisivel;

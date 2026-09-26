@@ -1,14 +1,12 @@
 /* =========================================================
    Silhuetas — o único elemento gráfico com personalidade
-   Duas escalas. Em tamanho de leitura, o carro é um desenho a
-   traço, na cor do texto, como uma gravura. Em tamanho de
-   etiqueta (rodas:false), é o perfil cheio na cor real do carro,
-   com contorno de 1px em Inchiostro a 20% para que carros claros
-   continuem legíveis sobre Calce (BRAND-GUIDELINES §8).
+   Duas escalas, as duas na cor do texto à volta. Em tamanho de
+   leitura, o carro é um desenho a traço, como uma gravura. Em
+   tamanho de etiqueta (rodas:false), é o perfil cheio, com os
+   vidros vazados. O carro diz-se pelo modelo; não há cor.
    ========================================================= */
 
 window.Silhuetas = (function () {
-  const CONTORNO = 'rgba(30,27,24,0.22)';
 
   /* Desenhos a traço, vetorizados de desenhos de perfil do DB12, do DB11, do Vanquish, do DBS, do Vantage, do V12 Vantage, do DB7, do DB5 e do DBX e
      encaixados na mesma grelha de 400 × 140. São preenchimentos, não
@@ -5410,69 +5408,28 @@ window.Silhuetas = (function () {
     { id: 'db5', nome: 'DB5 Superleggera', forma: 'classico', traco: 'db5' }
   ];
 
-  /* Paleta de carroçaria. Códigos a confirmar com a marca. */
-  const CORES = [
-    { id: 'onyx', nome: 'Onyx Black', hex: '#17181A' },
-    { id: 'jet', nome: 'Jet Black', hex: '#2B2C2F' },
-    { id: 'magnetic', nome: 'Magnetic Silver', hex: '#A9AEB2' },
-    { id: 'skyfall', nome: 'Skyfall Silver', hex: '#C3C8CB' },
-    { id: 'lunar', nome: 'Lunar White', hex: '#E4E2DC' },
-    { id: 'racing', nome: 'AM Racing Green', hex: '#1D3A2C' },
-    { id: 'buckingham', nome: 'Buckinghamshire Green', hex: '#12352A' },
-    { id: 'aris', nome: 'Aris Blue', hex: '#20415F' },
-    { id: 'ultramarine', nome: 'Ultramarine Black', hex: '#161E2C' },
-    { id: 'hyper', nome: 'Hyper Red', hex: '#8E1319' },
-    { id: 'divine', nome: 'Divine Red', hex: '#6B1418' },
-    { id: 'golden', nome: 'Golden Saffron', hex: '#B98A2A' },
-    { id: 'sabiro', nome: 'Sabiro Blue', hex: '#3E6C93' },
-    { id: 'quantum', nome: 'Quantum Silver', hex: '#8B9095' }
-  ];
-
   function modelo(id) {
     return MODELOS.find(function (m) { return m.id === id; }) || MODELOS[0];
   }
 
-  function cor(id) {
-    const c = CORES.find(function (x) { return x.id === id; });
-    return c || CORES[5];
-  }
-
-  /* svg(modeloId, corId, { rodas:false, titulo:'' }) → string
-     Com rodas, o desenho a traço; sem rodas, a etiqueta cheia. */
-  function svg(modeloId, corId, opcoes) {
+  /* svg(modeloId, { rodas:false, titulo:'' }) → string
+     Com rodas, o desenho a traço; sem rodas, a etiqueta: o perfil
+     cheio, com os vidros vazados. Os dois na cor do texto à volta. */
+  function svg(modeloId, opcoes) {
     const o = opcoes || {};
     const m = modelo(modeloId);
     const f = FORMAS[m.forma];
-    const c = cor(corId);
-    const titulo = o.titulo === undefined ? m.nome + ', ' + c.nome : o.titulo;
+    const titulo = o.titulo === undefined ? m.nome : o.titulo;
     const abrir = '<svg class="silhueta" viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg" ' +
       'role="img" aria-label="' + escapar(titulo) + '">';
 
-    if (o.rodas === false) {
-      return abrir +
-        '<path d="' + f.corpo + '" fill="' + c.hex + '" stroke="' + CONTORNO +
-        '" stroke-width="1" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>' +
-        '<path d="' + f.vidro + '" fill="rgba(30,27,24,0.16)"/>' +
-        '</svg>';
-    }
-
     const traco = m.traco || f.traco;
-    if (traco) {
-      folha();
-      return abrir + '<use href="#silhueta-' + traco + '"/></svg>';
+    if (o.rodas === false || !traco) {
+      return abrir + '<path d="' + f.corpo + ' ' + f.vidro + '" fill="currentColor" fill-rule="evenodd"/></svg>';
     }
 
-    /* Formas ainda sem desenho próprio: o mesmo perfil, só em linha. */
-    const linha = ' fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"';
-    return abrir +
-      '<path d="' + f.corpo + '"' + linha + '/>' +
-      '<path d="' + f.vidro + '"' + linha + '/>' +
-      f.rodas.map(function (r) {
-        return '<circle cx="' + r[0] + '" cy="' + r[1] + '" r="' + (r[2] - 1) + '"' + linha + '/>' +
-               '<circle cx="' + r[0] + '" cy="' + r[1] + '" r="' + (r[2] * 0.66).toFixed(1) + '"' + linha + '/>' +
-               '<circle cx="' + r[0] + '" cy="' + r[1] + '" r="' + (r[2] * 0.14).toFixed(1) + '"' + linha + '/>';
-      }).join('') +
-      '</svg>';
+    folha();
+    return abrir + '<use href="#silhueta-' + traco + '"/></svg>';
   }
 
   /* Os desenhos a traço pesam; vivem uma vez só, numa folha escondida,
@@ -5493,5 +5450,5 @@ window.Silhuetas = (function () {
     return String(t).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
   }
 
-  return { svg: svg, MODELOS: MODELOS, CORES: CORES, modelo: modelo, cor: cor, FORMAS: FORMAS };
+  return { svg: svg, MODELOS: MODELOS, modelo: modelo, FORMAS: FORMAS };
 })();

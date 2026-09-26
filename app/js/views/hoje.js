@@ -365,10 +365,9 @@
       (carro ? '<div class="faixa">' +
         '<div class="seccao-cabecalho"><h2 class="etiqueta">O seu carro</h2></div>' +
         '<a href="#/carro" style="display:block;color:inherit">' +
-          '<div style="max-width:240px">' + Silhuetas.svg(carro.modelo, carro.cor) + '</div>' +
+          '<div style="max-width:240px">' + Silhuetas.svg(carro.modelo) + '</div>' +
           '<p class="titulo-ui" style="margin-top:12px">' + UI.h(Silhuetas.modelo(carro.modelo).nome) + '</p>' +
-          '<p class="meta" style="margin-top:2px">' +
-            UI.h([Silhuetas.cor(carro.cor).nome, carro.matricula].filter(Boolean).join(' · ')) + '</p>' +
+          (carro.matricula ? '<p class="meta" style="margin-top:2px">' + UI.h(carro.matricula) + '</p>' : '') +
         '</a>' +
       '</div>' : '') +
 

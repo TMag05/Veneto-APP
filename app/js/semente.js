@@ -318,13 +318,13 @@ window.SEMENTE = (function () {
         promessa: 'Respondemos em menos de dez minutos. Sempre uma pessoa.' }
     },
     participantes: [
-      ['Tiago', 'Magalhães', 'condutor', '1', 'db12', 'racing', 'AA-12-BB'],
+      ['Tiago', 'Magalhães', 'condutor', '1', 'db12', 'AA-12-BB'],
       ['Inês', 'Magalhães', 'acompanhante', '1'],
-      ['Rui', 'Sacramento', 'condutor', '2', 'dbx707', 'onyx', 'BB-24-CC'],
+      ['Rui', 'Sacramento', 'condutor', '2', 'dbx707', 'BB-24-CC'],
       ['Marta', 'Sacramento', 'acompanhante', '2'],
-      ['Henrique', 'Vilar', 'condutor', '3', 'vantage', 'hyper', 'CC-36-DD'],
-      ['Duarte', 'Pinho', 'condutor', '4', 'vanquish', 'ultramarine', 'DD-48-EE'],
-      ['Sofia', 'Cardoso', 'condutor', '5', 'v12-vantage', 'divine', 'EE-60-FF'],
+      ['Henrique', 'Vilar', 'condutor', '3', 'vantage', 'CC-36-DD'],
+      ['Duarte', 'Pinho', 'condutor', '4', 'vanquish', 'DD-48-EE'],
+      ['Sofia', 'Cardoso', 'condutor', '5', 'v12-vantage', 'EE-60-FF'],
       ['Miguel', 'Cardoso', 'acompanhante', '5']
     ],
     contactos: [

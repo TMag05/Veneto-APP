@@ -57,7 +57,7 @@ Três separadores, como no documento, mais os dados do evento. Mesma identidade 
 
 **Paragens** — criadas de raiz ou escolhidas de uma **biblioteca de sugestões da região** com coordenadas já preenchidas: os dezoito sítios reais de 2026, com fotografia, e texto para os de maior peso (a partir de [docs/pesquisa-locais-passeio-dolomitas-2026.md](docs/pesquisa-locais-passeio-dolomitas-2026.md)). Aceita-se um endereço colado do Google Maps: as coordenadas são extraídas automaticamente. Cada paragem tem subtítulo, história em parágrafos e nota prática.
 
-**Pessoas** — cartão por participante com nome, apelido, data de nascimento, papel, nº do carro, email e fotografia. O bloco do veículo — carta, apólice, matrícula, modelo e cor — só aparece para condutores. Os carros são derivados do nº de equipa: quem partilha o número, partilha o carro.
+**Pessoas** — cartão por participante com nome, apelido, data de nascimento, papel, nº do carro, email e fotografia. O bloco do veículo — carta, apólice, matrícula e modelo — só aparece para condutores. Os carros são derivados do nº de equipa: quem partilha o número, partilha o carro.
 
 **É o email que liga as duas apps.** Quando o convidado entra, a app procura a ficha com esse email: dela vêm o nome e o carro. Quem não estiver na lista entra na mesma, mas sem carro associado — e o ecrã diz-lhe porquê.
 
@@ -130,7 +130,6 @@ servidor.js             servidor estático de desenvolvimento
 | Waypoints âncora | `ui.js` › `ANCORAS` | Da rota real, lidos do programa: a Strada Cadorna para subir ao Grappa, San Boldo por Trichiana e Tovena, o Cansiglio pelo Alpago. **Confirmar com a organização**; o dia 3 pelos vales ainda não tem. Só servem o link de recurso |
 | Fotografias | `assets/fotos/` | Dezasseis fotografias dos sítios: as oficiais de cada local (hotel, restaurantes, museu, ateliê, refúgios) e Pixabay para Veneza e San Boldo, reduzidas a 1600 px e guardadas pelo service worker. Usadas sem créditos, por decisão da organização, que trata da autorização. Os quatro momentos de logística usam os gráficos de `imagens.js`, com as cores de `tokens.css`. A organização pode trocar qualquer uma na sua área |
 | Silhuetas dos carros | `silhuetas.js` › `FORMAS` | Cinco arquétipos. A versão final deve ter um perfil por modelo |
-| Cores de carroçaria | `silhuetas.js` › `CORES` | Nomes reais, hexadecimais aproximados — pedir os códigos à marca |
 | Código de acesso da organização | `js/views/mais.js` | Um código partilhado. Não é autenticação |
 | Traçados das estradas | `js/estradas.js` | Só o Passo di San Boldo está confirmado, com geometria do OpenStreetMap. A Strada Cadorna, a Val Canali, os vales do dia 3 e o Cansiglio aparecem sem desenho, até a Stappando confirmar por onde se vai |
 | O que fazer à chegada | `js/conteudo.js` › `chegada` | Estacionamento, quem recebe, casas de banho e hora de voltar aos carros. Os campos estão criados e editáveis; falta a organização preenchê-los paragem a paragem |

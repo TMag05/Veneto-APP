@@ -15,7 +15,7 @@
     if (f.propria) return Estado.eu();
     if (f.autor === 'organizacao') return { nome: DADOS.evento.nome || 'Do passeio', semCarro: true };
     const p = DADOS.participante(f.autor);
-    return p ? { nome: DADOS.nomeCompleto(p), modelo: p.modelo, cor: p.cor } : { nome: 'Do grupo', modelo: 'db12', cor: 'onyx' };
+    return p ? { nome: DADOS.nomeCompleto(p), modelo: p.modelo } : { nome: 'Do grupo', modelo: 'db12' };
   }
 
   function deAbertura(f) { return !f.propria && f.autor === 'organizacao'; }
@@ -54,7 +54,7 @@
 
         '<div class="faixa" style="margin-top:20px">' +
           '<div class="foto-autor">' +
-            (a.semCarro ? '' : '<span class="foto-autor__carro">' + Silhuetas.svg(a.modelo, a.cor, { rodas: false, titulo: a.nome }) + '</span>') +
+            (a.semCarro ? '' : '<span class="foto-autor__carro">' + Silhuetas.svg(a.modelo, { rodas: false, titulo: a.nome }) + '</span>') +
             '<div>' +
               '<p class="titulo-ui">' + UI.h(a.nome) + '</p>' +
               (linha ? '<p class="meta num">' + UI.h(linha) + '</p>' : '') +

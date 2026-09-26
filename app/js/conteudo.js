@@ -220,19 +220,17 @@ window.Conteudo = (function () {
     dados.participantes.forEach(function (p) {
       const chave = (p.equipa || '').trim() || p.id;
       if (!mapa[chave]) {
-        mapa[chave] = { id: 'eq-' + talho(chave), equipa: chave, modelo: '', cor: '', matricula: '', perfis: [] };
+        mapa[chave] = { id: 'eq-' + talho(chave), equipa: chave, modelo: '', matricula: '', perfis: [] };
       }
       mapa[chave].perfis.push(nomeCompleto(p));
       if (p.papel === 'condutor') {
         mapa[chave].modelo = p.modelo || mapa[chave].modelo;
-        mapa[chave].cor = p.cor || mapa[chave].cor;
         mapa[chave].matricula = p.matricula || mapa[chave].matricula;
       }
     });
     return Object.keys(mapa).map(function (k) {
       const c = mapa[k];
       if (!c.modelo) c.modelo = 'db12';
-      if (!c.cor) c.cor = 'magnetic';
       return c;
     });
   }
@@ -583,8 +581,7 @@ window.Conteudo = (function () {
       carta: '',
       apolice: '',
       matricula: '',
-      modelo: 'db12',
-      cor: 'racing'
+      modelo: 'db12'
     });
     guardar();
     return id;
@@ -682,8 +679,8 @@ window.Conteudo = (function () {
         id: 'p-ex-' + i,
         nome: p[0], apelido: p[1], nascimento: '', papel: p[2], equipa: p[3],
         foto: '', telefone: '', email: '',
-        carta: '', apolice: '', matricula: p[6] || '',
-        modelo: p[4] || 'db12', cor: p[5] || 'magnetic'
+        carta: '', apolice: '', matricula: p[5] || '',
+        modelo: p[4] || 'db12'
       });
     });
 

@@ -13,7 +13,7 @@
   function escolha(carro) {
     return '<div class="faixa">' +
       '<div class="cartao">' +
-        UI.escolhaCarro(carro ? carro.modelo : '', carro ? carro.cor : '') +
+        UI.escolhaCarro(carro ? carro.modelo : '') +
         (carro ? '<button class="botao botao--secundario botao--largo" style="margin-top:24px" type="button" data-acao="fecharTroca">Feito</button>' : '') +
       '</div>' +
     '</div>';
@@ -32,7 +32,7 @@
             UI.foto({ semente: 'sem-carro', variante: 'paisagem' }, 'foto--32 capa__imagem') +
             '<div class="capa__texto">' +
               '<h1 class="capa-titulo">O meu carro</h1>' +
-              '<p class="subtitulo" style="margin-top:8px">Escolha o modelo e a cor.</p>' +
+              '<p class="subtitulo" style="margin-top:8px">Escolha o modelo.</p>' +
             '</div>' +
           '</div>' +
           '<div style="margin-top:24px">' + escolha(null) + '</div>';
@@ -46,13 +46,12 @@
           UI.foto({ semente: carro.modelo || 'carro', variante: 'paisagem' }, 'foto--32 capa__imagem') +
           '<div class="capa__texto">' +
             '<h1 class="capa-titulo">' + UI.h(Silhuetas.modelo(carro.modelo).nome) + '</h1>' +
-            '<p class="subtitulo" style="margin-top:8px">' + UI.h(Silhuetas.cor(carro.cor).nome) +
-              (carro.matricula ? ' · ' + UI.h(carro.matricula) : '') + '</p>' +
+            (carro.matricula ? '<p class="subtitulo" style="margin-top:8px">' + UI.h(carro.matricula) + '</p>' : '') +
           '</div>' +
         '</div>' +
 
         '<div class="faixa" style="margin-top:8px">' +
-          '<div style="max-width:280px;margin:0 auto">' + Silhuetas.svg(carro.modelo, carro.cor) + '</div>' +
+          '<div style="max-width:280px;margin:0 auto">' + Silhuetas.svg(carro.modelo) + '</div>' +
           '<p class="meta" style="margin-top:16px">' +
             'Nas fotografias do grupo, é o carro que identifica quem as tirou.' + '</p>' +
         '</div>' +
@@ -74,9 +73,9 @@
           : '<div class="faixa">' +
               '<div class="cartao">' +
                 '<p class="etiqueta">Algum dado incorreto?</p>' +
-                '<p class="corpo-ui" style="margin-top:8px">O modelo e a cor trocam-se aqui. ' +
+                '<p class="corpo-ui" style="margin-top:8px">O modelo troca-se aqui. ' +
                   (carro.matricula ? 'A matrícula é registada pela organização.' : 'A matrícula não é pedida.') + '</p>' +
-                '<button class="botao botao--texto" type="button" data-acao="trocar">Trocar modelo ou cor &rsaquo;</button>' +
+                '<button class="botao botao--texto" type="button" data-acao="trocar">Trocar modelo &rsaquo;</button>' +
               '</div>' +
             '</div>');
     },
@@ -84,8 +83,7 @@
       nada: function () { /* linhas de leitura */ },
       trocar: function () { aTrocar = true; App.repintar(); },
       fecharTroca: function () { aTrocar = false; App.repintar(); },
-      modelo: function (id) { Estado.atualizarPerfil({ modelo: id, cor: Estado.get().perfil.cor || (Estado.meuCarro() || {}).cor || '' }); },
-      cor: function (id) { Estado.atualizarPerfil({ cor: id, modelo: Estado.get().perfil.modelo || (Estado.meuCarro() || {}).modelo || '' }); }
+      modelo: function (id) { Estado.atualizarPerfil({ modelo: id }); }
     }
   };
 

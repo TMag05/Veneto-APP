@@ -549,10 +549,10 @@
       '</div></div>' +
       '<div class="faixa" style="margin-top:24px">' + DADOS.carros.map(function (c) {
         return '<div class="presenca-linha">' +
-          '<div class="presenca-linha__carro">' + Silhuetas.svg(c.modelo, c.cor, { rodas: false }) + '</div>' +
+          '<div class="presenca-linha__carro">' + Silhuetas.svg(c.modelo, { rodas: false }) + '</div>' +
           '<div style="flex:1;min-width:0">' +
             '<div class="titulo-ui">' + UI.h(c.perfis.join(' e ')) + '</div>' +
-            '<div class="meta">' + UI.h(Silhuetas.modelo(c.modelo).nome) + ' · ' + UI.h(Silhuetas.cor(c.cor).nome) + '</div>' +
+            '<div class="meta">' + UI.h(Silhuetas.modelo(c.modelo).nome) + '</div>' +
           '</div>' +
         '</div>';
       }).join('') + '</div>' +

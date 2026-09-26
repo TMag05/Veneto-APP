@@ -151,7 +151,7 @@
             linhaCert('Edição', edicao) +
           '</div>' +
 
-          (carro ? '<div class="cert__carro">' + Silhuetas.svg(carro.modelo, carro.cor) + '</div>' : '') +
+          (carro ? '<div class="cert__carro">' + Silhuetas.svg(carro.modelo) + '</div>' : '') +
 
           (carro && carro.perfis.length
             ? '<div class="cert__nomes">' +

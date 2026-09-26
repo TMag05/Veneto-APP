@@ -40,7 +40,7 @@
 
           (carro
             ? '<div class="chegada__carro chegada__passo" style="--atraso:1.5s">' +
-                Silhuetas.svg(carro.modelo, carro.cor) +
+                Silhuetas.svg(carro.modelo) +
                 '<p class="chegada__matricula num">' +
                   UI.h([Silhuetas.modelo(carro.modelo).nome, carro.matricula].filter(Boolean).join(' · ')) +
                 '</p>' +

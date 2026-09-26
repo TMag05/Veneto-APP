@@ -354,13 +354,12 @@
         });
       },
       csv: function () {
-        const cabecalho = ['Nome', 'Apelido', 'Nascimento', 'Papel', 'Equipa', 'Telefone', 'Email', 'Carta', 'Apolice', 'Matricula', 'Modelo', 'Cor'];
+        const cabecalho = ['Nome', 'Apelido', 'Nascimento', 'Papel', 'Equipa', 'Telefone', 'Email', 'Carta', 'Apolice', 'Matricula', 'Modelo'];
         const linhas = DADOS.participantes.map(function (p) {
           return [p.nome, p.apelido, p.nascimento, p.papel, p.equipa, p.telefone, p.email,
             p.papel === 'condutor' ? p.carta : '', p.papel === 'condutor' ? p.apolice : '',
             p.papel === 'condutor' ? p.matricula : '',
-            p.papel === 'condutor' ? Silhuetas.modelo(p.modelo).nome : '',
-            p.papel === 'condutor' ? Silhuetas.cor(p.cor).nome : ''];
+            p.papel === 'condutor' ? Silhuetas.modelo(p.modelo).nome : ''];
         });
         const csv = [cabecalho].concat(linhas).map(function (l) {
           return l.map(function (c) { return '"' + String(c || '').replace(/"/g, '""') + '"'; }).join(';');
