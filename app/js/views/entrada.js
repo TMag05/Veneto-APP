@@ -127,7 +127,7 @@ Vistas.entrada = (function () {
       campoEmail() +
       campoSenha(true) +
       '<div>' +
-        '<h2 class="etiqueta">O carro em que viaja</h2>' +
+        '<h2 class="etiqueta">Qual é o seu Aston Martin?</h2>' +
         '<div style="margin-top:24px">' + UI.escolhaCarro(rascunho.modelo, rascunho.cor) + '</div>' +
       '</div>' +
       aviso() +
