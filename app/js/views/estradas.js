@@ -252,7 +252,7 @@
           ESTRADAS.svg(principal, 'estrada--capa') +
           '<div class="capa__texto">' +
             '<p class="capa__data">' + UI.h(principal.subtitulo) + '</p>' +
-            '<h1 class="capa-titulo">Estradas</h1>' +
+            '<h1 class="capa-titulo">Etapas</h1>' +
           '</div>' +
         '</div>';
 
@@ -304,7 +304,7 @@
       if (!e) {
         return '<div class="faixa" style="padding-top:24px">' +
           '<p class="corpo-editorial">Estrada não encontrada.</p>' +
-          '<a class="botao botao--secundario botao--largo" style="margin-top:24px" href="#/estradas">Voltar às estradas</a>' +
+          '<a class="botao botao--secundario botao--largo" style="margin-top:24px" href="#/estradas">Voltar às etapas</a>' +
         '</div>';
       }
 

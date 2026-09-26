@@ -51,7 +51,7 @@
   const ABAS_CONVIDADO = [
     { rota: '#/hoje', icone: 'hoje', rotulo: 'Hoje', nav: 'hoje' },
     { rota: '#/roadbook', icone: 'roadbook', rotulo: 'Roadbook', nav: 'roadbook' },
-    { rota: '#/estradas', icone: 'mapa', rotulo: 'Estradas', nav: 'estradas' },
+    { rota: '#/estradas', icone: 'mapa', rotulo: 'Etapas', nav: 'estradas' },
     { rota: '#/galeria', icone: 'galeria', rotulo: 'Galeria', nav: 'galeria' },
     { rota: '#/mais', icone: 'mais', rotulo: 'Mais', nav: 'mais' }
   ];
