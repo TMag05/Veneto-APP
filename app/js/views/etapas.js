@@ -408,6 +408,27 @@
      O separador
      --------------------------------------------------------- */
 
+  /* A abertura do separador diz o passeio em números: quilómetros,
+     dias ao volante e o ponto mais alto. Lidos do itinerário, para
+     não mentirem quando a organização o mudar. */
+  const EXTENSO = ['', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete'];
+
+  function resumoDoPasseio() {
+    const aoVolante = DADOS.dias.filter(function (d) { return d.distancia > 0; });
+    const km = aoVolante.reduce(function (t, d) { return t + d.distancia; }, 0);
+    let alto = null;
+    aoVolante.forEach(function (d) {
+      const P = PERCURSOS.para(d);
+      (P ? P.picos : []).forEach(function (p) { if (!alto || p.altitude > alto.altitude) alto = p; });
+    });
+    if (!aoVolante.length) return 'O percurso de cada dia, pela estrada real.';
+    const n = aoVolante.length;
+    const dias = (EXTENSO[n] || n) + (n === 1 ? ' dia' : ' dias');
+    return km + '\u00A0km em ' + dias + ' ao volante' +
+      (alto ? ', até aos ' + alto.altitude + '\u00A0m ' + (/^Cima\b/.test(alto.nome) ? 'da ' : 'do ') + alto.nome : '') + '. ' +
+      'Cada dia tem a estrada vista de cima e, por baixo, as subidas e as altitudes.';
+  }
+
   Vistas.etapas = {
     nav: 'etapas',
     semCabecalho: true,
@@ -435,8 +456,7 @@
 
       return capa +
         '<div class="faixa" style="margin-top:24px">' +
-          '<p class="corpo-editorial silencioso">O desenho do que se conduz, dia a dia. ' +
-            'Cada traço segue a estrada real.</p>' +
+          '<p class="corpo-editorial silencioso">' + UI.h(resumoDoPasseio()) + '</p>' +
         '</div>' +
         DADOS.dias.map(seccaoDia).join('') +
         '<div class="faixa" style="margin-top:32px">' +
