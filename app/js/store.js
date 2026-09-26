@@ -31,7 +31,11 @@ window.Estado = (function () {
     chegadaVista: false,
     album: false,
     /* 'escuro' (o de origem) ou 'claro'. Escolhe-se em Mais. */
-    tema: 'escuro'
+    tema: 'escuro',
+    /* Só para acessos de organização: o modo em que se estava da
+       última vez, 'convidado' ou 'organizacao'. A equipa usa a app
+       como os convidados e passa à organização para alterar. */
+    modo: 'convidado'
   };
 
   let estado = carregar();
@@ -196,6 +200,13 @@ window.Estado = (function () {
       }
     });
     publicarPendente();
+  }
+
+  /* Lembra o modo sem repintar: é o ecrã que se abre que o diz. */
+  function lembrarModo(modo) {
+    if (estado.modo === modo) return;
+    estado.modo = modo;
+    guardar();
   }
 
   /* O papel é da conta: sai com ela. */
@@ -446,6 +457,7 @@ window.Estado = (function () {
     diaAtivo: diaAtivo,
     diasAte: diasAte,
     ehOrganizacao: ehOrganizacao,
+    lembrarModo: lembrarModo,
     eu: eu,
     carroRegistado: carroRegistado,
     iniciarSessao: iniciarSessao,

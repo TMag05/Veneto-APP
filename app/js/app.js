@@ -179,9 +179,11 @@
   function ehEntrada(vista) { return vista === 'entrada' || vista === 'entradaOrg'; }
 
   /* Para onde vai quem acabou de entrar. A organização não passa
-     pela primeira abertura: é a do convidado, com o carro dele. */
+     pela primeira abertura — é a do convidado, com o carro dele — e
+     abre no modo em que estava da última vez: de origem, o do
+     convidado, porque a área da organização é só para alterar. */
   function inicio() {
-    if (Estado.ehOrganizacao()) return '#/org/itinerario';
+    if (Estado.ehOrganizacao()) return Estado.get().modo === 'organizacao' ? '#/org/itinerario' : '#/hoje';
     return Estado.get().chegadaVista ? '#/hoje' : '#/chegada';
   }
 
@@ -197,7 +199,7 @@
       return;
     }
     if (!r) {
-      irSubstituindo(org ? '#/org/itinerario' : '#/hoje');
+      irSubstituindo(org && estado.modo === 'organizacao' ? '#/org/itinerario' : '#/hoje');
       return;
     }
     if (estado.autenticado && ehEntrada(r.vista)) {
@@ -222,6 +224,8 @@
       irSubstituindo('#/hoje');
       return;
     }
+    /* O modo é o do ecrã em que se está. */
+    if (org) Estado.lembrarModo(vista.area === 'organizacao' ? 'organizacao' : 'convidado');
 
     sincronizarProfundidade();
     /* Sair de um ecrã é o momento de devolver o que ele pediu

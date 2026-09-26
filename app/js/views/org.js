@@ -36,7 +36,7 @@
     return {
       titulo: titulo,
       linha: true,
-      acao: acao || { acao: 'verConvidado', icone: 'externo', rotulo: 'Ver como convidado' }
+      acao: acao || { acao: 'verConvidado', icone: 'externo', rotulo: 'Passar para o modo convidado' }
     };
   }
 
@@ -261,7 +261,7 @@
 
         '<div class="faixa">' +
           '<div class="lista">' +
-            UI.linhaLista({ titulo: 'Ver como convidado', nota: 'A app que os convidados veem', icone: 'externo', acao: 'verConvidado' }) +
+            UI.linhaLista({ titulo: 'Modo convidado', nota: 'A app como os convidados a usam no passeio', icone: 'externo', acao: 'verConvidado' }) +
             UI.linhaLista({ titulo: 'Terminar sessão', nota: Estado.get().perfil.email, icone: 'fechar', acao: 'sair' }) +
           '</div>' +
           '<p class="meta" style="margin-top:24px">Cada pessoa da equipa entra com o seu acesso. As etapas e as paragens dizem quem as alterou por último.</p>' +

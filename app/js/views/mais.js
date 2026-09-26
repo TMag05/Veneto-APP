@@ -36,6 +36,16 @@
           '</div>' +
         '</div>' +
 
+        /* A equipa usa a app como os convidados; daqui passa à
+           organização quando for preciso alterar alguma coisa. */
+        (org
+          ? '<div class="faixa" style="margin-top:32px">' +
+              '<div class="lista">' +
+                UI.linhaLista({ titulo: 'Modo organização', nota: 'Alterar o itinerário, as pessoas e os contactos', icone: 'oficina', href: '#/org/itinerario' }) +
+              '</div>' +
+            '</div>'
+          : '') +
+
         '<div class="faixa" style="margin-top:32px">' +
           '<div class="seccao-cabecalho"><h2 class="etiqueta">Durante o passeio</h2></div>' +
           '<div class="lista">' +
@@ -73,9 +83,6 @@
 
         '<div class="faixa">' +
           '<div class="lista">' +
-            (org
-              ? UI.linhaLista({ titulo: 'Área da organização', nota: 'Itinerário, pessoas, contactos', icone: 'oficina', href: '#/org/itinerario' })
-              : '') +
             UI.linhaLista({ titulo: 'Definições', nota: 'Sobre a app', icone: 'definicoes', href: '#/definicoes' }) +
           '</div>' +
           '<p class="meta num" style="margin-top:24px">' + UI.h(DADOS.evento.nome || 'Passeio') + ' · versão ' + versao() +
@@ -104,7 +111,7 @@
         (Estado.ehOrganizacao()
           ? '<div class="faixa" style="margin-top:24px">' +
               '<div class="lista">' +
-                UI.linhaLista({ titulo: 'Área da organização', nota: 'Sessão iniciada', icone: 'oficina', href: '#/org/itinerario' }) +
+                UI.linhaLista({ titulo: 'Modo organização', nota: 'Sessão iniciada', icone: 'oficina', href: '#/org/itinerario' }) +
               '</div>' +
             '</div>'
           : '') +
