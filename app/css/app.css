@@ -963,10 +963,10 @@ a { color: var(--verde); text-decoration: none; }
   position: absolute;
   display: flex;
   flex-direction: column;
-  /* A chapa por baixo: a linha de outro ponto alto pode passar atrás. */
-  padding: 2px 4px;
-  border-radius: 6px;
-  background: var(--estrada-chapa);
+  /* Um halo da cor da chapa, e não uma chapa: a chapa tapava um
+     bocado da linha, que é a informação. O halo só limpa o que fica
+     debaixo das letras. */
+  text-shadow: 0 0 3px var(--estrada-chapa), 0 0 3px var(--estrada-chapa), 0 0 6px var(--estrada-chapa);
   line-height: 1.2;
   white-space: nowrap;
   pointer-events: none;
