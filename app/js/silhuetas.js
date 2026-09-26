@@ -3200,23 +3200,14 @@ window.Silhuetas = (function () {
       vidro: 'M 160 41 C 172 23 188 14 208 14 L 262 14 C 282 15 296 23 306 39 Z',
       rodas: [[94, 100, 33], [308, 100, 33]]
     },
-    mid: {
-      nome: 'Motor central',
-      corpo: 'M 12 108 C 8 100 12 93 22 91 L 58 85 C 74 81 88 77 100 73 ' +
-             'C 116 57 138 47 164 45 C 192 43 214 52 228 67 C 244 78 262 83 288 85 ' +
-             'C 330 88 366 92 384 99 C 391 102 392 108 390 112 L 343 112 ' +
-             'A 31 31 0 0 0 281 112 L 133 112 A 31 31 0 0 0 71 112 L 16 112 Z',
-      vidro: 'M 122 68 C 138 55 152 50 170 50 C 190 50 206 57 216 70 Z',
-      rodas: [[102, 106, 26], [312, 106, 26]]
-    },
-    volante: {
-      nome: 'Volante',
-      corpo: 'M 16 110 C 12 102 14 94 24 90 C 44 84 60 80 76 76 C 108 66 140 60 166 57 ' +
-             'C 180 44 196 36 212 34 C 216 44 222 51 236 54 L 300 57 ' +
-             'C 326 66 350 76 368 82 C 382 87 389 96 387 106 L 384 112 L 338 112 ' +
-             'A 32 32 0 0 0 274 112 L 136 112 A 32 32 0 0 0 72 112 L 20 112 Z',
-      vidro: 'M 180 55 C 190 45 200 39 210 37 L 214 52 Z',
-      rodas: [[104, 105, 27], [306, 105, 27]]
+    classico: {
+      nome: 'Clássico',
+      corpo: 'M 18 106 C 14 98 16 90 26 86 C 46 80 64 76 84 72 C 110 66 136 62 160 58 ' +
+             'C 172 42 190 32 214 30 C 244 28 266 34 282 48 C 300 62 324 68 350 72 ' +
+             'C 372 76 386 84 386 98 L 384 110 L 336 110 A 30 30 0 0 0 276 110 ' +
+             'L 134 110 A 30 30 0 0 0 74 110 L 22 110 Z',
+      vidro: 'M 172 56 C 184 42 198 36 216 35 C 240 34 258 38 272 50 Z',
+      rodas: [[104, 104, 26], [306, 104, 26]]
     }
   };
 
@@ -3224,14 +3215,14 @@ window.Silhuetas = (function () {
      desenho próprio diz qual; os outros herdam o da forma. */
   const MODELOS = [
     { id: 'db12', nome: 'DB12', forma: 'gt' },
-    { id: 'db12-volante', nome: 'DB12 Volante', forma: 'volante' },
     { id: 'db11', nome: 'DB11', forma: 'gt', traco: 'db11' },
     { id: 'vanquish', nome: 'Vanquish', forma: 'gt' },
     { id: 'dbs', nome: 'DBS Superleggera', forma: 'gt', traco: 'dbs' },
     { id: 'vantage', nome: 'Vantage', forma: 'sport' },
     { id: 'v12-vantage', nome: 'V12 Vantage', forma: 'sport' },
     { id: 'dbx707', nome: 'DBX707', forma: 'suv' },
-    { id: 'valhalla', nome: 'Valhalla', forma: 'mid' }
+    { id: 'db7', nome: 'DB7', forma: 'classico' },
+    { id: 'db5', nome: 'DB5 Superleggera', forma: 'classico' }
   ];
 
   /* Paleta de carroçaria. Códigos a confirmar com a marca. */
