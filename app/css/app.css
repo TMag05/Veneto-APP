@@ -1693,7 +1693,11 @@ a { color: var(--verde); text-decoration: none; }
    Entrada
    --------------------------------------------------------- */
 
+/* O logótipo é sempre claro sobre escuro: a entrada é escura nos
+   dois temas, como a fotografia e as Etapas (.material-escuro). */
 .entrada {
+  background: var(--calce);
+  color: var(--inchiostro);
   min-height: 100dvh;
   display: flex;
   flex-direction: column;

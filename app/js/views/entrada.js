@@ -59,7 +59,7 @@ function fabrica(org) {
 
   function html() {
     preparar();
-    return '<div class="entrada">' +
+    return '<div class="entrada material-escuro">' +
       '<div>' +
         UI.logo('logo--entrada') +
         (DADOS.evento.subtitulo

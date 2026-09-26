@@ -257,6 +257,7 @@
     if (vista.montar) vista.montar(elEcra, paramsAtuais, chegada === true);
     ligarAcoes();
     atualizarTituloCabecalho();
+    aplicarTema();
   }
 
   function desenharCabecalho(vista) {
@@ -367,13 +368,16 @@
      Tema
      Escuro de origem, claro para se ler ao sol. A escolha é de
      quem lê e vive no estado local; a folha de tokens faz o resto,
-     e a barra do browser acompanha a cor do fundo.
+     e a barra do browser acompanha a cor do fundo — a do ecrã, se
+     ele for escuro nos dois temas, como a entrada.
      --------------------------------------------------------- */
 
   function aplicarTema() {
     const tema = Estado.get().tema === 'claro' ? 'claro' : 'escuro';
     document.documentElement.dataset.tema = tema;
-    const cor = getComputedStyle(document.documentElement).getPropertyValue('--calce').trim();
+    const topo = elEcra.firstElementChild;
+    const fundo = topo && topo.classList.contains('material-escuro') ? topo : document.documentElement;
+    const cor = getComputedStyle(fundo).getPropertyValue('--calce').trim();
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta && cor) meta.setAttribute('content', cor);
   }

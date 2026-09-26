@@ -8,7 +8,12 @@
    uma cor mais quente, que é a que a fotografia da montanha pede.
    ========================================================= */
 
-:root {
+/* .material-escuro devolve os valores escuros a uma parte da app,
+   seja qual for o tema: é a chapa onde assenta o que é sempre claro
+   sobre escuro — o logótipo da entrada. As propriedades declaradas
+   no próprio elemento vencem as que ele herdaria do tema claro. */
+:root,
+.material-escuro {
   /* Superfícies */
   --calce: #121417;
   --istria: #1A1D21;
