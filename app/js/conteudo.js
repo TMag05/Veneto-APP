@@ -48,6 +48,18 @@ window.Conteudo = (function () {
       'É aqui que o passeio entra verdadeiramente nas Dolomitas. Do chalet, as Pale di San Martino ficam mesmo em frente.'
   };
 
+  /* Correções de dados da semente: um campo de um momento, num dia,
+     que ficou diferente da proposta. Ao contrário das REVISOES, não
+     se troca texto em todo o lado — só aquele momento, e só se ainda
+     tiver o valor antigo. Cada uma corre uma vez por telemóvel e fica
+     anotada em «correcoes», para a organização poder voltar a mudar
+     o valor sem que a app o desfaça.
+     26.09.2026: o regresso do jantar do dia 3 é às 23:30, como na
+     proposta da Stappando, e não às 23:00. */
+  const CORRECOES = [
+    { id: 'regresso-dia3-2330', dia: 'd-2026-10-03', titulo: 'Regresso ao hotel', campo: 'hora', de: '23:00', para: '23:30' }
+  ];
+
   let dados = carregar();
   projetar();
 
@@ -58,7 +70,9 @@ window.Conteudo = (function () {
   function clonar(o) { return JSON.parse(JSON.stringify(o)); }
 
   function base() {
-    return montar(SEMENTE.roteiro);
+    const d = montar(SEMENTE.roteiro);
+    d.correcoes = CORRECOES.map(function (c) { return c.id; });
+    return d;
   }
 
   /* O passeio a partir da semente: as paragens vêm da biblioteca,
@@ -140,11 +154,28 @@ window.Conteudo = (function () {
     return trocas;
   }
 
+  /* Aplica as correções ainda não aplicadas. Devolve quantas
+     anotou, para se saber se vale a pena gravar. */
+  function corrigir(o) {
+    const feitas = o.correcoes || (o.correcoes = []);
+    let novas = 0;
+    CORRECOES.forEach(function (c) {
+      if (feitas.indexOf(c.id) !== -1) return;
+      const dia = (o.dias || []).find(function (d) { return d.id === c.dia; });
+      (dia ? dia.momentos || [] : []).forEach(function (m) {
+        if (m.titulo === c.titulo && m[c.campo] === c.de) m[c.campo] = c.para;
+      });
+      feitas.push(c.id);
+      novas++;
+    });
+    return novas;
+  }
+
   function carregar() {
     try {
       const g = JSON.parse(localStorage.getItem(CHAVE));
       if (g && g.versao === VERSAO_DADOS) {
-        if (rever(g)) {
+        if (rever(g) + corrigir(g)) {
           try { localStorage.setItem(CHAVE, JSON.stringify(g)); } catch (e) { /* quota */ }
         }
         return Object.assign(base(), g);
@@ -618,6 +649,9 @@ window.Conteudo = (function () {
     const novo = JSON.parse(texto);
     if (!novo || !novo.evento) throw new Error('Ficheiro sem evento');
     dados = Object.assign(base(), novo, { versao: VERSAO_DADOS });
+    if (!novo.correcoes) dados.correcoes = [];
+    rever(dados);
+    corrigir(dados);
     guardar();
   }
 

@@ -259,7 +259,7 @@ window.SEMENTE = (function () {
             nota: 'Aperitivo à chegada.' },
           { hora: '20:00', titulo: 'Transfer para o jantar', local: 'À porta do hotel', tipo: 'logistica' },
           { hora: '20:15', titulo: 'Jantar', local: 'La Candola, Eremo di San Gallo', tipo: 'refeicao', paragem: 'La Candola' },
-          { hora: '23:00', titulo: 'Regresso ao hotel', local: 'Transfer privado', tipo: 'logistica', paragem: 'Hotel Villa Soligo' }
+          { hora: '23:30', titulo: 'Regresso ao hotel', local: 'Transfer privado', tipo: 'logistica', paragem: 'Hotel Villa Soligo' }
         ]
       },
       {
