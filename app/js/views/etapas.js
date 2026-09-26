@@ -436,13 +436,11 @@
       Array.prototype.forEach.call(el.querySelectorAll('[data-perfil]'), ligarPerfil);
     },
     html: function () {
-      const principal = ESTRADAS.por('san-boldo');
       /* A capa é a ilustração do San Boldo: os tornantes e os túneis
          da Strada dei 100 Giorni, em relevo de papel. */
       const capa = '<div class="capa capa--ilustracao">' +
           UI.foto({ foto: 'assets/fotos/san-boldo-ilustracao.jpg' }, 'capa__imagem') +
           '<div class="capa__texto">' +
-            '<p class="capa__data">' + UI.h(principal.subtitulo) + '</p>' +
             '<h1 class="capa-titulo">Etapas</h1>' +
           '</div>' +
         '</div>';
