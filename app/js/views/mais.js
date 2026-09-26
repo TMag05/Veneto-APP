@@ -30,7 +30,7 @@
           '<div class="capa__texto">' +
             '<h1 class="capa-titulo">' + UI.h(e.perfil.nome || 'Convidado') + '</h1>' +
             '<p class="subtitulo" style="margin-top:8px">' +
-              (carro ? UI.h(Silhuetas.modelo(carro.modelo).nome) : 'Sem carro associado') + '</p>' +
+              (carro ? UI.h(Silhuetas.modelo(carro.modelo).nome) : 'Carro por escolher') + '</p>' +
           '</div>' +
         '</div>' +
 
@@ -46,7 +46,7 @@
         '<div class="faixa">' +
           '<div class="seccao-cabecalho"><h2 class="etiqueta">O meu</h2></div>' +
           '<div class="lista">' +
-            UI.linhaLista({ titulo: 'O meu carro', nota: carro ? Silhuetas.modelo(carro.modelo).nome + ' · ' + Silhuetas.cor(carro.cor).nome : 'Sem carro associado', icone: 'carro', href: '#/carro' }) +
+            UI.linhaLista({ titulo: 'O meu carro', nota: carro ? Silhuetas.modelo(carro.modelo).nome + ' · ' + Silhuetas.cor(carro.cor).nome : 'Carro por escolher', icone: 'carro', href: '#/carro' }) +
             UI.linhaLista({ titulo: 'Perfil', nota: e.perfil.email, icone: 'pessoas', href: '#/perfil' }) +
             UI.linhaLista({ titulo: 'O que levar', nota: UI.plural(DADOS.levar.length, 'item', 'itens'), icone: 'documento', href: '#/preparacao' }) +
             UI.linhaLista({ titulo: 'Arquivo', nota: 'Álbum e roadbook', icone: 'galeria', href: '#/arquivo' }) +

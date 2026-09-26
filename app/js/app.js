@@ -7,6 +7,8 @@
 (function () {
 
   const ROTAS = [
+    /* O link partilhado no grupo do WhatsApp. */
+    ['entrar', 'entrada'],
     ['entrada', 'entrada'],
     ['chegada', 'chegada'],
     ['hoje', 'hoje'],
@@ -44,6 +46,7 @@
     ['org/paragem/:id', 'orgParagem'],
     ['org/participantes', 'orgParticipantes'],
     ['org/participante/:id', 'orgParticipante'],
+    ['org/acessos', 'orgAcessos'],
     ['org/contactos', 'orgContactos'],
     ['org/contacto/:id', 'orgContacto'],
     ['org/local/:id', 'orgLocal']
@@ -174,14 +177,13 @@
 
     const estado = Estado.get();
 
-    if (!estado.autenticado && location.hash !== '#/entrada') {
-      irSubstituindo('#/entrada');
+    let r = resolver(location.hash);
+    if (!estado.autenticado && (!r || r.vista !== 'entrada')) {
+      irSubstituindo('#/entrar');
       return;
     }
-
-    let r = resolver(location.hash);
     if (!r) {
-      irSubstituindo(estado.autenticado ? '#/hoje' : '#/entrada');
+      irSubstituindo('#/hoje');
       return;
     }
     if (estado.autenticado && r.vista === 'entrada') {
@@ -393,6 +395,12 @@
       irSubstituindo(Estado.get().chegadaVista ? '#/hoje' : '#/chegada');
       return;
     }
+    /* A sessão acabou — a conta foi apagada: volta-se à entrada. */
+    if (vistaAtual !== 'entrada' && !Estado.get().autenticado) {
+      UI.fecharFolha();
+      irSubstituindo('#/entrar');
+      return;
+    }
     desenhar();
   });
 
@@ -410,6 +418,7 @@
   aplicarTema();
   navegar();
   Estado.sincronizar();
+  Estado.verificarSessao();
 
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     /* Quando um service worker novo toma conta da página, ela ainda

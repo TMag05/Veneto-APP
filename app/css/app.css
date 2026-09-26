@@ -1639,20 +1639,24 @@ a { color: var(--verde); text-decoration: none; }
   color: var(--inchiostro-chiaro);
 }
 
-.codigo-campos { display: flex; gap: var(--esp-1); }
-.codigo-campos input {
-  flex: 1;
-  min-width: 0;
-  height: 56px;
-  text-align: center;
-  font-size: 22px;
-  font-variant-numeric: tabular-nums;
+.entrada__aviso {
+  padding: 12px 14px;
   background: var(--istria);
-  border: 1px solid var(--pietra-forte);
   border-radius: var(--raio-controlo);
   color: var(--inchiostro);
 }
-.codigo-campos input:focus { border-color: var(--verde); outline: none; }
+
+/* Palavra-passe com «Mostrar» dentro do campo: para quem escreve
+   ao sol, num teclado pequeno, ver o que escreveu poupa um erro. */
+.campo-senha { position: relative; display: block; }
+.campo-senha .campo__entrada { padding-right: 96px; }
+.campo-senha__ver {
+  position: absolute;
+  top: 2px;
+  right: 14px;
+  min-width: 44px;
+  font-size: 15px;
+}
 
 /* ---------------------------------------------------------
    Ecrãs largos — a app é de telemóvel; no desktop centra-se

@@ -11,9 +11,17 @@ window.Estado = (function () {
   const inicial = {
     versao: 1,
     autenticado: false,
-    perfil: { nome: '', email: '', telefone: '' },
-    /* O carro não é registado pelo convidado: vem da ficha que a
-       organização criou, encontrada pelo email na entrada. */
+    /* A conta do convidado, criada por ele na primeira abertura.
+       O carro é o que declarou: modelo e cor. */
+    uid: '',
+    sessao: null,
+    perfilPendente: false,
+    /* O que a entrada tem para dizer, quando a sessão acabou sem
+       ser por escolha de quem a tinha. */
+    aviso: '',
+    perfil: { nome: '', email: '', telefone: '', modelo: '', cor: '' },
+    /* A ficha da organização com o mesmo email, se existir. Dá a
+       matrícula e quem partilha o carro; não é condição de entrada. */
     participanteId: '',
     /* Só os metadados. A imagem vive em Fotos (IndexedDB). */
     fotos: [],
@@ -42,6 +50,11 @@ window.Estado = (function () {
         /* A marcação de chegada saiu da app: o grupo anda em caravana e
            chega junto. O que ficou gravado de versões anteriores vai fora. */
         delete e.chegadas;
+        e.perfil = Object.assign({}, inicial.perfil, e.perfil);
+        /* Antes de haver contas, a entrada aceitava qualquer código.
+           Quem entrou assim cria a sua conta; o nome e o email ficam
+           escritos para não ter de os repetir. */
+        if (e.autenticado && !e.uid) e.autenticado = false;
         return e;
       }
     } catch (e) { /* estado corrompido: recomeça-se em silêncio */ }
@@ -112,17 +125,22 @@ window.Estado = (function () {
      Perfil e carro
      --------------------------------------------------------- */
 
-  /* A ficha que a organização criou para esta pessoa. */
+  /* A ficha que a organização criou para esta pessoa, se criou. */
   function euParticipante() {
     if (!estado.participanteId) return null;
     return DADOS.participante(estado.participanteId);
   }
 
-  /* O carro da equipa desta pessoa — o condutor é quem o define. */
+  /* O carro é o que o convidado declarou ao criar a conta. Havendo
+     ficha da organização com o mesmo email, é dela que vêm a
+     matrícula e quem viaja no mesmo carro. */
   function meuCarro() {
     const p = euParticipante();
-    if (!p) return null;
-    return DADOS.carros.find(function (c) { return c.equipa === (p.equipa || '').trim(); }) || null;
+    const daFicha = p ? DADOS.carros.find(function (c) { return c.equipa === (p.equipa || '').trim(); }) : null;
+    const conta = estado.perfil;
+    if (!conta.modelo) return daFicha || null;
+    if (daFicha) return Object.assign({}, daFicha, { modelo: conta.modelo, cor: conta.cor || daFicha.cor });
+    return { id: 'conta', equipa: '', modelo: conta.modelo, cor: conta.cor || 'magnetic', matricula: '', perfis: [conta.nome] };
   }
 
   /* Encontra a ficha pelo email, na entrada. */
@@ -147,6 +165,92 @@ window.Estado = (function () {
   }
 
   function carroRegistado() { return !!meuCarro(); }
+
+  /* ---------------------------------------------------------
+     Sessão
+     A conta cria-se com rede, uma vez. Daí para a frente a
+     sessão vive no telemóvel e a app abre sem perguntar nada,
+     com ou sem rede. O token renova-se quando há ligação; se o
+     servidor disser que a conta deixou de existir, volta-se à
+     entrada, onde se pode criar outra.
+     --------------------------------------------------------- */
+
+  function iniciarSessao(r) {
+    const ficha = associarPorEmail(r.perfil.email);
+    definir({
+      autenticado: true,
+      aviso: '',
+      uid: r.sessao.uid,
+      sessao: r.sessao,
+      perfilPendente: !!r.perfilPendente,
+      participanteId: ficha ? ficha.id : '',
+      perfil: {
+        nome: r.perfil.nome || (ficha ? DADOS.nomeCompleto(ficha) : estado.perfil.nome),
+        email: r.perfil.email,
+        telefone: estado.perfil.telefone || (ficha ? ficha.telefone || '' : ''),
+        modelo: r.perfil.modelo || '',
+        cor: r.perfil.cor || ''
+      }
+    });
+    publicarPendente();
+  }
+
+  /* O papel de organização é do telemóvel, não da conta: fica. */
+  function terminarSessao(aviso) {
+    definir({ autenticado: false, aviso: aviso || '', uid: '', sessao: null, perfilPendente: false, participanteId: '' });
+  }
+
+  /* Uma sessão com o token em dia, renovado se faltar pouco. */
+  let aRenovar = null;
+  function sessaoValida(forcar) {
+    const s = estado.sessao;
+    if (!s) return Promise.reject(new Error('sem sessão'));
+    if (!forcar && s.expira - Date.now() > 5 * 60 * 1000) return Promise.resolve(s);
+    if (aRenovar) return aRenovar;
+    aRenovar = Nuvem.renovar(s).then(function (nova) {
+      aRenovar = null;
+      if (estado.sessao && estado.sessao.uid === nova.uid) {
+        estado.sessao = nova;
+        guardar();
+      }
+      return nova;
+    }).catch(function (e) {
+      aRenovar = null;
+      if (e && e.codigo === 'conta-apagada' && estado.sessao === s) terminarSessao('conta-apagada');
+      throw e;
+    });
+    return aRenovar;
+  }
+
+  function perfilPublico() {
+    const p = estado.perfil;
+    return { nome: p.nome, email: p.email, modelo: p.modelo, cor: p.cor, criado: Date.now() };
+  }
+
+  /* O perfil que ficou por gravar no servidor, ou que mudou desde. */
+  function publicarPendente() {
+    if (!estado.autenticado || !estado.perfilPendente || !navigator.onLine) return;
+    sessaoValida().then(function (s) {
+      return Nuvem.publicarPerfil(s, perfilPublico());
+    }).then(function () {
+      if (estado.perfilPendente) definir({ perfilPendente: false });
+    }).catch(function () { /* fica para a próxima ligação */ });
+  }
+
+  /* Muda o nome, o contacto ou o carro. Escreve-se primeiro aqui;
+     o servidor recebe quando houver rede. */
+  function atualizarPerfil(mudanca) {
+    definir({ perfil: Object.assign({}, estado.perfil, mudanca), perfilPendente: true });
+    publicarPendente();
+  }
+
+  /* Ao abrir e ao voltar a ter rede: confirma a sessão e envia o
+     que ficou pendente. Sem rede não faz nada, e ninguém dá por isso. */
+  function verificarSessao() {
+    if (!estado.autenticado || !estado.sessao || !navigator.onLine) return;
+    /* Renova-se sempre: é o que faz saber que a conta ainda existe. */
+    sessaoValida(true).then(publicarPendente).catch(function () { /* resolvido acima */ });
+  }
 
   /* ---------------------------------------------------------
      Fila offline
@@ -321,6 +425,7 @@ window.Estado = (function () {
   }
 
   window.addEventListener('online', sincronizar);
+  window.addEventListener('online', verificarSessao);
   window.addEventListener('offline', emitir);
 
   return {
@@ -337,6 +442,11 @@ window.Estado = (function () {
     ehOrganizacao: ehOrganizacao,
     eu: eu,
     carroRegistado: carroRegistado,
+    iniciarSessao: iniciarSessao,
+    terminarSessao: terminarSessao,
+    sessaoValida: sessaoValida,
+    verificarSessao: verificarSessao,
+    atualizarPerfil: atualizarPerfil,
     euParticipante: euParticipante,
     meuCarro: meuCarro,
     associarPorEmail: associarPorEmail,

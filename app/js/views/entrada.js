@@ -1,13 +1,53 @@
 /* =========================================================
-   Entrada — sem palavras-passe
-   Código por email. A app não guarda credenciais.
+   Entrada — #/entrar
+   Um só link, partilhado no grupo do WhatsApp. Na primeira vez
+   o convidado cria o seu acesso: nome, email, palavra-passe e o
+   carro em que viaja. Nas seguintes, a sessão está no telemóvel
+   e a app abre sem perguntar nada, com ou sem rede.
+
+   O registo é aberto: não há lista, aprovação nem data de
+   fecho. Quem fala com o servidor é Nuvem; este ecrã só pede,
+   espera e diz o que aconteceu.
    ========================================================= */
 
 Vistas.entrada = (function () {
-  let passo = 'identificacao';
-  let rascunho = { nome: '', email: '' };
+  /* 'criar' | 'entrar' | 'recuperar' | 'recuperado' */
+  let modo = null;
+  let rascunho = null;
+  let aEnviar = false;
+  let mensagem = '';
+  let senhaVisivel = false;
+
+  const MENSAGENS = {
+    'email-usado': 'Já existe um acesso com este email. Entre com a palavra-passe.',
+    'email-invalido': 'Este email parece incompleto.',
+    'senha-curta': 'A palavra-passe precisa de pelo menos seis caracteres.',
+    'credenciais': 'O email ou a palavra-passe não estão certos.',
+    'muitas-tentativas': 'Muitas tentativas seguidas. Tente de novo daqui a uns minutos.',
+    'sem-rede': 'Sem ligação. É preciso rede só desta vez; depois, a app funciona sem ela.',
+    'conta-apagada': 'Este acesso deixou de existir. Crie outro para continuar.',
+    'outro': 'Não foi possível agora. Tente de novo dentro de momentos.'
+  };
+
+  /* Na app instalada no ecrã principal, quem chega quase sempre já
+     criou o acesso no browser: no iPhone os dois não partilham a
+     sessão. Abre-se logo em «Entrar». */
+  function instalada() {
+    return window.navigator.standalone === true ||
+      (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+  }
+
+  function preparar() {
+    if (rascunho) return;
+    const e = Estado.get();
+    rascunho = { nome: e.perfil.nome || '', email: e.perfil.email || '', senha: '', modelo: e.perfil.modelo || '', cor: e.perfil.cor || '' };
+    modo = instalada() && !e.aviso ? 'entrar' : 'criar';
+    mensagem = e.aviso ? MENSAGENS[e.aviso] || '' : '';
+    aEnviar = false;
+  }
 
   function html() {
+    preparar();
     return '<div class="entrada">' +
       '<div>' +
         '<p class="assinatura-am">Aston Martin</p>' +
@@ -21,87 +61,192 @@ Vistas.entrada = (function () {
           (DADOS.dias.length ? ' · ' + UI.plural(DADOS.dias.length, 'dia', 'dias') : '') + '</p>' +
       '</div>' +
 
-      (passo === 'identificacao' ? formIdentificacao() : formCodigo()) +
+      ({ criar: formCriar, entrar: formEntrar, recuperar: formRecuperar, recuperado: recuperado })[modo]() +
     '</div>';
   }
 
-  function formIdentificacao() {
+  /* ---------------------------------------------------------
+     Peças
+     --------------------------------------------------------- */
+
+  function cabeca(titulo, nota) {
+    return '<div>' +
+      '<h1 class="titulo-ui">' + titulo + '</h1>' +
+      (nota ? '<p class="meta" style="margin-top:4px">' + nota + '</p>' : '') +
+    '</div>';
+  }
+
+  function campoEmail() {
+    return '<label class="campo">' +
+      '<span class="campo__rotulo">Email</span>' +
+      '<input class="campo__entrada" name="email" type="email" autocomplete="username" inputmode="email" ' +
+        'autocapitalize="off" spellcheck="false" required value="' + UI.h(rascunho.email) + '" placeholder="nome@exemplo.pt">' +
+    '</label>';
+  }
+
+  /* autocomplete new-password / current-password é o que faz o
+     iPhone oferecer-se para guardar a palavra-passe no Porta-chaves,
+     e para a pôr sozinho na app instalada. */
+  function campoSenha(nova) {
+    return '<div class="campo">' +
+      '<label class="campo__rotulo" for="entrada-senha">Palavra-passe</label>' +
+      '<span class="campo-senha">' +
+        '<input class="campo__entrada" id="entrada-senha" name="senha" type="' + (senhaVisivel ? 'text' : 'password') + '" ' +
+          'autocomplete="' + (nova ? 'new-password' : 'current-password') + '" ' +
+          'autocapitalize="off" spellcheck="false" required value="' + UI.h(rascunho.senha) + '"' +
+          (nova ? ' minlength="6" aria-describedby="nota-senha"' : '') + '>' +
+        '<button class="botao--texto campo-senha__ver" type="button" data-acao="verSenha" ' +
+          'aria-pressed="' + (senhaVisivel ? 'true' : 'false') + '">' + (senhaVisivel ? 'Esconder' : 'Mostrar') + '</button>' +
+      '</span>' +
+      (nova ? '<span class="meta campo__nota" id="nota-senha">Pelo menos seis caracteres.</span>' : '') +
+    '</div>';
+  }
+
+  /* role="alert" faz o leitor de ecrã dizê-la assim que aparece. */
+  function aviso() {
+    return mensagem ? '<p class="corpo-ui entrada__aviso" role="alert">' + UI.h(mensagem) + '</p>' : '';
+  }
+
+  function principal(rotulo, aEnviarRotulo) {
+    return '<button class="botao botao--principal botao--largo" type="submit"' + (aEnviar ? ' disabled' : '') + '>' +
+      (aEnviar ? aEnviarRotulo : rotulo) + '</button>';
+  }
+
+  function trocar(para, rotulo) {
+    return '<button class="botao botao--texto" type="button" data-acao="modo" data-valor="' + para + '" style="width:100%">' +
+      rotulo + '</button>';
+  }
+
+  /* ---------------------------------------------------------
+     Os quatro momentos
+     --------------------------------------------------------- */
+
+  function formCriar() {
     return '<form id="form-entrada" class="pilha-3" novalidate>' +
+      cabeca('Criar acesso', 'Uma vez só. Depois, a app abre sem perguntar nada.') +
       '<label class="campo">' +
         '<span class="campo__rotulo">Nome</span>' +
         '<input class="campo__entrada" name="nome" autocomplete="name" required value="' + UI.h(rascunho.nome) + '" placeholder="Nome próprio e apelido">' +
       '</label>' +
-      '<label class="campo">' +
-        '<span class="campo__rotulo">Email</span>' +
-        '<input class="campo__entrada" name="email" type="email" autocomplete="email" inputmode="email" required value="' + UI.h(rascunho.email) + '" placeholder="nome@exemplo.pt">' +
-      '</label>' +
-      '<button class="botao botao--principal botao--largo" type="submit">Receber código</button>' +
-      '<p class="meta" style="text-align:center">O código chega por email e por mensagem. Não há palavra-passe.</p>' +
+      campoEmail() +
+      campoSenha(true) +
+      '<div>' +
+        '<h2 class="etiqueta">O carro em que viaja</h2>' +
+        '<p class="meta" style="margin-top:4px">É por ele que o grupo reconhece as suas fotografias.</p>' +
+        '<div style="margin-top:24px">' + UI.escolhaCarro(rascunho.modelo, rascunho.cor) + '</div>' +
+      '</div>' +
+      aviso() +
+      principal('Criar acesso', 'A criar o acesso') +
+      trocar('entrar', 'Já tenho acesso') +
     '</form>';
   }
 
-  function formCodigo() {
-    return '<form id="form-codigo" class="pilha-3" novalidate>' +
-      '<div>' +
-        '<p class="campo__rotulo">Código enviado para</p>' +
-        '<p class="corpo-ui">' + UI.h(rascunho.email) + '</p>' +
-      '</div>' +
-      '<div class="codigo-campos">' +
-        '<input inputmode="numeric" maxlength="1" aria-label="Dígito 1">' +
-        '<input inputmode="numeric" maxlength="1" aria-label="Dígito 2">' +
-        '<input inputmode="numeric" maxlength="1" aria-label="Dígito 3">' +
-        '<input inputmode="numeric" maxlength="1" aria-label="Dígito 4">' +
-        '<input inputmode="numeric" maxlength="1" aria-label="Dígito 5">' +
-        '<input inputmode="numeric" maxlength="1" aria-label="Dígito 6">' +
-      '</div>' +
-      '<button class="botao botao--principal botao--largo" type="submit">Entrar</button>' +
-      '<button class="botao botao--texto" type="button" data-acao="recuar" style="width:100%">Corrigir o email</button>' +
+  function formEntrar() {
+    return '<form id="form-entrada" class="pilha-3" novalidate>' +
+      cabeca('Entrar', 'Com o email e a palavra-passe do seu acesso.') +
+      campoEmail() +
+      campoSenha(false) +
+      aviso() +
+      principal('Entrar', 'A entrar') +
+      trocar('recuperar', 'Esqueci-me da palavra-passe') +
+      trocar('criar', 'Primeira vez? Criar acesso') +
     '</form>';
+  }
+
+  /* Sem servidor não sai email nenhum, e o ecrã não o promete. */
+  function formRecuperar() {
+    if (Nuvem.simulada()) {
+      return '<div class="pilha-3">' +
+        cabeca('Recuperar a palavra-passe',
+          'A app ainda não está ligada ao servidor e não pode enviar email. ' +
+          'Peça à organização que apague o seu acesso, e crie outro com o mesmo email.') +
+        trocar('entrar', 'Voltar a entrar') +
+      '</div>';
+    }
+    return '<form id="form-entrada" class="pilha-3" novalidate>' +
+      cabeca('Recuperar a palavra-passe', 'Enviamos um email para escolher outra.') +
+      campoEmail() +
+      aviso() +
+      principal('Enviar', 'A enviar') +
+      trocar('entrar', 'Voltar a entrar') +
+    '</form>';
+  }
+
+  function recuperado() {
+    return '<div class="pilha-3">' +
+      cabeca('Veja o seu email',
+        'Se houver um acesso com ' + UI.h(rascunho.email.trim()) + ', a mensagem chega dentro de minutos. ' +
+        'Pode estar no lixo eletrónico.') +
+      trocar('entrar', 'Voltar a entrar') +
+    '</div>';
+  }
+
+  /* ---------------------------------------------------------
+     Envio
+     --------------------------------------------------------- */
+
+  function falhou(e) {
+    aEnviar = false;
+    const codigo = (e && e.codigo) || 'outro';
+    mensagem = MENSAGENS[codigo] || MENSAGENS.outro;
+    if (codigo === 'email-usado') { modo = 'entrar'; rascunho.senha = ''; }
+    App.repintar();
+  }
+
+  /* A sessão fica no telemóvel; a app sai sozinha da entrada. */
+  function entrou(r) {
+    rascunho = null;
+    mensagem = '';
+    Estado.iniciarSessao(r);
+  }
+
+  /* O que se pode dizer sem perguntar ao servidor. */
+  function validar() {
+    if (modo === 'criar' && !rascunho.nome.trim()) return 'Falta o nome.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rascunho.email.trim())) return MENSAGENS['email-invalido'];
+    if (modo === 'criar' && rascunho.senha.length < 6) return MENSAGENS['senha-curta'];
+    if (modo === 'entrar' && !rascunho.senha) return 'Falta a palavra-passe.';
+    if (modo === 'criar' && (!rascunho.modelo || !rascunho.cor)) return 'Escolha o modelo e a cor do carro.';
+    return '';
+  }
+
+  function enviar() {
+    if (aEnviar) return;
+    mensagem = validar();
+    if (mensagem) { App.repintar(); return; }
+
+    aEnviar = true;
+    App.repintar();
+
+    const email = rascunho.email.trim();
+    if (modo === 'criar') {
+      Nuvem.criarConta({ nome: rascunho.nome.trim(), email: email, senha: rascunho.senha, modelo: rascunho.modelo, cor: rascunho.cor })
+        .then(entrou, falhou);
+    } else if (modo === 'entrar') {
+      Nuvem.entrar(email, rascunho.senha).then(entrou, falhou);
+    } else if (modo === 'recuperar') {
+      Nuvem.recuperar(email).then(function () {
+        aEnviar = false;
+        modo = 'recuperado';
+        App.repintar();
+      }, falhou);
+    }
   }
 
   function montar(el) {
-    const fi = el.querySelector('#form-entrada');
-    if (fi) {
-      fi.addEventListener('submit', function (e) {
-        e.preventDefault();
-        rascunho.nome = fi.nome.value.trim();
-        rascunho.email = fi.email.value.trim();
-        if (!rascunho.nome || !rascunho.email) return;
-        passo = 'codigo';
-        App.repintar();
-      });
-    }
-
-    const fc = el.querySelector('#form-codigo');
-    if (fc) {
-      const campos = Array.prototype.slice.call(fc.querySelectorAll('.codigo-campos input'));
-      campos[0].focus();
-      campos.forEach(function (c, i) {
-        c.addEventListener('input', function () {
-          c.value = c.value.replace(/\D/g, '');
-          if (c.value && campos[i + 1]) campos[i + 1].focus();
-        });
-        c.addEventListener('keydown', function (e) {
-          if (e.key === 'Backspace' && !c.value && campos[i - 1]) campos[i - 1].focus();
-        });
-      });
-      fc.addEventListener('submit', function (e) {
-        e.preventDefault();
-        /* Qualquer código é aceite nesta versão de demonstração.
-           A ficha do convidado é a que a organização criou: procura-se
-           pelo email e é dela que vem o carro. */
-        const ficha = Estado.associarPorEmail(rascunho.email);
-        Estado.definir({
-          autenticado: true,
-          participanteId: ficha ? ficha.id : '',
-          perfil: {
-            nome: ficha ? DADOS.nomeCompleto(ficha) : rascunho.nome,
-            email: rascunho.email,
-            telefone: ficha ? (ficha.telefone || '') : ''
-          }
-        });
-      });
-    }
+    const f = el.querySelector('#form-entrada');
+    if (!f) return;
+    /* O que se escreve fica no rascunho: tocar num modelo ou numa cor
+       repinta o ecrã, e nada do que já estava escrito se perde. */
+    f.addEventListener('input', function (e) {
+      if (e.target.name && Object.prototype.hasOwnProperty.call(rascunho, e.target.name)) {
+        rascunho[e.target.name] = e.target.value;
+      }
+    });
+    f.addEventListener('submit', function (e) {
+      e.preventDefault();
+      enviar();
+    });
   }
 
   return {
@@ -110,7 +255,22 @@ Vistas.entrada = (function () {
     html: html,
     montar: montar,
     acoes: {
-      recuar: function () { passo = 'identificacao'; App.repintar(); }
+      modo: function (valor) {
+        modo = valor;
+        mensagem = '';
+        rascunho.senha = '';
+        App.repintar();
+      },
+      modelo: function (valor) { rascunho.modelo = valor; App.repintar(); },
+      cor: function (valor) { rascunho.cor = valor; App.repintar(); },
+      /* Troca-se no próprio campo, sem repintar: o teclado fica aberto. */
+      verSenha: function (valor, botao) {
+        senhaVisivel = !senhaVisivel;
+        const campo = botao.parentNode.querySelector('input');
+        campo.type = senhaVisivel ? 'text' : 'password';
+        botao.textContent = senhaVisivel ? 'Esconder' : 'Mostrar';
+        botao.setAttribute('aria-pressed', senhaVisivel ? 'true' : 'false');
+      }
     }
   };
 })();

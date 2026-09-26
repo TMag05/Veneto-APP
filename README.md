@@ -29,6 +29,8 @@ Depois: `http://localhost:8124`. Não há dependências, não há passo de build
 
 A app existe para o passeio e só para o passeio. Os convidados recebem acesso poucos dias antes de partir.
 
+**A entrada** — um só link, `#/entrar`, partilhado no grupo do WhatsApp. Na primeira vez o convidado cria o seu acesso com nome, email, palavra-passe e o carro em que viaja; nas seguintes, a sessão está no telemóvel e a app abre sem perguntar nada, com ou sem rede. O registo é aberto: sem lista, sem aprovação, sem data de fecho. A organização vê quem se registou em Pessoas › Acessos criados e pode apagar acessos, sem nunca bloquear a entrada.
+
 **A primeira abertura** — uma chegada, uma vez por instalação: fotografia a ecrã inteiro, o nome do convidado em Garamond, as datas e o carro dele em tamanho de objeto. É o equivalente digital de abrir a caixa.
 
 **Nos dias anteriores** — o briefing, que explica também como se anda na estrada: há batedores e o grupo segue em caravana, a app é o guia do dia e não o de condução. E uma **revelação por dia**: uma paragem do percurso que se abre, com fotografia e três linhas. É o que faz a app abrir-se todos os dias antes de partir.
@@ -98,7 +100,7 @@ app/
     icones.js           conjunto outline de 1.5px + os punções da navegação principal
     imagens.js          imagens de reserva, a substituir por fotografia
     fotos.js            arquivo das fotografias do grupo, em IndexedDB
-    nuvem.js            a fronteira com o servidor, por implementar
+    nuvem.js            a fronteira com o servidor: contas (REST do Firebase, simulado até haver projeto) e fotografias
     lib/zip.js          junta ficheiros num .zip, sem os comprimir
     app.js              encaminhamento, histórico e chrome
     views/              ecrãs do convidado; org*.js são a área da organização
@@ -132,6 +134,7 @@ servidor.js             servidor estático de desenvolvimento
 | Código de acesso da organização | `js/views/mais.js` | Um código partilhado. Não é autenticação |
 | Traçados das estradas | `js/estradas.js` | Só o Passo di San Boldo está confirmado, com geometria do OpenStreetMap. A Strada Cadorna, a Val Canali, os vales do dia 3 e o Cansiglio aparecem sem desenho, até a Stappando confirmar por onde se vai |
 | O que fazer à chegada | `js/conteudo.js` › `chegada` | Estacionamento, quem recebe, casas de banho e hora de voltar aos carros. Os campos estão criados e editáveis; falta a organização preenchê-los paragem a paragem |
+| Contas dos convidados | `js/nuvem.js` › `CONFIG` | Sem projeto Firebase, as contas vivem num servidor simulado em cada browser: a organização só vê as criadas no seu, e a recuperação da palavra-passe não envia email. Com o projeto, faltam as regras de `contas/{uid}` e a Cloud Function que apaga do Auth a conta que a organização apagou |
 | Envio das fotografias | `js/nuvem.js` | O ficheiro fica guardado no telemóvel, inteiro, com miniatura e vista já geradas e o caminho de destino já calculado. Faltam as quatro funções que falam com o Firebase: até lá a fila diz *pendente* e nunca *enviado* |
 
 ---
@@ -146,7 +149,7 @@ Sete dos oito movimentos de [O Luxo é Atmosfera](PESQUISA-LUXO.html) estão imp
 
 1. **Sessão fotográfica do próprio passeio.** As fotografias oficiais dos sítios já estão na app; falta o passeio em si — os carros na estrada, o grupo, a luz de outubro. É o movimento de maior efeito.
 2. **O traçado real dos quatro troços por confirmar**, pedido à Stappando: a subida a Cima Grappa, a Val Canali, os vales da tarde do dia 3 e a subida ao Cansiglio. Chega o GPX ou o nome das estradas — o desenho projeta-se do OpenStreetMap, como se fez ao San Boldo.
-2. **Servidor.** Firestore para conteúdo, chegadas e pedidos; Storage para fotografias; Auth por link mágico; papéis de organização e convidado com regras de segurança a sério; Cloud Messaging para as notificações de alteração de programa.
+2. **Servidor.** Firestore para conteúdo e pedidos; Storage para fotografias; o projeto Firebase para as contas, que já falam REST com email e palavra-passe; papéis de organização e convidado com regras de segurança a sério; Cloud Messaging para as notificações de alteração de programa.
 3. **Publicação e notificação.** O botão que empurra uma alteração para os telemóveis. Sem isto a regra operacional da secção 4 do manifesto não se cumpre.
 4. **Confirmar os waypoints âncora com a organização** e acrescentar os do dia 3 pelos vales das Dolomitas. Com batedores, só servem o link de recurso — mas para quem se afastar da caravana só serve se apontar para a estrada certa.
 5. **Revisão da identidade para a rota real.** `Pietra e Vigna` foi deduzida do Veneto — pedra de Istria, verde Veronese, villas palladianas, tipografia aldina — e a rota de 2026 passa a maior parte do tempo precisamente aí. O que a fundamentação ainda não tem são os dois fios que o passeio acrescenta: a Grande Guerra (o Grappa e San Boldo) e a dolomia das Pale di San Martino. A paleta e as regras ficam; a revisão acrescenta, não substitui. Ver [ENQUADRAMENTO.md](ENQUADRAMENTO.md) §4.

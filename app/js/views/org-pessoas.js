@@ -52,7 +52,13 @@
             '<p class="meta" style="margin-top:8px">Cada pessoa fica associada a um carro pelo número de equipa.</p>' +
           '</div></div>';
 
-      return OrgComum.cabecalhoEvento() + corpo +
+      return OrgComum.cabecalhoEvento() +
+        '<div class="faixa" style="padding-top:24px">' +
+          '<div class="lista">' +
+            UI.linhaLista({ titulo: 'Acessos criados', nota: 'Quem entrou pelo link e o link para o grupo', icone: 'selado', href: '#/org/acessos' }) +
+          '</div>' +
+        '</div>' +
+        corpo +
         '<div class="faixa">' +
           '<button class="botao botao--secundario botao--largo" type="button" data-acao="novo">' +
             Icone('juntar', 20) + 'Adicionar participante</button>' +
@@ -175,6 +181,149 @@
     }
   };
 
+  /* ---------------------------------------------------------
+     Acessos — quem criou conta pela app
+     O registo é aberto: esta lista é para ver, não para aprovar.
+     Apagar um acesso não impede ninguém de entrar — liberta o
+     email, e a pessoa pode criar outro quando quiser. Serve para
+     duplicados, enganos e testes.
+     --------------------------------------------------------- */
+
+  let acessos = null;
+  let falhaAcessos = '';
+
+  function carregarAcessos() {
+    falhaAcessos = '';
+    Estado.sessaoValida().then(function (s) {
+      return Nuvem.contas(s);
+    }).then(function (lista) {
+      acessos = lista.sort(function (a, b) { return b.criado - a.criado; });
+      App.repintar();
+    }).catch(function (e) {
+      falhaAcessos = e && e.codigo === 'sem-rede'
+        ? 'Sem ligação. A lista de acessos vem do servidor.'
+        : 'Não foi possível ler a lista agora.';
+      App.repintar();
+    });
+  }
+
+  function linkDoGrupo() {
+    return location.origin + location.pathname + '#/entrar';
+  }
+
+  function linhaAcesso(c) {
+    const ficha = Estado.associarPorEmail(c.email);
+    const proprio = c.uid === Estado.get().uid;
+    const carro = c.modelo
+      ? Silhuetas.modelo(c.modelo).nome + (c.cor ? ' · ' + Silhuetas.cor(c.cor).nome : '')
+      : 'Carro por escolher';
+    return '<div class="linha-org">' +
+      '<div class="linha-org__corpo">' +
+        '<span class="titulo-ui" style="display:block">' + UI.h(c.nome || 'Sem nome') + '</span>' +
+        '<span class="meta" style="display:block;margin-top:2px">' + UI.h(c.email) + '</span>' +
+        '<span class="meta" style="display:block;margin-top:2px">' + UI.h(carro) +
+          (c.criado ? ' · ' + UI.h(UI.dataCurta(Estado.chave(new Date(c.criado)))) : '') + '</span>' +
+        '<span class="meta" style="display:block;margin-top:2px">' +
+          (ficha ? 'Ficha: ' + UI.h(DADOS.nomeCompleto(ficha)) + (ficha.equipa ? ', carro ' + UI.h(ficha.equipa) : '') : 'Sem ficha da organização') +
+          (proprio ? ' · o acesso deste telemóvel' : '') + '</span>' +
+      '</div>' +
+      '<button class="botao-icone" type="button" data-acao="apagarAcesso" data-valor="' + UI.h(c.uid) + '" ' +
+        'aria-label="Apagar o acesso de ' + UI.h(c.nome || c.email) + '">' + Icone('apagar', 20) + '</button>' +
+    '</div>';
+  }
+
+  Vistas.orgAcessos = {
+    area: 'organizacao',
+    nav: 'org-pessoas',
+    cabecalho: { voltar: '#/org/participantes', titulo: 'Acessos', tituloSempre: true },
+    desmontar: function () { acessos = null; falhaAcessos = ''; },
+    html: function () {
+      let lista;
+      if (falhaAcessos && !acessos) {
+        lista = '<div class="vazio">' +
+            '<p class="corpo-editorial">' + UI.h(falhaAcessos) + '</p>' +
+            '<button class="botao botao--secundario" style="margin-top:16px" type="button" data-acao="recarregar">Tentar de novo</button>' +
+          '</div>';
+      } else if (!acessos) {
+        lista = '<p class="meta">A ler a lista.</p>';
+      } else if (!acessos.length) {
+        lista = '<div class="vazio">' +
+            '<p class="corpo-editorial">Ainda ninguém criou acesso.</p>' +
+            '<p class="meta" style="margin-top:8px">Aparecem aqui assim que entrarem pelo link.</p>' +
+          '</div>';
+      } else {
+        lista = acessos.map(linhaAcesso).join('');
+      }
+
+      return '<div class="faixa" style="padding-top:24px">' +
+          '<h2 class="etiqueta">O link para o grupo</h2>' +
+          '<p class="corpo-ui silencioso" style="margin-top:8px">Um só para todos. Quem o abre cria o seu acesso, sem aprovação.</p>' +
+          '<p class="corpo-ui num" style="margin-top:16px;overflow-wrap:anywhere">' + UI.h(linkDoGrupo()) + '</p>' +
+          '<button class="botao botao--secundario botao--largo" style="margin-top:16px" type="button" data-acao="partilharLink">' +
+            Icone('partilhar', 20) + 'Partilhar o link</button>' +
+          (Nuvem.simulada()
+            ? '<p class="meta" style="margin-top:16px">Sem servidor ligado, cada telemóvel guarda os seus acessos. ' +
+                'Esta lista mostra só os que foram criados neste.</p>'
+            : '') +
+        '</div>' +
+
+        '<div class="faixa">' +
+          '<div class="seccao-cabecalho"><h2 class="etiqueta">Acessos criados</h2>' +
+            (acessos ? '<span class="meta num">' + acessos.length + '</span>' : '') + '</div>' +
+          lista +
+          '<p class="meta" style="margin-top:16px">Apagar um acesso não impede ninguém de entrar: o email fica livre e a pessoa pode criar outro.</p>' +
+        '</div>';
+    },
+    montar: function (el, p, chegada) {
+      if (chegada) carregarAcessos();
+    },
+    acoes: {
+      recarregar: function () { falhaAcessos = ''; App.repintar(); carregarAcessos(); },
+
+      partilharLink: function () {
+        const url = linkDoGrupo();
+        const titulo = DADOS.evento.nome || 'Passeio';
+        if (navigator.share) {
+          navigator.share({ title: titulo, url: url }).catch(function () {});
+        } else if (navigator.clipboard) {
+          navigator.clipboard.writeText(url).then(function () {
+            UI.abrirFolha('Link copiado', '<p class="corpo-ui silencioso" style="overflow-wrap:anywhere">' + UI.h(url) + '</p>');
+          }).catch(function () {});
+        }
+      },
+
+      apagarAcesso: function (uid) {
+        const c = (acessos || []).find(function (x) { return x.uid === uid; });
+        if (!c) return;
+        const proprio = uid === Estado.get().uid;
+        UI.abrirFolha('Apagar acesso',
+          '<p class="corpo-ui silencioso">' + UI.h(c.nome || c.email) + ' deixa de entrar com este email e esta palavra-passe. ' +
+            'Pode criar outro acesso quando quiser.</p>' +
+          (proprio ? '<p class="corpo-ui" style="margin-top:12px">É o acesso deste telemóvel: a app volta à entrada.</p>' : '') +
+          '<button class="botao botao--rosso botao--largo" style="margin-top:24px" type="button" id="btn-apagar-acesso">Apagar acesso</button>' +
+          '<p class="meta" style="margin-top:16px" id="msg-apagar-acesso" role="alert"></p>');
+
+        const botao = document.getElementById('btn-apagar-acesso');
+        botao.addEventListener('click', function () {
+          botao.disabled = true;
+          Estado.sessaoValida().then(function (s) {
+            return Nuvem.apagarConta(s, uid);
+          }).then(function () {
+            UI.fecharFolha();
+            acessos = acessos.filter(function (x) { return x.uid !== uid; });
+            if (proprio) Estado.terminarSessao('conta-apagada');
+            else App.repintar();
+          }).catch(function (e) {
+            botao.disabled = false;
+            document.getElementById('msg-apagar-acesso').textContent = e && e.codigo === 'sem-rede'
+              ? 'Sem ligação. Tente de novo quando houver rede.'
+              : 'Não foi possível apagar agora.';
+          });
+        });
+      }
+    }
+  };
+
   function blocoVeiculo(x) {
     return '<div class="faixa faixa--recuada" style="margin-top:32px">' +
       '<h2 class="etiqueta">Veículo</h2>' +
@@ -186,21 +335,8 @@
         UI.campo({ rotulo: 'Nº apólice de seguro', nome: 'apolice', valor: x.apolice, placeholder: 'Número' }) +
       '</div>' +
 
-      '<h3 class="etiqueta" style="margin-top:32px">Modelo</h3>' +
-      '<div class="silhueta-grelha" style="margin-top:12px">' + Silhuetas.MODELOS.map(function (m) {
-        return '<button class="silhueta-opcao" type="button" data-acao="modelo" data-valor="' + m.id + '" ' +
-          'aria-pressed="' + (m.id === x.modelo ? 'true' : 'false') + '">' +
-          Silhuetas.svg(m.id, x.cor, { rodas: false }) +
-          '<span class="silhueta-opcao__nome">' + UI.h(m.nome) + '</span></button>';
-      }).join('') + '</div>' +
-
-      '<h3 class="etiqueta" style="margin-top:32px">Cor</h3>' +
-      '<div class="cores-grelha" style="margin-top:12px">' + Silhuetas.CORES.map(function (c) {
-        return '<button class="cor-opcao" type="button" data-acao="cor" data-valor="' + c.id + '" ' +
-          'aria-pressed="' + (c.id === x.cor ? 'true' : 'false') + '" style="background:' + c.hex + '" ' +
-          'aria-label="' + UI.h(c.nome) + '"></button>';
-      }).join('') + '</div>' +
-      '<p class="meta" style="margin-top:12px">É esta silhueta que representa o carro nas fotografias e no álbum.</p>' +
+      '<div style="margin-top:32px">' + UI.escolhaCarro(x.modelo, x.cor) + '</div>' +
+      '<p class="meta" style="margin-top:12px">O convidado escolhe o modelo e a cor ao criar o acesso, e é esse o carro que vê na app. O desta ficha serve a organização.</p>' +
     '</div>';
   }
 })();

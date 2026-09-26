@@ -306,7 +306,7 @@
           UI.fecharFolha();
           Conteudo.repor();
           Estado.reiniciar();
-          location.hash = '#/entrada';
+          location.hash = '#/entrar';
         });
       },
 
