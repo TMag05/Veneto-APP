@@ -457,8 +457,7 @@
       const dia = Estado.fase() === 'durante' ? Estado.diaAtivo() : null;
       return {
         titulo: dia ? dia.titulo : (DADOS.evento.nome || 'Passeio'),
-        linha: false,
-        acao: { acao: 'partilhar', icone: 'partilhar', rotulo: 'Partilhar' }
+        linha: false
       };
     },
     html: function () {

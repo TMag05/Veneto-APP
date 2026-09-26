@@ -483,8 +483,7 @@
       return {
         voltar: '#/etapas',
         titulo: e ? e.nome : 'Estrada',
-        linha: false,
-        acao: { acao: 'partilhar', icone: 'partilhar', rotulo: 'Partilhar' }
+        linha: false
       };
     },
     html: function (p) {

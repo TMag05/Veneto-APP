@@ -454,20 +454,6 @@ window.UI = (function () {
     document.body.style.overflow = '';
   }
 
-  /* ---------------------------------------------------------
-     Partilha de ecrã — cada ecrã tem endereço fixo
-     --------------------------------------------------------- */
-
-  function partilhar(titulo) {
-    const url = location.href;
-    if (navigator.share) {
-      navigator.share({ title: titulo, url: url }).catch(function () {});
-    } else if (navigator.clipboard) {
-      navigator.clipboard.writeText(url);
-      abrirFolha('Endereço copiado', '<p class="corpo-ui silencioso">' + h(url) + '</p>');
-    }
-  }
-
   return {
     h: h, dataLonga: dataLonga, dataCurta: dataCurta, intervaloEvento: intervaloEvento,
     minutos: minutos, horaAgora: horaAgora, plural: plural, duracao: duracao,
@@ -476,7 +462,7 @@ window.UI = (function () {
     foto: foto, imagemDe: imagemDe, logo: logo, horario: horario, distintivo: distintivo, linhaLista: linhaLista,
     campo: campo, ligarCampos: ligarCampos, coordenadas: coordenadas, escolhaCarro: escolhaCarro,
     reduzirImagem: reduzirImagem, derivadas: derivadas, campoFoto: campoFoto, talho: talho, nomeDeFoto: nomeDeFoto,
-    abrirFolha: abrirFolha, fecharFolha: fecharFolha, partilhar: partilhar,
+    abrirFolha: abrirFolha, fecharFolha: fecharFolha,
     MESES: MESES
   };
 })();

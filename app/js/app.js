@@ -309,9 +309,6 @@
     /* Voltar é sempre recuar no histórico. O valor só serve de
        recurso quando o ecrã foi aberto de fora, por deep link. */
     voltar: function (valor) { voltar(valor); },
-    partilhar: function () {
-      UI.partilhar(document.title);
-    },
     ir: function (valor) { location.hash = valor; },
     externo: function (valor) { window.open(valor, '_blank', 'noopener'); }
   };

@@ -111,8 +111,7 @@
       return {
         voltar: '#/roadbook',
         titulo: poi ? poi.nome : 'Ponto de interesse',
-        linha: false,
-        acao: { acao: 'partilhar', icone: 'partilhar', rotulo: 'Partilhar' }
+        linha: false
       };
     },
     html: function (p) { return paginaPoi(p.id); }
@@ -133,8 +132,7 @@
       return {
         voltar: '#/hoje',
         titulo: poi ? poi.nome : (x ? x.m.titulo : 'Momento'),
-        linha: false,
-        acao: { acao: 'partilhar', icone: 'partilhar', rotulo: 'Partilhar' }
+        linha: false
       };
     },
     html: function (p) {
