@@ -284,7 +284,7 @@ window.UI = (function () {
       '<div class="silhueta-grelha" style="margin-top:12px">' + Silhuetas.MODELOS.map(function (m) {
         return '<button class="silhueta-opcao" type="button" data-acao="modelo" data-valor="' + m.id + '" ' +
           'aria-pressed="' + (m.id === modelo ? 'true' : 'false') + '">' +
-          Silhuetas.svg(m.id, vista, { rodas: false }) +
+          Silhuetas.svg(m.id, vista) +
           '<span class="silhueta-opcao__nome">' + h(m.nome) + '</span></button>';
       }).join('') + '</div>' +
 

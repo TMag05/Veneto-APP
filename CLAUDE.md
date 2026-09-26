@@ -166,7 +166,7 @@ O código de acesso da organização (`2026`, em `js/views/mais.js`) é uma port
 | Waypoints âncora | `ui.js` › `ANCORAS` — da rota real, lidos do programa (Strada Cadorna; San Boldo por Trichiana e Tovena; o Cansiglio pelo Alpago). **Por confirmar com a organização**; os troços do dia 3 pelos vales ainda não têm. Só servem o link de recurso |
 | Horas por confirmar | `semente.js` › `roteiro` — a chegada do dia 1 (aeroportos, levantamento dos carros, hotel) não tem hora na proposta; a app mostra *A confirmar* |
 | Fotografias | `assets/fotos/` — as oficiais de cada sítio (hotéis, restaurantes, museus, ateliê) e Pixabay para Veneza e San Boldo, usadas sem créditos por decisão da organização, que trata da autorização. Sem fotografia, fica o desenho de `imagens.js` |
-| Silhuetas dos carros | `silhuetas.js` › `FORMAS` — cinco arquétipos, não um perfil por modelo. O desportivo (Vantage, V12 Vantage) já é traçado sobre uma fotografia de perfil do Vantage de 2024; os outros quatro continuam desenhados à mão |
+| Silhuetas dos carros | `silhuetas.js` — em tamanho de leitura, desenho a traço na cor do texto; em etiqueta, o perfil cheio na cor do carro. Só há traço do DB12, vetorizado de um desenho de terceiros (licença por confirmar) e usado também por DB11, Vanquish, DBS e Vantage. DB12 Volante, DBX707 e Valhalla continuam com o perfil antigo, só em linha |
 | Cores de carroçaria | `silhuetas.js` › `CORES` — hexadecimais aproximados |
 | Código da organização | `js/views/mais.js` |
 | Traçados das estradas | `js/estradas.js` — só o San Boldo está confirmado. Ver a tabela abaixo |
