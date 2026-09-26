@@ -1158,6 +1158,7 @@ a { color: var(--verde); text-decoration: none; }
   border-radius: var(--raio-cartao);
   background: var(--istria);
   padding: var(--esp-2);
+  scroll-margin-top: calc(var(--alt-cabecalho) + env(safe-area-inset-top) + var(--esp-1));
 }
 .cartao-org + .cartao-org { margin-top: var(--esp-2); }
 
@@ -1705,6 +1706,16 @@ a { color: var(--verde); text-decoration: none; }
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--inchiostro-chiaro);
+}
+
+/* A porta da organização: no fim, em texto e sem acento. Quem
+   não é da equipa não tem de dar por ela. */
+.entrada__porta {
+  align-self: center;
+  margin-top: var(--esp-4);
+  color: var(--inchiostro-medio);
+  font-weight: 400;
+  font-size: 15px;
 }
 
 .entrada__aviso {

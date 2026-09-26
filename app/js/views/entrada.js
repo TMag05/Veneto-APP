@@ -8,9 +8,16 @@
    O registo é aberto: não há lista, aprovação nem data de
    fecho. Quem fala com o servidor é Nuvem; este ecrã só pede,
    espera e diz o que aconteceu.
+
+   A organização entra pela mesma forma, noutra porta —
+   #/organizacao, com um botão discreto no fim desta. Sem a
+   pergunta do carro: viaja em carros próprios. Só entra quem
+   tiver o email na equipa.
    ========================================================= */
 
-Vistas.entrada = (function () {
+(function () {
+
+function fabrica(org) {
   /* 'criar' | 'entrar' | 'recuperar' | 'recuperado' */
   let modo = null;
   let rascunho = null;
@@ -26,6 +33,8 @@ Vistas.entrada = (function () {
     'muitas-tentativas': 'Muitas tentativas seguidas. Tente de novo daqui a uns minutos.',
     'sem-rede': 'Sem ligação. É preciso rede só desta vez; depois, a app funciona sem ela.',
     'conta-apagada': 'Este acesso deixou de existir. Crie outro para continuar.',
+    'fora-da-equipa': 'Este email não está na equipa da organização. Peça a quem já entrou que o acrescente.',
+    'codigo-errado': 'O código da organização não está certo.',
     'outro': 'Não foi possível agora. Tente de novo dentro de momentos.'
   };
 
@@ -40,8 +49,10 @@ Vistas.entrada = (function () {
   function preparar() {
     if (rascunho) return;
     const e = Estado.get();
-    rascunho = { nome: e.perfil.nome || '', email: e.perfil.email || '', senha: '', modelo: e.perfil.modelo || '' };
-    modo = instalada() && !e.aviso ? 'entrar' : 'criar';
+    rascunho = { nome: e.perfil.nome || '', email: e.perfil.email || '', senha: '', modelo: e.perfil.modelo || '', codigo: '' };
+    /* A equipa é pequena e cria o acesso uma vez: quem volta a
+       esta porta quase sempre já o tem. */
+    modo = org || (instalada() && !e.aviso) ? 'entrar' : 'criar';
     mensagem = e.aviso ? MENSAGENS[e.aviso] || '' : '';
     aEnviar = false;
   }
@@ -58,6 +69,11 @@ Vistas.entrada = (function () {
       '</div>' +
 
       ({ criar: formCriar, entrar: formEntrar, recuperar: formRecuperar, recuperado: recuperado })[modo]() +
+
+      /* A outra porta, no fim e em texto: quem não é da equipa
+         não tem de dar por ela. */
+      '<a class="botao botao--texto entrada__porta" href="' + (org ? '#/entrar' : '#/organizacao') + '">' +
+        (org ? 'Entrada dos convidados' : 'Organização') + '</a>' +
     '</div>';
   }
 
@@ -118,6 +134,7 @@ Vistas.entrada = (function () {
      --------------------------------------------------------- */
 
   function formCriar() {
+    if (org) return formCriarOrg();
     return '<form id="form-entrada" class="pilha-3" novalidate>' +
       cabeca('Criar acesso') +
       '<label class="campo">' +
@@ -136,9 +153,35 @@ Vistas.entrada = (function () {
     '</form>';
   }
 
+  function formCriarOrg() {
+    const codigo = Nuvem.pedeCodigo();
+    return '<form id="form-entrada" class="pilha-3" novalidate>' +
+      cabeca('Criar acesso da organização', codigo
+        ? 'É a primeira conta da equipa. As seguintes acrescentam-se lá dentro, em Pessoas.'
+        : 'O email tem de estar na equipa.') +
+      '<label class="campo">' +
+        '<span class="campo__rotulo">Nome</span>' +
+        '<input class="campo__entrada" name="nome" autocomplete="name" required value="' + UI.h(rascunho.nome) + '" placeholder="Nome próprio e apelido">' +
+      '</label>' +
+      campoEmail() +
+      campoSenha(true) +
+      (codigo
+        ? '<label class="campo">' +
+            '<span class="campo__rotulo">Código da organização</span>' +
+            '<input class="campo__entrada" name="codigo" inputmode="numeric" autocomplete="off" required value="' + UI.h(rascunho.codigo) + '">' +
+          '</label>'
+        : '') +
+      aviso() +
+      principal('Criar acesso', 'A criar o acesso') +
+      trocar('entrar', 'Já tenho acesso') +
+    '</form>';
+  }
+
   function formEntrar() {
     return '<form id="form-entrada" class="pilha-3" novalidate>' +
-      cabeca('Entrar', 'Com o email e a palavra-passe do seu acesso.') +
+      (org
+        ? cabeca('Organização', 'Com o email e a palavra-passe da equipa.')
+        : cabeca('Entrar', 'Com o email e a palavra-passe do seu acesso.')) +
       campoEmail() +
       campoSenha(false) +
       aviso() +
@@ -154,7 +197,9 @@ Vistas.entrada = (function () {
       return '<div class="pilha-3">' +
         cabeca('Recuperar a palavra-passe',
           'A app ainda não está ligada ao servidor e não pode enviar email. ' +
-          'Peça à organização que apague o seu acesso, e crie outro com o mesmo email.') +
+          (org
+            ? 'Peça a outra pessoa da equipa que retire o seu email e o volte a acrescentar, e crie outro acesso.'
+            : 'Peça à organização que apague o seu acesso, e crie outro com o mesmo email.')) +
         trocar('entrar', 'Voltar a entrar') +
       '</div>';
     }
@@ -201,7 +246,8 @@ Vistas.entrada = (function () {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rascunho.email.trim())) return MENSAGENS['email-invalido'];
     if (modo === 'criar' && rascunho.senha.length < 6) return MENSAGENS['senha-curta'];
     if (modo === 'entrar' && !rascunho.senha) return 'Falta a palavra-passe.';
-    if (modo === 'criar' && !rascunho.modelo) return 'Escolha o modelo do carro.';
+    if (modo === 'criar' && !org && !rascunho.modelo) return 'Escolha o modelo do carro.';
+    if (modo === 'criar' && org && Nuvem.pedeCodigo() && !rascunho.codigo.trim()) return 'Falta o código da organização.';
     return '';
   }
 
@@ -214,7 +260,16 @@ Vistas.entrada = (function () {
     App.repintar();
 
     const email = rascunho.email.trim();
-    if (modo === 'criar') {
+    if (modo === 'criar' && org) {
+      Nuvem.criarContaOrganizacao({ nome: rascunho.nome.trim(), email: email, senha: rascunho.senha, codigo: rascunho.codigo })
+        .then(entrou, falhou);
+    } else if (modo === 'entrar' && org) {
+      /* Um acesso de convidado não abre esta porta. */
+      Nuvem.entrar(email, rascunho.senha).then(function (r) {
+        if (r.perfil.papel !== 'organizacao') throw Object.assign(new Error('fora-da-equipa'), { codigo: 'fora-da-equipa' });
+        entrou(r);
+      }).catch(falhou);
+    } else if (modo === 'criar') {
       Nuvem.criarConta({ nome: rascunho.nome.trim(), email: email, senha: rascunho.senha, modelo: rascunho.modelo })
         .then(entrou, falhou);
     } else if (modo === 'entrar') {
@@ -267,4 +322,9 @@ Vistas.entrada = (function () {
       }
     }
   };
+}
+
+Vistas.entrada = fabrica(false);
+Vistas.entradaOrg = fabrica(true);
+
 })();

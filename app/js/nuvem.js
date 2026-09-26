@@ -4,9 +4,9 @@
    escreve no telemóvel e segue. Este ficheiro é o único sítio
    que sabe que há um do outro lado.
 
-   Tem duas metades: as contas dos convidados, que já funcionam,
-   e as fotografias, que esperam pelo Storage. Nada fora deste
-   ficheiro conhece o Firestore, o Storage ou o Auth.
+   Tem duas metades: as contas, dos convidados e da organização,
+   que já funcionam, e as fotografias, que esperam pelo
+   Storage. Nada fora deste ficheiro conhece o Firestore, o Storage ou o Auth.
    ========================================================= */
 
 window.Nuvem = (function () {
@@ -27,6 +27,13 @@ window.Nuvem = (function () {
 
   function simulada() { return !CONFIG.apiKey || !CONFIG.projectId; }
 
+  /* Só no servidor simulado, e só enquanto a equipa estiver
+     vazia: é o que deixa entrar a primeira pessoa da
+     organização. Não é segurança — é a chave de uma casa nova.
+     No Firebase a primeira entrada da equipa escreve-se à mão,
+     na consola, e este código não serve para nada. */
+  const CODIGO_EQUIPA = '2026';
+
   /* ---------------------------------------------------------
      Contas — o contrato
 
@@ -36,7 +43,9 @@ window.Nuvem = (function () {
      entrar — uma conta apagada liberta o email para outra.
 
      Uma sessão é { uid, idToken, refreshToken, expira }.
-     Um perfil é { uid, nome, email, modelo, criado }.
+     Um perfil é { uid, nome, email, modelo, papel, criado }.
+     papel é 'convidado' ou 'organizacao'. A organização viaja
+     em carros próprios: o perfil dela não tem modelo.
 
      criarConta({ nome, email, senha, modelo })
        → { sessao, perfil, perfilPendente }
@@ -44,15 +53,26 @@ window.Nuvem = (function () {
        perfil não chegou ao Firestore; volta-se a publicar
        depois, com publicarPerfil.
      entrar(email, senha)        → { sessao, perfil }
+     criarContaOrganizacao({ nome, email, senha, codigo })
+       → { sessao, perfil, perfilPendente }
+       Só para emails da equipa. O código só é pedido, e só
+       serve, enquanto a equipa estiver vazia (pedeCodigo()).
      recuperar(email)            → resolve sempre, exista a conta ou não
      renovar(sessao)             → sessão nova
      publicarPerfil(sessao, p)   → grava o perfil
      contas(sessao)              → todos os perfis, para a organização
      apagarConta(sessao, uid)    → apaga o perfil e a conta
 
+     A equipa — os emails que podem ter acesso de organização:
+     equipa(sessao)              → [{ email, criado }]
+     juntarEquipa(sessao, email) → acrescenta o email
+     retirarEquipa(sessao, email)→ tira o email e apaga o acesso
+                                   que houver com ele
+
      Os erros rejeitam com um Error cujo .codigo é um de:
        email-usado, email-invalido, senha-curta, credenciais,
-       conta-apagada, muitas-tentativas, sem-rede, outro
+       conta-apagada, muitas-tentativas, fora-da-equipa,
+       codigo-errado, sem-rede, outro
      --------------------------------------------------------- */
 
   function erro(codigo) {
@@ -70,7 +90,8 @@ window.Nuvem = (function () {
       uid: uid,
       nome: String(d.nome || '').trim(),
       email: normalizar(d.email),
-      modelo: d.modelo || '',
+      modelo: d.papel === 'organizacao' ? '' : (d.modelo || ''),
+      papel: d.papel === 'organizacao' ? 'organizacao' : 'convidado',
       criado: criado || Date.now()
     };
   }
@@ -86,9 +107,14 @@ window.Nuvem = (function () {
        · Auth › Email/palavra-passe ligado, e o modelo do email
          de recuperação em português.
        · Regras do Firestore para contas/{uid}: cada pessoa lê e
-         escreve a sua; a organização lê e apaga todas (por
-         claim personalizada, quando houver contas de
-         organização).
+         escreve a sua; a organização lê e apaga todas. Quem é
+         da organização diz-se por equipa/{email}: um perfil só
+         pode ter papel 'organizacao' se existir esse documento
+         para o email do token.
+       · Regras para equipa/{email}: get aberto a todos — a
+         entrada precisa de saber se o email é da equipa antes
+         de criar a conta —; list e escrita só para a equipa. A
+         primeira entrada escreve-se à mão, na consola.
        · Uma Cloud Function em contas/{uid} onDelete que apaga
          o utilizador do Auth. O telemóvel não pode apagar a
          conta de outra pessoa, e sem isto o email ficaria
@@ -163,6 +189,7 @@ window.Nuvem = (function () {
       nome: { stringValue: p.nome },
       email: { stringValue: p.email },
       modelo: { stringValue: p.modelo },
+      papel: { stringValue: p.papel || 'convidado' },
       criado: { integerValue: String(p.criado) }
     } };
   }
@@ -173,6 +200,7 @@ window.Nuvem = (function () {
     return {
       uid: doc.name.split('/').pop(),
       nome: t('nome'), email: t('email'), modelo: t('modelo'),
+      papel: t('papel') === 'organizacao' ? 'organizacao' : 'convidado',
       criado: f.criado ? Number(f.criado.integerValue) : 0
     };
   }
@@ -186,6 +214,16 @@ window.Nuvem = (function () {
           return firebase.publicarPerfil(sessao, perfil)
             .then(function () { return { sessao: sessao, perfil: perfil, perfilPendente: false }; })
             .catch(function () { return { sessao: sessao, perfil: perfil, perfilPendente: true }; });
+        });
+    },
+
+    /* Pergunta-se primeiro se o email é da equipa: criar a conta
+       e só depois descobrir que não é deixaria uma conta órfã. */
+    criarContaOrganizacao: function (d) {
+      return pedir(firestore('equipa/' + encodeURIComponent(normalizar(d.email))), { method: 'GET' })
+        .catch(function (e) { throw e.codigo === 'nao-existe' ? erro('fora-da-equipa') : e; })
+        .then(function () {
+          return firebase.criarConta(Object.assign({}, d, { papel: 'organizacao' }));
         });
     },
 
@@ -230,6 +268,37 @@ window.Nuvem = (function () {
     apagarConta: function (sessao, uid) {
       return pedir(firestore('contas/' + uid), comSessao(sessao, 'DELETE'))
         .catch(function (e) { if (e.codigo !== 'nao-existe') throw e; });
+    },
+
+    pedeCodigo: function () { return false; },
+
+    equipa: function (sessao) {
+      return pedir(firestore('equipa?pageSize=100'), comSessao(sessao, 'GET')).then(function (r) {
+        return (r.documents || []).map(function (doc) {
+          const f = doc.fields || {};
+          return {
+            email: f.email ? f.email.stringValue : decodeURIComponent(doc.name.split('/').pop()),
+            criado: f.criado ? Number(f.criado.integerValue) : 0
+          };
+        });
+      });
+    },
+
+    juntarEquipa: function (sessao, email) {
+      return pedir(firestore('equipa/' + encodeURIComponent(email)), comSessao(sessao, 'PATCH', { fields: {
+        email: { stringValue: email },
+        criado: { integerValue: String(Date.now()) }
+      } }));
+    },
+
+    retirarEquipa: function (sessao, email) {
+      return pedir(firestore('equipa/' + encodeURIComponent(email)), comSessao(sessao, 'DELETE'))
+        .catch(function (e) { if (e.codigo !== 'nao-existe') throw e; })
+        .then(function () { return firebase.contas(sessao); })
+        .then(function (lista) {
+          const c = lista.find(function (x) { return x.email === email; });
+          if (c) return firebase.apagarConta(sessao, c.uid);
+        });
     }
   };
 
@@ -250,9 +319,9 @@ window.Nuvem = (function () {
   function lerSimulado() {
     try {
       const s = JSON.parse(localStorage.getItem(CHAVE_SIMULADA));
-      if (s && s.contas && s.tokens) return s;
+      if (s && s.contas && s.tokens) { s.equipa = s.equipa || {}; return s; }
     } catch (e) { /* recomeça-se vazio */ }
-    return { contas: {}, tokens: {} };
+    return { contas: {}, tokens: {}, equipa: {} };
   }
 
   function gravarSimulado(s) {
@@ -285,7 +354,8 @@ window.Nuvem = (function () {
   }
 
   function semSegredos(c) {
-    return { uid: c.uid, nome: c.nome, email: c.email, modelo: c.modelo, criado: c.criado };
+    return { uid: c.uid, nome: c.nome, email: c.email, modelo: c.modelo,
+      papel: c.papel === 'organizacao' ? 'organizacao' : 'convidado', criado: c.criado };
   }
 
   function porEmail(s, email) {
@@ -308,6 +378,23 @@ window.Nuvem = (function () {
           gravarSimulado(s);
           return { sessao: sessao, perfil: perfil, perfilPendente: false };
         });
+      });
+    },
+
+    /* A primeira pessoa da equipa entra com o código; as outras
+       têm de lá estar antes, acrescentadas por quem já entrou. */
+    criarContaOrganizacao: function (d) {
+      const email = normalizar(d.email);
+      const s = lerSimulado();
+      if (!s.equipa[email]) {
+        if (Object.keys(s.equipa).length) return demora().then(function () { throw erro('fora-da-equipa'); });
+        if (String(d.codigo || '').trim() !== CODIGO_EQUIPA) return demora().then(function () { throw erro('codigo-errado'); });
+      }
+      return simulado.criarConta(Object.assign({}, d, { papel: 'organizacao' })).then(function (r) {
+        const t = lerSimulado();
+        t.equipa[email] = t.equipa[email] || { email: email, criado: Date.now() };
+        gravarSimulado(t);
+        return r;
       });
     },
 
@@ -362,6 +449,33 @@ window.Nuvem = (function () {
         Object.keys(s.tokens).forEach(function (t) { if (s.tokens[t] === uid) delete s.tokens[t]; });
         gravarSimulado(s);
       });
+    },
+
+    pedeCodigo: function () { return !Object.keys(lerSimulado().equipa).length; },
+
+    equipa: function () {
+      return demora().then(function () {
+        const s = lerSimulado();
+        return Object.keys(s.equipa).map(function (k) { return s.equipa[k]; });
+      });
+    },
+
+    juntarEquipa: function (sessao, email) {
+      return demora().then(function () {
+        const s = lerSimulado();
+        s.equipa[email] = s.equipa[email] || { email: email, criado: Date.now() };
+        gravarSimulado(s);
+      });
+    },
+
+    retirarEquipa: function (sessao, email) {
+      return demora().then(function () {
+        const s = lerSimulado();
+        delete s.equipa[email];
+        gravarSimulado(s);
+        const c = porEmail(s, email);
+        if (c) return simulado.apagarConta(sessao, c.uid);
+      });
     }
   };
 
@@ -378,6 +492,18 @@ window.Nuvem = (function () {
     if (!emailValido(normalizar(email))) return Promise.reject(erro('email-invalido'));
     if (!senha) return Promise.reject(erro('credenciais'));
     return servidor().entrar(email, senha);
+  }
+
+  function criarContaOrganizacao(d) {
+    if (!emailValido(normalizar(d.email))) return Promise.reject(erro('email-invalido'));
+    if (String(d.senha || '').length < 6) return Promise.reject(erro('senha-curta'));
+    return servidor().criarContaOrganizacao(d);
+  }
+
+  function emailDaEquipa(sessao, email) {
+    const e = normalizar(email);
+    if (!emailValido(e)) return Promise.reject(erro('email-invalido'));
+    return servidor().juntarEquipa(sessao, e);
   }
 
   function recuperar(email) {
@@ -433,12 +559,17 @@ window.Nuvem = (function () {
     simulada: simulada,
 
     criarConta: criarConta,
+    criarContaOrganizacao: criarContaOrganizacao,
+    pedeCodigo: function () { return servidor().pedeCodigo(); },
     entrar: entrar,
     recuperar: recuperar,
     renovar: function (sessao) { return servidor().renovar(sessao); },
     publicarPerfil: function (sessao, perfil) { return servidor().publicarPerfil(sessao, perfil); },
     contas: function (sessao) { return servidor().contas(sessao); },
     apagarConta: function (sessao, uid) { return servidor().apagarConta(sessao, uid); },
+    equipa: function (sessao) { return servidor().equipa(sessao); },
+    juntarEquipa: emailDaEquipa,
+    retirarEquipa: function (sessao, email) { return servidor().retirarEquipa(sessao, normalizar(email)); },
 
     ligada: function () { return false; },
     enviarFoto: porLigar,

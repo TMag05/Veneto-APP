@@ -10,6 +10,8 @@
     /* O link partilhado no grupo do WhatsApp. */
     ['entrar', 'entrada'],
     ['entrada', 'entrada'],
+    /* A porta da organização, no fim da entrada. */
+    ['organizacao', 'entradaOrg'],
     ['chegada', 'chegada'],
     ['hoje', 'hoje'],
     ['dia/:id', 'dia'],
@@ -43,10 +45,12 @@
     ['org/itinerario', 'orgItinerario'],
     ['org/fotos', 'orgFotos'],
     ['org/etapa/:id', 'orgEtapa'],
+    ['org/etapa/:id/:momento', 'orgEtapa'],
     ['org/paragem/:id', 'orgParagem'],
     ['org/participantes', 'orgParticipantes'],
     ['org/participante/:id', 'orgParticipante'],
     ['org/acessos', 'orgAcessos'],
+    ['org/equipa', 'orgEquipa'],
     ['org/contactos', 'orgContactos'],
     ['org/contacto/:id', 'orgContacto'],
     ['org/local/:id', 'orgLocal']
@@ -172,30 +176,40 @@
       .catch(function () { /* sem rede, fica a versão que há */ });
   }
 
+  function ehEntrada(vista) { return vista === 'entrada' || vista === 'entradaOrg'; }
+
+  /* Para onde vai quem acabou de entrar. A organização não passa
+     pela primeira abertura: é a do convidado, com o carro dele. */
+  function inicio() {
+    if (Estado.ehOrganizacao()) return '#/org/itinerario';
+    return Estado.get().chegadaVista ? '#/hoje' : '#/chegada';
+  }
+
   function navegar() {
     verificarVersao();
 
     const estado = Estado.get();
+    const org = Estado.ehOrganizacao();
 
     let r = resolver(location.hash);
-    if (!estado.autenticado && (!r || r.vista !== 'entrada')) {
+    if (!estado.autenticado && (!r || !ehEntrada(r.vista))) {
       irSubstituindo('#/entrar');
       return;
     }
     if (!r) {
-      irSubstituindo('#/hoje');
+      irSubstituindo(org ? '#/org/itinerario' : '#/hoje');
       return;
     }
-    if (estado.autenticado && r.vista === 'entrada') {
-      irSubstituindo(estado.chegadaVista ? '#/hoje' : '#/chegada');
+    if (estado.autenticado && ehEntrada(r.vista)) {
+      irSubstituindo(inicio());
       return;
     }
     /* A chegada acontece uma vez por instalação. */
-    if (estado.autenticado && !estado.chegadaVista && r.vista !== 'chegada') {
+    if (estado.autenticado && !org && !estado.chegadaVista && r.vista !== 'chegada') {
       irSubstituindo('#/chegada');
       return;
     }
-    if (estado.chegadaVista && r.vista === 'chegada') {
+    if ((estado.chegadaVista || org) && r.vista === 'chegada') {
       irSubstituindo('#/hoje');
       return;
     }
@@ -388,14 +402,16 @@
     aplicarTema();
     if (!vistaAtual) return;
     /* A entrada não deve ficar no histórico depois de autenticar. */
-    if (vistaAtual === 'entrada' && Estado.get().autenticado) {
-      irSubstituindo(Estado.get().chegadaVista ? '#/hoje' : '#/chegada');
+    if (ehEntrada(vistaAtual) && Estado.get().autenticado) {
+      irSubstituindo(inicio());
       return;
     }
-    /* A sessão acabou — a conta foi apagada: volta-se à entrada. */
-    if (vistaAtual !== 'entrada' && !Estado.get().autenticado) {
+    /* A sessão acabou — a conta foi apagada, ou saiu-se: volta-se à entrada. */
+    if (!ehEntrada(vistaAtual) && !Estado.get().autenticado) {
       UI.fecharFolha();
-      irSubstituindo('#/entrar');
+      /* Quem saiu da área da organização volta à porta dela. */
+      const v = window.Vistas[vistaAtual];
+      irSubstituindo(v && v.area === 'organizacao' ? '#/organizacao' : '#/entrar');
       return;
     }
     desenhar();

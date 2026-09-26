@@ -21,7 +21,7 @@ Depois: `http://localhost:8124`. Não há dependências, não há passo de build
 
 **Instalar no telemóvel:** abrir o endereço no Safari ou no Chrome e escolher *Adicionar ao ecrã principal*.
 
-**Entrar na área da organização:** Mais › Organização › Entrar. O código provisório é `2026`, definido em `js/views/mais.js`. Não é segurança — é uma porta. A segurança chega com contas no servidor.
+**Entrar na área da organização:** o botão «Organização», no fim da entrada dos convidados, abre `#/organizacao` — email e palavra-passe, sem a pergunta do carro. Só cria acesso quem tiver o email na equipa (Pessoas › Equipa da organização). A primeira pessoa, com a equipa vazia, entra com o código `2026` (`CODIGO_EQUIPA` em `js/nuvem.js`); só existe no servidor simulado.
 
 ---
 
@@ -130,7 +130,7 @@ servidor.js             servidor estático de desenvolvimento
 | Waypoints âncora | `ui.js` › `ANCORAS` | Da rota real, lidos do programa: a Strada Cadorna para subir ao Grappa, San Boldo por Trichiana e Tovena, o Cansiglio pelo Alpago. **Confirmar com a organização**; o dia 3 pelos vales ainda não tem. Só servem o link de recurso |
 | Fotografias | `assets/fotos/` | Dezasseis fotografias dos sítios: as oficiais de cada local (hotel, restaurantes, museu, ateliê, refúgios) e Pixabay para Veneza e San Boldo, reduzidas a 1600 px e guardadas pelo service worker. Usadas sem créditos, por decisão da organização, que trata da autorização. Os quatro momentos de logística usam os gráficos de `imagens.js`, com as cores de `tokens.css`. A organização pode trocar qualquer uma na sua área |
 | Silhuetas dos carros | `silhuetas.js` › `FORMAS` | Cinco arquétipos. A versão final deve ter um perfil por modelo |
-| Código de acesso da organização | `js/views/mais.js` | Um código partilhado. Não é autenticação |
+| Código da primeira pessoa da equipa | `js/nuvem.js` › `CODIGO_EQUIPA` | Só no servidor simulado, e só com a equipa vazia. No Firebase, a primeira entrada escreve-se na consola |
 | Traçados das estradas | `js/estradas.js` | Só o Passo di San Boldo está confirmado, com geometria do OpenStreetMap. A Strada Cadorna, a Val Canali, os vales do dia 3 e o Cansiglio aparecem sem desenho, até a Stappando confirmar por onde se vai |
 | O que fazer à chegada | `js/conteudo.js` › `chegada` | Estacionamento, quem recebe, casas de banho e hora de voltar aos carros. Os campos estão criados e editáveis; falta a organização preenchê-los paragem a paragem |
 | Contas dos convidados | `js/nuvem.js` › `CONFIG` | Sem projeto Firebase, as contas vivem num servidor simulado em cada browser: a organização só vê as criadas no seu, e a recuperação da palavra-passe não envia email. Com o projeto, faltam as regras de `contas/{uid}` e a Cloud Function que apaga do Auth a conta que a organização apagou |

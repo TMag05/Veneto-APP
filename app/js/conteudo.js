@@ -402,6 +402,7 @@ window.Conteudo = (function () {
     const d = dados.dias.find(function (x) { return x.id === id; });
     if (!d) return;
     Object.assign(d, patch);
+    marcar(d);
     guardar();
   }
 
@@ -417,6 +418,14 @@ window.Conteudo = (function () {
     const [x] = dados.dias.splice(i, 1);
     dados.dias.splice(j, 0, x);
     guardar();
+  }
+
+  /* Quem mexeu por último numa etapa ou numa paragem, e quando.
+     Com várias pessoas na equipa, é o que evita que duas se
+     contradigam sem saber. Só a área da organização o mostra. */
+  function marcar(o) {
+    const e = window.Estado ? Estado.get() : null;
+    o.editado = { por: e ? e.perfil.nome || e.perfil.email : '', em: Date.now() };
   }
 
   /* ---------------------------------------------------------
@@ -455,12 +464,14 @@ window.Conteudo = (function () {
   function atualizarChegada(id, patch) {
     if (!dados.pois[id]) return;
     dados.pois[id].chegada = Object.assign(chegadaVazia(), dados.pois[id].chegada, patch);
+    marcar(dados.pois[id]);
     guardar();
   }
 
   function atualizarPoi(id, patch) {
     if (!dados.pois[id]) return;
     Object.assign(dados.pois[id], patch);
+    marcar(dados.pois[id]);
     guardar();
   }
 
@@ -478,6 +489,7 @@ window.Conteudo = (function () {
     if (!d) return;
     d.etapas = d.etapas || [];
     d.etapas.push(poiId);
+    marcar(d);
     guardar();
   }
 
@@ -485,6 +497,7 @@ window.Conteudo = (function () {
     const d = dados.dias.find(function (x) { return x.id === diaId; });
     if (!d || !d.etapas) return;
     d.etapas.splice(indice, 1);
+    marcar(d);
     guardar();
   }
 
@@ -495,6 +508,7 @@ window.Conteudo = (function () {
     if (j < 0 || j >= d.etapas.length) return;
     const [x] = d.etapas.splice(indice, 1);
     d.etapas.splice(j, 0, x);
+    marcar(d);
     guardar();
   }
 
@@ -508,6 +522,7 @@ window.Conteudo = (function () {
     d.momentos = d.momentos || [];
     d.momentos.push({ hora: '09:00', fim: '', titulo: '', local: '', tipo: 'paragem', poi: '', nota: '' });
     ordenarMomentos(d);
+    marcar(d);
     guardar();
   }
 
@@ -515,6 +530,7 @@ window.Conteudo = (function () {
     const d = dados.dias.find(function (x) { return x.id === diaId; });
     if (!d || !d.momentos[indice]) return;
     Object.assign(d.momentos[indice], patch);
+    marcar(d);
     guardar();
   }
 
@@ -522,6 +538,7 @@ window.Conteudo = (function () {
     const d = dados.dias.find(function (x) { return x.id === diaId; });
     if (!d || !d.momentos) return;
     d.momentos.splice(indice, 1);
+    marcar(d);
     guardar();
   }
 
@@ -551,6 +568,7 @@ window.Conteudo = (function () {
       m.alterado = { antes: m.hora, razao: razao };
     }
     ordenarMomentos(d);
+    marcar(d);
     guardar();
   }
 
@@ -559,6 +577,7 @@ window.Conteudo = (function () {
     const m = d && d.momentos[indice];
     if (!m) return;
     delete m.alterado;
+    marcar(d);
     guardar();
   }
 

@@ -19,7 +19,8 @@ window.Estado = (function () {
     /* O que a entrada tem para dizer, quando a sessão acabou sem
        ser por escolha de quem a tinha. */
     aviso: '',
-    perfil: { nome: '', email: '', telefone: '', modelo: '' },
+    /* papel vem da conta: 'convidado' ou 'organizacao'. */
+    perfil: { nome: '', email: '', telefone: '', modelo: '', papel: 'convidado' },
     /* A ficha da organização com o mesmo email, se existir. Dá a
        matrícula e quem partilha o carro; não é condição de entrada. */
     participanteId: '',
@@ -29,7 +30,6 @@ window.Estado = (function () {
     fila: [],
     chegadaVista: false,
     album: false,
-    papel: 'convidado',
     /* 'escuro' (o de origem) ou 'claro'. Escolhe-se em Mais. */
     tema: 'escuro'
   };
@@ -51,6 +51,10 @@ window.Estado = (function () {
            chega junto. O que ficou gravado de versões anteriores vai fora. */
         delete e.chegadas;
         e.perfil = Object.assign({}, inicial.perfil, e.perfil);
+        /* Até 26.09.2026 a organização entrava por um código, e o
+           papel ficava no telemóvel. Agora é da conta: quem entrou
+           assim volta a convidado e entra pela porta da organização. */
+        delete e.papel;
         /* Antes de haver contas, a entrada aceitava qualquer código.
            Quem entrou assim cria a sua conta; o nome e o email ficam
            escritos para não ter de os repetir. */
@@ -119,7 +123,7 @@ window.Estado = (function () {
     return Math.round(ms / 86400000);
   }
 
-  function ehOrganizacao() { return estado.papel === 'organizacao'; }
+  function ehOrganizacao() { return estado.autenticado && estado.perfil.papel === 'organizacao'; }
 
   /* ---------------------------------------------------------
      Perfil e carro
@@ -187,15 +191,19 @@ window.Estado = (function () {
         nome: r.perfil.nome || (ficha ? DADOS.nomeCompleto(ficha) : estado.perfil.nome),
         email: r.perfil.email,
         telefone: estado.perfil.telefone || (ficha ? ficha.telefone || '' : ''),
-        modelo: r.perfil.modelo || ''
+        modelo: r.perfil.modelo || '',
+        papel: r.perfil.papel === 'organizacao' ? 'organizacao' : 'convidado'
       }
     });
     publicarPendente();
   }
 
-  /* O papel de organização é do telemóvel, não da conta: fica. */
+  /* O papel é da conta: sai com ela. */
   function terminarSessao(aviso) {
-    definir({ autenticado: false, aviso: aviso || '', uid: '', sessao: null, perfilPendente: false, participanteId: '' });
+    definir({
+      autenticado: false, aviso: aviso || '', uid: '', sessao: null, perfilPendente: false, participanteId: '',
+      perfil: Object.assign({}, estado.perfil, { papel: 'convidado' })
+    });
   }
 
   /* Uma sessão com o token em dia, renovado se faltar pouco. */
@@ -222,7 +230,7 @@ window.Estado = (function () {
 
   function perfilPublico() {
     const p = estado.perfil;
-    return { nome: p.nome, email: p.email, modelo: p.modelo, criado: Date.now() };
+    return { nome: p.nome, email: p.email, modelo: p.modelo, papel: p.papel, criado: Date.now() };
   }
 
   /* O perfil que ficou por gravar no servidor, ou que mudou desde. */

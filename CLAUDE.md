@@ -116,6 +116,8 @@ servidor.js             servidor estático de desenvolvimento
 - **As fotografias do grupo não passam pelo `localStorage`.** O ficheiro sai da câmara e vai inteiro para `js/fotos.js` (IndexedDB, base `veneto-fotos`), sem compressão; ao lado ficam uma miniatura de 320 px e uma vista de 1600 px, geradas no telemóvel numa leitura só, com a orientação da câmara já aplicada. No `localStorage` ficam só os metadados. Uma fotografia só se dá por enviada quando o Storage confirmar — nunca por omissão, nunca por um temporizador. As vistas que mostram fotografias pedem os endereços a `Fotos.pintar` e devolvem-nos em `desmontar`.
 - **Há duas peças que mudam quando houver servidor, e só duas:** `conteudo.js` para o conteúdo e `nuvem.js` para as contas e as fotografias. Para as fotografias, `nuvem.js` declara quatro funções — `ligada`, `enviarFoto`, `apagarFoto`, `fotosDoDia` — e enquanto responder que não está ligada, a fila fica parada, de propósito. Nada fora desse ficheiro conhece o Firestore, o Storage ou o Auth.
 - **Entrada com registo aberto.** Um só link para todos, `#/entrar`, partilhado no grupo do WhatsApp. Na primeira vez o convidado cria o acesso — nome, email, palavra-passe e o modelo do carro em que viaja —; nas seguintes a sessão está no telemóvel e a app abre sem perguntar nada, com ou sem rede. Sem lista de convidados, sem aprovação, sem data de fecho: decisão de 26.09.2026. Volta-se a entrar com email e palavra-passe, e a recuperação é por email do Firebase. A organização vê quem se registou em Pessoas › Acessos criados e pode apagar acessos, mas nunca bloqueia ninguém — um acesso apagado liberta o email para outro. O Firebase Auth fala-se por REST, sem SDK, dentro de `nuvem.js`; com `CONFIG` vazio, as contas vivem num servidor simulado no `localStorage`, com o mesmo contrato e os mesmos erros. O carro do convidado é o que ele escolheu; a ficha da organização com o mesmo email, se existir, junta a matrícula e quem viaja no mesmo carro.
+- **A organização entra pela sua porta: `#/organizacao`**, um botão discreto em texto, «Organização», no fim da entrada dos convidados. Mesma forma, sem a pergunta do carro: a equipa viaja em carros próprios, não Aston Martin, e o perfil dela não tem modelo. O papel (`convidado` ou `organizacao`) é da conta, não do telemóvel (`Estado.perfil.papel`), e sai com a sessão; um acesso de convidado não abre a porta da organização. Só cria acesso quem tiver o email na equipa, gerida em Pessoas › Equipa da organização; retirar um email apaga o acesso com ele. A organização não passa pela primeira abertura e entra em `#/org/itinerario`. Decisão de 26.09.2026, que substituiu o código em Mais › Definições.
+- **Alterações de última hora, a partir do que o convidado vê.** Com sessão de organização, a página de um momento e a de uma paragem acabam em «Editar a hora e o local» (`#/org/etapa/dia/n`, que abre já no cartão desse momento) e «Editar esta paragem». Cada etapa e cada paragem guardam quem lhes mexeu por último (`editado`), e só a área da organização o mostra.
 - **O caminho de uma fotografia é `fotos/{dia}/{idConvidado}/{sha256}-{tamanho}.jpg`**, calculado por `Fotos.caminho()`. O SHA-256 é do ficheiro de origem: a mesma fotografia enviada duas vezes cai no mesmo sítio, e por isso a fila pode repetir sem duplicar. Onde não há `crypto.subtle` — pelo IP da rede local, em http — a conta faz-se em JavaScript, no mesmo ficheiro.
 - **Cada ecrã tem endereço fixo e partilhável** (`ROTAS` em `app.js`). É isto que permite ao WhatsApp ser o sino e à app ser o arquivo — e é a decisão com maior impacto no sucesso do projeto.
 - **Voltar é recuar no caminho feito, não subir na hierarquia.** O ecrã-pai declarado só serve quando não há histórico — o caso do link vindo do WhatsApp.
@@ -152,7 +154,7 @@ Data de nascimento, número de carta de condução e número de apólice existem
 
 Enquanto não houver servidor, tudo isto está no `localStorage` do telemóvel de quem organiza. Fazer cópias de segurança; não usar telemóvel partilhado.
 
-O código de acesso da organização (`2026`, em `js/views/mais.js`) é uma porta, não autenticação. Não o tratar como segurança.
+O código da organização (`2026`, `CODIGO_EQUIPA` em `js/nuvem.js`) só existe no servidor simulado e só serve enquanto a equipa estiver vazia: é o que deixa entrar a primeira pessoa. Com o Firebase, a primeira entrada de `equipa/{email}` escreve-se à mão na consola, e são as regras que decidem quem tem papel de organização.
 
 ---
 
@@ -167,7 +169,7 @@ O código de acesso da organização (`2026`, em `js/views/mais.js`) é uma port
 | Horas por confirmar | `semente.js` › `roteiro` — a chegada do dia 1 (aeroportos, levantamento dos carros, hotel) não tem hora na proposta; a app mostra *A confirmar* |
 | Fotografias | `assets/fotos/` — as oficiais de cada sítio (hotéis, restaurantes, museus, ateliê) e Pixabay para Veneza e San Boldo, usadas sem créditos por decisão da organização, que trata da autorização. Sem fotografia, fica o desenho de `imagens.js`. A capa das Etapas é uma ilustração do San Boldo, dada pelo Tiago a 26.09.2026 (`san-boldo-ilustracao.jpg`), cortada por cima da placa, que tinha o nome errado |
 | Silhuetas dos carros | `silhuetas.js` — em tamanho de leitura, desenho a traço na cor do texto; em etiqueta, o perfil cheio na mesma cor. Não há escolha de cor: saiu a 26.09.2026, por não acrescentar nada; o carro diz-se pelo modelo. Há traço do DB12, do DB11, do Vanquish, do DBS, do Vantage, do V12 Vantage, do DB7, do DB5 e do DBX707, vetorizados de desenhos de terceiros — licença por confirmar. Nas jantes de arame do DB5, os raios foram redesenhados, e a figura do condutor saiu. As versões Volante e o Valhalla saíram da lista a 26.09.2026; um acesso antigo com um deles aparece como DB12 |
-| Código da organização | `js/views/mais.js` |
+| Código da organização | `js/nuvem.js` › `CODIGO_EQUIPA` — só no servidor simulado, e só para a primeira pessoa da equipa. Sem servidor, a equipa vive em cada browser |
 | Traçados das estradas | `js/estradas.js` — só o San Boldo está confirmado. Ver a tabela abaixo |
 | Envio das fotografias | `js/nuvem.js` — as quatro funções por implementar. Até lá a fila diz *pendente* e nunca *enviado* |
 | Contas dos convidados | `js/nuvem.js` › `CONFIG` — vazio, as contas vivem num servidor simulado em cada browser, e a organização só vê as criadas no seu. Com o projeto Firebase faltam as regras de `contas/{uid}` e uma Cloud Function que apague do Auth a conta cujo perfil a organização apagou. Sem servidor, a recuperação da palavra-passe não envia email, e o ecrã diz isso |
@@ -205,7 +207,7 @@ A secção **Demonstração**, o endereço `#/demo/n` e o campo `demoFase` **sa�
 node servidor.js     # http://localhost:8124
 ```
 
-Sem dependências, sem build. Instalar no telemóvel pelo *Adicionar ao ecrã principal*. Entrar na organização por Mais › Organização › Entrar.
+Sem dependências, sem build. Instalar no telemóvel pelo *Adicionar ao ecrã principal*. Entrar na organização pelo botão «Organização», no fim da entrada (`#/organizacao`).
 
 ---
 

@@ -44,7 +44,18 @@
     verConvidado: function () { App.ir('#/hoje'); }
   };
 
-  window.OrgComum = { cabecalhoEvento: cabecalhoEvento, cabecalhoOrg: cabecalhoOrg, acoesComuns: acoesComuns };
+  /* «Alterado por Sara Duarte, 26 set., 14h02» — a última mão numa
+     etapa ou numa paragem. */
+  function editado(o) {
+    const x = o && o.editado;
+    if (!x || !x.em) return '';
+    const d = new Date(x.em);
+    const hora = String(d.getHours()).padStart(2, '0') + 'h' + String(d.getMinutes()).padStart(2, '0');
+    return '<p class="meta num">Alterado' + (x.por ? ' por ' + UI.h(x.por) : '') + ', ' +
+      UI.h(UI.dataCurta(Estado.chave(d))) + ', ' + hora + '</p>';
+  }
+
+  window.OrgComum = { cabecalhoEvento: cabecalhoEvento, cabecalhoOrg: cabecalhoOrg, acoesComuns: acoesComuns, editado: editado };
 
   /* ---------------------------------------------------------
      Entrada
@@ -251,9 +262,9 @@
         '<div class="faixa">' +
           '<div class="lista">' +
             UI.linhaLista({ titulo: 'Ver como convidado', nota: 'A app que os convidados veem', icone: 'externo', acao: 'verConvidado' }) +
-            UI.linhaLista({ titulo: 'Sair da organização', nota: 'Volta ao modo convidado', icone: 'fechar', acao: 'sair' }) +
+            UI.linhaLista({ titulo: 'Terminar sessão', nota: Estado.get().perfil.email, icone: 'fechar', acao: 'sair' }) +
           '</div>' +
-          '<p class="meta" style="margin-top:24px">O acesso a esta área é por código. Na versão com servidor passa a ser por conta, com registo de quem alterou o quê.</p>' +
+          '<p class="meta" style="margin-top:24px">Cada pessoa da equipa entra com o seu acesso. As etapas e as paragens dizem quem as alterou por último.</p>' +
         '</div>';
     },
     montar: function (el) {
@@ -367,8 +378,13 @@
         UI.descarregar('participantes.csv', '﻿' + csv, 'text/csv;charset=utf-8');
       },
       sair: function () {
-        Estado.definir({ papel: 'convidado' });
-        App.substituir('#/hoje');
+        UI.abrirFolha('Terminar sessão',
+          '<p class="corpo-ui silencioso">Para voltar a entrar, use a porta da organização, no fim da entrada, com o email e a palavra-passe.</p>' +
+          '<button class="botao botao--principal botao--largo" style="margin-top:24px" type="button" id="btn-sair">Terminar sessão</button>');
+        document.getElementById('btn-sair').addEventListener('click', function () {
+          UI.fecharFolha();
+          Estado.terminarSessao();
+        });
       }
     })
   };

@@ -56,6 +56,7 @@
         '<div class="faixa" style="padding-top:24px">' +
           '<div class="lista">' +
             UI.linhaLista({ titulo: 'Acessos criados', nota: 'Quem entrou pelo link e o link para o grupo', icone: 'selado', href: '#/org/acessos' }) +
+            UI.linhaLista({ titulo: 'Equipa da organização', nota: 'Quem pode entrar nesta área', icone: 'oficina', href: '#/org/equipa' }) +
           '</div>' +
         '</div>' +
         corpo +
@@ -213,9 +214,9 @@
   function linhaAcesso(c) {
     const ficha = Estado.associarPorEmail(c.email);
     const proprio = c.uid === Estado.get().uid;
-    const carro = c.modelo
-      ? Silhuetas.modelo(c.modelo).nome
-      : 'Carro por escolher';
+    const carro = c.papel === 'organizacao'
+      ? 'Organização'
+      : (c.modelo ? Silhuetas.modelo(c.modelo).nome : 'Carro por escolher');
     return '<div class="linha-org">' +
       '<div class="linha-org__corpo">' +
         '<span class="titulo-ui" style="display:block">' + UI.h(c.nome || 'Sem nome') + '</span>' +
@@ -317,6 +318,151 @@
             document.getElementById('msg-apagar-acesso').textContent = e && e.codigo === 'sem-rede'
               ? 'Sem ligação. Tente de novo quando houver rede.'
               : 'Não foi possível apagar agora.';
+          });
+        });
+      }
+    }
+  };
+
+  /* ---------------------------------------------------------
+     Equipa — quem pode entrar na área da organização
+     A equipa é uma lista de emails. Quem está nela cria o seu
+     acesso na porta da organização, no fim da entrada; quem não
+     está não passa. Retirar um email apaga o acesso que houver
+     com ele, e a sessão desse telemóvel acaba na próxima ligação.
+     --------------------------------------------------------- */
+
+  let equipa = null;
+  let contasEquipa = [];
+  let falhaEquipa = '';
+
+  function carregarEquipa() {
+    falhaEquipa = '';
+    Estado.sessaoValida().then(function (s) {
+      return Promise.all([Nuvem.equipa(s), Nuvem.contas(s)]);
+    }).then(function (r) {
+      equipa = r[0].sort(function (a, b) { return a.criado - b.criado; });
+      contasEquipa = r[1];
+      App.repintar();
+    }).catch(function (e) {
+      falhaEquipa = e && e.codigo === 'sem-rede'
+        ? 'Sem ligação. A equipa vem do servidor.'
+        : 'Não foi possível ler a equipa agora.';
+      App.repintar();
+    });
+  }
+
+  function linhaEquipa(m) {
+    const conta = contasEquipa.find(function (c) { return c.email === m.email; });
+    const propria = m.email === Estado.get().perfil.email;
+    return '<div class="linha-org">' +
+      '<div class="linha-org__corpo">' +
+        '<span class="titulo-ui" style="display:block">' + UI.h(conta && conta.nome ? conta.nome : m.email) + '</span>' +
+        (conta && conta.nome ? '<span class="meta" style="display:block;margin-top:2px">' + UI.h(m.email) + '</span>' : '') +
+        '<span class="meta" style="display:block;margin-top:2px">' +
+          (conta ? 'Acesso criado' : 'Ainda sem acesso') + (propria ? ' · este telemóvel' : '') + '</span>' +
+      '</div>' +
+      (propria ? '' :
+        '<button class="botao-icone" type="button" data-acao="retirar" data-valor="' + UI.h(m.email) + '" ' +
+          'aria-label="Retirar ' + UI.h(m.email) + ' da equipa">' + Icone('apagar', 20) + '</button>') +
+    '</div>';
+  }
+
+  function portaDaOrganizacao() {
+    return location.origin + location.pathname + '#/organizacao';
+  }
+
+  Vistas.orgEquipa = {
+    area: 'organizacao',
+    nav: 'org-pessoas',
+    cabecalho: { voltar: '#/org/participantes', titulo: 'Equipa', tituloSempre: true },
+    desmontar: function () { equipa = null; contasEquipa = []; falhaEquipa = ''; },
+    html: function () {
+      let lista;
+      if (falhaEquipa && !equipa) {
+        lista = '<div class="vazio">' +
+            '<p class="corpo-editorial">' + UI.h(falhaEquipa) + '</p>' +
+            '<button class="botao botao--secundario" style="margin-top:16px" type="button" data-acao="recarregar">Tentar de novo</button>' +
+          '</div>';
+      } else if (!equipa) {
+        lista = '<p class="meta">A ler a equipa.</p>';
+      } else {
+        lista = equipa.map(linhaEquipa).join('');
+      }
+
+      return '<div class="faixa" style="padding-top:24px">' +
+          '<div class="seccao-cabecalho"><h2 class="etiqueta">Equipa</h2>' +
+            (equipa ? '<span class="meta num">' + equipa.length + '</span>' : '') + '</div>' +
+          lista +
+        '</div>' +
+
+        '<div class="faixa">' +
+          '<h2 class="etiqueta">Acrescentar à equipa</h2>' +
+          '<p class="corpo-ui silencioso" style="margin-top:8px">Com o email acrescentado, a pessoa cria o seu acesso na porta da organização, no fim da entrada.</p>' +
+          '<form id="form-equipa" class="pilha-2" style="margin-top:16px" novalidate>' +
+            '<label class="campo">' +
+              '<span class="campo__rotulo">Email</span>' +
+              '<input class="campo__entrada" name="email" type="email" inputmode="email" autocapitalize="off" spellcheck="false" placeholder="nome@exemplo.pt">' +
+            '</label>' +
+            '<button class="botao botao--secundario botao--largo" type="submit">' + Icone('juntar', 20) + 'Acrescentar</button>' +
+            '<p class="meta" id="msg-equipa" role="alert"></p>' +
+          '</form>' +
+        '</div>' +
+
+        '<div class="faixa">' +
+          '<h2 class="etiqueta">A porta da organização</h2>' +
+          '<p class="corpo-ui num" style="margin-top:12px;overflow-wrap:anywhere">' + UI.h(portaDaOrganizacao()) + '</p>' +
+          '<p class="meta" style="margin-top:12px">É também o botão «Organização», no fim da entrada dos convidados.' +
+            (Nuvem.simulada() ? ' Sem servidor ligado, a equipa vive em cada telemóvel: noutro, a primeira pessoa entra com o código.' : '') +
+          '</p>' +
+        '</div>';
+    },
+    montar: function (el, p, chegada) {
+      if (chegada) carregarEquipa();
+      const f = el.querySelector('#form-equipa');
+      f.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const campo = f.querySelector('[name="email"]');
+        const msg = f.querySelector('#msg-equipa');
+        const email = campo.value.trim().toLowerCase();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { msg.textContent = 'Este email parece incompleto.'; return; }
+        if ((equipa || []).some(function (m) { return m.email === email; })) { msg.textContent = 'Este email já está na equipa.'; return; }
+        msg.textContent = 'A acrescentar.';
+        Estado.sessaoValida().then(function (s) {
+          return Nuvem.juntarEquipa(s, email);
+        }).then(function () {
+          carregarEquipa();
+        }).catch(function (e) {
+          msg.textContent = e && e.codigo === 'sem-rede'
+            ? 'Sem ligação. Tente de novo quando houver rede.'
+            : 'Não foi possível acrescentar agora.';
+        });
+      });
+    },
+    acoes: {
+      recarregar: function () { falhaEquipa = ''; App.repintar(); carregarEquipa(); },
+
+      retirar: function (email) {
+        const conta = contasEquipa.find(function (c) { return c.email === email; });
+        UI.abrirFolha('Retirar da equipa',
+          '<p class="corpo-ui silencioso">' + UI.h(conta && conta.nome ? conta.nome : email) + ' deixa de entrar na área da organização.' +
+            (conta ? ' O acesso é apagado, e a sessão no telemóvel dessa pessoa acaba na próxima ligação.' : '') + '</p>' +
+          '<button class="botao botao--rosso botao--largo" style="margin-top:24px" type="button" id="btn-retirar">Retirar</button>' +
+          '<p class="meta" style="margin-top:16px" id="msg-retirar" role="alert"></p>');
+
+        const botao = document.getElementById('btn-retirar');
+        botao.addEventListener('click', function () {
+          botao.disabled = true;
+          Estado.sessaoValida().then(function (s) {
+            return Nuvem.retirarEquipa(s, email);
+          }).then(function () {
+            UI.fecharFolha();
+            carregarEquipa();
+          }).catch(function (e) {
+            botao.disabled = false;
+            document.getElementById('msg-retirar').textContent = e && e.codigo === 'sem-rede'
+              ? 'Sem ligação. Tente de novo quando houver rede.'
+              : 'Não foi possível retirar agora.';
           });
         });
       }

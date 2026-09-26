@@ -101,7 +101,18 @@
       '<div class="faixa" style="margin-top:32px">' +
         '<a class="botao botao--texto" href="' + UI.linkLocal(p.id) + '" target="_blank" rel="noopener">' +
           Icone('externo', 20) + 'Abrir no Google Maps</a>' +
-      '</div>';
+      '</div>' +
+
+      (x.editar || editar('#/org/paragem/' + p.id, 'Editar esta paragem'));
+  }
+
+  /* Para a organização, a caminho de uma alteração de última hora:
+     do que o convidado vê direto ao sítio onde se muda. */
+  function editar(href, rotulo, icone) {
+    if (!Estado.ehOrganizacao()) return '';
+    return '<div class="faixa">' +
+      '<a class="botao botao--texto" href="' + href + '">' + Icone(icone || 'pin', 20) + rotulo + '</a>' +
+    '</div>';
   }
 
   Vistas.poi = {
@@ -144,7 +155,9 @@
           momento: '<div class="faixa"><div class="cartao">' +
             Programa.corpoMomento(x.dia, x.m, x.i, undefined, 'h2') +
           '</div></div>',
-          seguinte: Programa.seguinteHtml(x.dia, x.i)
+          seguinte: Programa.seguinteHtml(x.dia, x.i),
+          editar: editar('#/org/etapa/' + x.dia.id + '/' + x.i, 'Editar a hora e o local', 'relogio') +
+            editar('#/org/paragem/' + x.m.poi, 'Editar esta paragem')
         });
       }
 
@@ -164,7 +177,8 @@
           '</div>' +
         '</div>' +
         (detalhe ? '<div class="faixa" style="margin-top:24px">' + detalhe + '</div>' : '') +
-        '<div style="margin-top:24px">' + Programa.seguinteHtml(x.dia, x.i) + '</div>';
+        '<div style="margin-top:24px">' + Programa.seguinteHtml(x.dia, x.i) + '</div>' +
+        editar('#/org/etapa/' + x.dia.id + '/' + x.i, 'Editar a hora e o local', 'relogio');
     }
   };
 })();

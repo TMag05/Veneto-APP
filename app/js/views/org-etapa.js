@@ -145,11 +145,19 @@
         '</div>' +
 
         '<div class="faixa">' +
-          '<button class="botao botao--secundario botao--largo" type="button" data-acao="remover">Remover etapa</button>' +
+          OrgComum.editado(d) +
+          '<button class="botao botao--secundario botao--largo" style="margin-top:16px" type="button" data-acao="remover">Remover etapa</button>' +
         '</div>';
     },
 
-    montar: function (el, p) {
+    montar: function (el, p, chegada) {
+      /* Vindo de «Editar» num momento da app do convidado, abre-se
+         já no cartão desse momento. */
+      if (chegada && p.momento !== undefined) {
+        const alvo = el.querySelector('[data-momento="' + parseInt(p.momento, 10) + '"]');
+        if (alvo) alvo.scrollIntoView({ block: 'start' });
+      }
+
       const ent = el.querySelector('#ent-foto-etapa');
       if (ent) {
         ent.addEventListener('change', function () {
@@ -364,7 +372,8 @@
         '</div>' +
 
         '<div class="faixa">' +
-          '<p class="meta">' + (usadaEm.length
+          OrgComum.editado(poi) +
+          '<p class="meta"' + (poi.editado ? ' style="margin-top:8px"' : '') + '>' + (usadaEm.length
             ? 'Usada em: ' + usadaEm.map(function (d) { return UI.h(d.titulo || 'etapa ' + d.numero); }).join(', ')
             : 'Ainda não está em nenhuma etapa.') + '</p>' +
           '<button class="botao botao--secundario botao--largo" style="margin-top:24px" type="button" data-acao="remover">Remover paragem</button>' +
