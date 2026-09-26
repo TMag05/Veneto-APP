@@ -76,7 +76,7 @@
               : '') +
             UI.linhaLista({ titulo: 'Definições', nota: 'Organização e aspeto', icone: 'definicoes', href: '#/definicoes' }) +
           '</div>' +
-          '<p class="meta num" style="margin-top:24px">' + UI.h(DADOS.evento.nome || 'Passeio') + ' · versão de trabalho ' + versao() +
+          '<p class="meta num" style="margin-top:24px">' + UI.h(DADOS.evento.nome || 'Passeio') + ' · versão ' + versao() +
             (fase === 'pre' ? ' · pré-evento' : (fase === 'pos' ? ' · pós-evento' : '')) + '</p>' +
         '</div>';
     }
@@ -114,8 +114,7 @@
         '<div class="faixa" style="margin-top:48px">' +
           '<h2 class="etiqueta">Sobre</h2>' +
           '<p class="corpo-editorial" style="margin-top:12px">Aplicação do passeio Aston Martin' +
-            (DADOS.evento.nome ? ' — ' + UI.h(DADOS.evento.nome) : '') + '. ' +
-            'Identidade Pietra e Vigna, versão de trabalho.</p>' +
+            (DADOS.evento.nome ? ' — ' + UI.h(DADOS.evento.nome) : '') + '.</p>' +
           '<p class="meta" style="margin-top:12px">Funciona sem rede. O programa do dia fica no telemóvel desde manhã.</p>' +
         '</div>';
     },

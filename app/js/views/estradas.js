@@ -266,7 +266,7 @@
       return capa +
         '<div class="faixa" style="margin-top:24px">' +
           '<p class="corpo-editorial silencioso">O desenho do que se conduz, dia a dia. ' +
-            'Os traçados são a geometria real das estradas.</p>' +
+            'Cada traço segue a estrada real.</p>' +
         '</div>' +
         DADOS.dias.map(seccaoDia).join('') +
         '<div class="faixa" style="margin-top:32px">' +
@@ -338,8 +338,7 @@
 
         (ESTRADAS.desenhavel(e)
           ? ''
-          : '<div class="faixa"><p class="meta">O traçado desta estrada ainda não está confirmado. ' +
-            'Até estar, não se desenha — um traço aproximado seria pior do que nenhum.</p></div>');
+          : '<div class="faixa"><p class="meta">O traçado desta estrada ainda não está confirmado.</p></div>');
     }
   };
 

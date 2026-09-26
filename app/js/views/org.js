@@ -238,10 +238,10 @@
 
         '<div class="faixa">' +
           '<div class="seccao-cabecalho"><h2 class="etiqueta">Cópia de segurança</h2></div>' +
-          '<p class="corpo-ui silencioso">Enquanto não há servidor, o conteúdo vive neste telemóvel. Descarregue o ficheiro depois de trabalhar.</p>' +
+          '<p class="corpo-ui silencioso">Por agora, tudo o que se edita aqui vive neste telemóvel. Descarregue o ficheiro depois de trabalhar.</p>' +
           '<div class="lista" style="margin-top:16px">' +
             UI.linhaLista({ titulo: 'Descarregar cópia', nota: 'Ficheiro JSON com tudo', icone: 'descarregar', acao: 'exportar' }) +
-            UI.linhaLista({ titulo: 'Restaurar de um ficheiro', nota: 'Substitui o conteúdo atual', icone: 'sincronizar', acao: 'importar' }) +
+            UI.linhaLista({ titulo: 'Restaurar de um ficheiro', nota: 'Substitui o que está neste telemóvel', icone: 'sincronizar', acao: 'importar' }) +
             UI.linhaLista({ titulo: 'Lista de participantes', nota: 'Ficheiro CSV para Excel', icone: 'documento', acao: 'csv' }) +
             UI.linhaLista({ titulo: 'Carregar passeio de exemplo', nota: 'O passeio de origem, com pessoas de exemplo', icone: 'juntar', acao: 'exemplo' }) +
             UI.linhaLista({ titulo: 'Repor tudo', nota: 'Volta ao passeio de origem e apaga o estado local', icone: 'fechar', acao: 'repor' }) +
@@ -250,7 +250,7 @@
 
         '<div class="faixa">' +
           '<div class="lista">' +
-            UI.linhaLista({ titulo: 'Ver como convidado', nota: 'A app que os clientes veem', icone: 'externo', acao: 'verConvidado' }) +
+            UI.linhaLista({ titulo: 'Ver como convidado', nota: 'A app que os convidados veem', icone: 'externo', acao: 'verConvidado' }) +
             UI.linhaLista({ titulo: 'Sair da organização', nota: 'Volta ao modo convidado', icone: 'fechar', acao: 'sair' }) +
           '</div>' +
           '<p class="meta" style="margin-top:24px">O acesso a esta área é por código. Na versão com servidor passa a ser por conta, com registo de quem alterou o quê.</p>' +
@@ -335,7 +335,7 @@
       },
       importar: function () {
         UI.abrirFolha('Restaurar de um ficheiro',
-          '<p class="corpo-ui silencioso">Substitui todo o conteúdo atual pelo do ficheiro.</p>' +
+          '<p class="corpo-ui silencioso">Substitui tudo o que está neste telemóvel pelo que vem no ficheiro.</p>' +
           '<input type="file" id="ent-json" accept="application/json,.json" style="margin-top:24px">' +
           '<p class="meta" id="msg-json" style="margin-top:16px"></p>');
         document.getElementById('ent-json').addEventListener('change', function (ev) {

@@ -170,7 +170,7 @@
      --------------------------------------------------------- */
 
   /* A imagem de um momento: a sua própria, a do sítio onde acontece.
-     Sem sítio — o autocarro para o jantar, um troço de estrada — é a
+     Sem sítio — o transfer para o jantar, um troço de estrada — é a
      do sítio de onde o grupo vem; na estrada, a do sítio para onde
      vai, a não ser que seja o regresso ao hotel. Por fim, a do dia. */
   function imagemDoMomento(dia, i) {
@@ -279,7 +279,7 @@
       '<div class="selado">' +
         '<div class="selado__icone">' + Icone('roadbook', 24) + '</div>' +
         '<p class="corpo-editorial">' + UI.h(titulo || 'O programa ainda não está publicado.') + '</p>' +
-        '<p class="meta" style="margin-top:12px">Recebe uma notificação assim que estiver.</p>' +
+        '<p class="meta" style="margin-top:12px">Aparece aqui assim que estiver.</p>' +
       '</div>' +
     '</div>';
   }

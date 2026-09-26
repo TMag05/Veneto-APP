@@ -40,8 +40,8 @@ window.SEMENTE = (function () {
     ],
     notas: [
       'Todas as manhãs, antes de partir, há um briefing: as regras da estrada e o resumo do dia.',
-      'Pequeno-almoço, almoço e jantar estão incluídos todos os dias.',
-      'Um guia que fala inglês acompanha o grupo em todos os dias.'
+      'Todas as refeições estão asseguradas, do pequeno-almoço ao jantar.',
+      'Um guia de língua inglesa acompanha o grupo todos os dias.'
     ]
   };
 
@@ -129,7 +129,7 @@ window.SEMENTE = (function () {
     { nome: 'Chalet Piereni', local: 'Val Canali', tipo: 'restaurante', lat: 46.2029, lng: 11.8580,
       subtitulo: 'Almoço de frente para as Pale di San Martino.',
       historia: [
-        'É aqui que o passeio entra na Dolomita a sério. Do chalet, as Pale di San Martino ficam mesmo em frente.',
+        'É aqui que o passeio entra verdadeiramente nas Dolomitas. Do chalet, as Pale di San Martino ficam mesmo em frente.',
         'A Val Canali está dentro do Parco Naturale Paneveggio – Pale di San Martino e é um dos acessos a pé ao planalto das Pale. Desde 2009, estas montanhas são Património Mundial.',
         'A cozinha é a do Trentino. Já não estamos no Veneto.'
       ],
@@ -150,7 +150,7 @@ window.SEMENTE = (function () {
         'Veneza pôs a floresta do Cansiglio sob proteção em 1420. A partir de 1548 foi o Bosco da Reme: faias criadas durante mais de um século para dar remos ao Arsenale.',
         'Proibia-se ali o pastoreio, e marcos de pedra fechavam o perímetro. A floresta que remava a Serenissima ainda aqui está.'
       ],
-      nota: 'Buffet de pé, a caminho de Veneza.',
+      nota: 'Almoço volante, a caminho de Veneza.',
       imagem: { foto: 'assets/fotos/rifugio-vittorio-veneto.jpg' } },
 
     { nome: 'Canal Grande', local: 'Veneza', tipo: 'cidade', lat: 45.4380, lng: 12.3359,
@@ -209,7 +209,7 @@ window.SEMENTE = (function () {
         paragens: ['LO.VE.', 'Hotel Villa Soligo'],
         momentos: [
           { titulo: 'Chegada a Veneza', local: 'Marco Polo, ou Treviso para voos privados', tipo: 'logistica', paragem: 'Aeroporto Marco Polo',
-            nota: 'Um autocarro privado leva o grupo até à LO.VE., em Follina.' },
+            nota: 'Um transfer privado leva o grupo até à LO.VE., em Follina.' },
           { titulo: 'Levantamento dos carros', local: 'LO.VE., Follina', tipo: 'logistica', paragem: 'LO.VE.' },
           { titulo: 'Chegada ao hotel', local: 'Hotel Villa Soligo', tipo: 'paragem', paragem: 'Hotel Villa Soligo',
             nota: 'Aperitivo de boas-vindas e check-in.' },
@@ -234,10 +234,10 @@ window.SEMENTE = (function () {
           { hora: '16:45', titulo: 'Molinetto della Croda', local: 'Refrontolo', tipo: 'visita', paragem: 'Molinetto della Croda',
             nota: 'Fotografia do grupo e de cada carro, e um aperitivo.' },
           { hora: '18:00', titulo: 'Chegada ao hotel', local: 'Hotel Villa Soligo', tipo: 'paragem', paragem: 'Hotel Villa Soligo',
-            nota: 'O grupo chega em duas levas, até às 18:30, para facilitar o estacionamento. Aperitivo à chegada.' },
-          { hora: '20:15', titulo: 'Autocarro para o jantar', local: 'À porta do hotel', tipo: 'logistica' },
+            nota: 'Os carros chegam em dois momentos, até às 18:30, para facilitar o estacionamento. Aperitivo à chegada.' },
+          { hora: '20:15', titulo: 'Transfer para o jantar', local: 'À porta do hotel', tipo: 'logistica' },
           { hora: '20:30', titulo: 'Jantar', local: 'Ristorante Da Gigetto, Miane', tipo: 'refeicao', paragem: 'Ristorante Da Gigetto' },
-          { hora: '23:30', titulo: 'Regresso ao hotel', local: 'De autocarro', tipo: 'logistica', paragem: 'Hotel Villa Soligo' }
+          { hora: '23:30', titulo: 'Regresso ao hotel', local: 'Transfer privado', tipo: 'logistica', paragem: 'Hotel Villa Soligo' }
         ]
       },
       {
@@ -257,9 +257,9 @@ window.SEMENTE = (function () {
           { hora: '16:00', titulo: 'Paragem curta', local: 'A meio do caminho', tipo: 'paragem' },
           { hora: '18:00', titulo: 'Chegada ao hotel', local: 'Hotel Villa Soligo', tipo: 'paragem', paragem: 'Hotel Villa Soligo',
             nota: 'Aperitivo à chegada.' },
-          { hora: '20:00', titulo: 'Autocarro para o jantar', local: 'À porta do hotel', tipo: 'logistica' },
+          { hora: '20:00', titulo: 'Transfer para o jantar', local: 'À porta do hotel', tipo: 'logistica' },
           { hora: '20:15', titulo: 'Jantar', local: 'La Candola, Eremo di San Gallo', tipo: 'refeicao', paragem: 'La Candola' },
-          { hora: '23:00', titulo: 'Regresso ao hotel', local: 'De autocarro', tipo: 'logistica', paragem: 'Hotel Villa Soligo' }
+          { hora: '23:00', titulo: 'Regresso ao hotel', local: 'Transfer privado', tipo: 'logistica', paragem: 'Hotel Villa Soligo' }
         ]
       },
       {
@@ -276,11 +276,11 @@ window.SEMENTE = (function () {
           { hora: '10:45', fim: '11:30', titulo: 'La Casera', local: 'Nevegal', tipo: 'paragem', paragem: 'La Casera',
             nota: 'Pausa curta.' },
           { hora: '11:30', titulo: 'Pelo Cansiglio', local: 'Planalto do Cansiglio', tipo: 'estrada' },
-          { hora: '13:00', fim: '14:00', titulo: 'Almoço de pé', local: 'Rifugio Città di Vittorio Veneto, Monte Pizzoc', tipo: 'refeicao', paragem: 'Rifugio Città di Vittorio Veneto',
+          { hora: '13:00', fim: '14:00', titulo: 'Almoço volante', local: 'Rifugio Città di Vittorio Veneto, Monte Pizzoc', tipo: 'refeicao', paragem: 'Rifugio Città di Vittorio Veneto',
             nota: 'Buffet, com vista até Veneza.' },
           { hora: '14:00', titulo: 'Partida', local: 'Para Follina', tipo: 'estrada' },
           { hora: '15:30', titulo: 'Entrega dos carros', local: 'LO.VE., Follina', tipo: 'logistica', paragem: 'LO.VE.',
-            nota: 'Os carros ficam aqui. Segue-se para Veneza de autocarro privado.' },
+            nota: 'Os carros ficam aqui. Segue-se para Veneza em transfer privado.' },
           { hora: '17:30', fim: '18:30', titulo: 'Pelo Canal Grande', local: 'Embarque no Tronchetto', tipo: 'visita', paragem: 'Canal Grande' },
           { hora: '18:30', fim: '19:30', titulo: 'Piazza San Marco', local: 'Veneza', tipo: 'visita', paragem: 'Piazza San Marco',
             nota: 'Visita à cidade e aperitivo reservado no Caffè Florian.' },

@@ -292,9 +292,9 @@
     elRede.hidden = false;
     if (offline) {
       elRede.innerHTML = Icone('semrede', 20) + '<span>Sem ligação. ' +
-        (pend ? UI.plural(pend, 'ação guardada', 'ações guardadas') + ' para enviar depois' : 'O conteúdo do dia está no telemóvel') + '</span>';
+        (pend ? UI.plural(pend, 'pedido guardado', 'pedidos guardados') + ' para enviar depois' : 'O programa do dia está no telemóvel') + '</span>';
     } else {
-      elRede.innerHTML = Icone('sincronizar', 20) + '<span>A sincronizar ' + UI.plural(pend, 'item', 'itens') + '</span>';
+      elRede.innerHTML = Icone('sincronizar', 20) + '<span>A enviar ' + UI.plural(pend, 'pedido', 'pedidos') + '</span>';
     }
   }
 

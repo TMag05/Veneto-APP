@@ -100,7 +100,7 @@ window.ESTRADAS = (function () {
       paragem: '',
       estado: 'por confirmar',
       dados: {},
-      nota: 'Três horas e meia de estrada que a proposta ainda não nomeia.'
+      nota: 'Três horas e meia de estrada pelos vales, com o percurso ainda por confirmar.'
     },
 
     'cansiglio': {

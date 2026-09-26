@@ -13,8 +13,9 @@
     html: function () {
       const e = Estado.get();
       const carro = Estado.meuCarro();
-      const nome = e.perfil.nome || 'Bem-vindo';
-      const primeiro = nome.split(' ')[0];
+      /* Sem nome, a frase fica sem vocativo: um «Bem-vindo» genérico
+         erraria o género a metade dos convidados. */
+      const primeiro = String(e.perfil.nome || '').split(' ')[0];
 
       /* A primeira fotografia real do passeio, se existir. Se não,
          o poente — que é a hora em que a dolomia se acende. */
@@ -32,7 +33,7 @@
           UI.logo('logo--chegada chegada__passo', '--atraso:0.5s') +
 
           '<h1 class="capa-titulo chegada__titulo chegada__passo" style="--atraso:0.9s">' +
-            UI.h(primeiro) + ',<br>o passeio<br>espera por si.</h1>' +
+            (primeiro ? UI.h(primeiro) + ',<br>o passeio' : 'O passeio') + '<br>espera por si.</h1>' +
 
           '<p class="chegada__data chegada__passo" style="--atraso:1.1s">' + UI.intervaloEvento() +
             (DADOS.evento.base ? ' · ' + UI.h(DADOS.evento.base) : '') + '</p>' +

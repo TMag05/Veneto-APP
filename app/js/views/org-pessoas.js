@@ -200,7 +200,7 @@
           'aria-pressed="' + (c.id === x.cor ? 'true' : 'false') + '" style="background:' + c.hex + '" ' +
           'aria-label="' + UI.h(c.nome) + '"></button>';
       }).join('') + '</div>' +
-      '<p class="meta" style="margin-top:12px">É esta silhueta que representa o carro no mapa e nas fotografias.</p>' +
+      '<p class="meta" style="margin-top:12px">É esta silhueta que representa o carro nas fotografias e no álbum.</p>' +
     '</div>';
   }
 })();

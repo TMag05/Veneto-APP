@@ -63,6 +63,22 @@ Português europeu. Italiano só em nomes próprios — `Passo di San Boldo`, `P
 
 > Não: "Ups! Algo correu mal."  Sim: "Sem ligação. Guardámos para enviar depois."
 
+**O registo é o de um evento privado de luxo, lido por quem tem mais de 45 anos.** Nada de vocabulário de excursão, de pacote turístico ou de balcão de aluguer. Revisto a 26.09.2026, depois de a organização assinalar «autocarro»:
+
+| Usar | Não usar | Porquê |
+|---|---|---|
+| transfer, transfer privado | autocarro | É o termo da hotelaria; «autocarro» é o da excursão |
+| almoço volante | almoço de pé, buffet de pé | O termo de eventos para uma refeição servida de pé |
+| as refeições estão asseguradas | estão incluídas | «Incluído» é a linguagem do pacote turístico |
+| convidado | cliente, utilizador | O convidado é-o do passeio, não de uma venda |
+| os carros chegam em dois momentos | em duas levas | «Levas» é de multidão |
+| programa, itinerário | conteúdo | Palavra de quem faz o produto |
+| pedido guardado, a enviar | item, sincronizar | Jargão técnico à vista do convidado |
+
+Sem género presumido: um vocativo genérico como «Bem-vindo» erra metade dos convidados — ou se usa o nome, ou a frase não leva vocativo. Nenhuma promessa que a app não cumpra: não se escreve «recebe uma notificação» enquanto não houver notificações.
+
+**O texto que já está nos telemóveis não muda sozinho.** O itinerário é dado, guardado à primeira abertura. Uma revisão de linguagem à semente entra também na tabela `REVISOES` de `conteudo.js`, que troca só o texto que ainda é, palavra por palavra, o antigo.
+
 ---
 
 ## 6. Arquitetura e regras de código

@@ -17,6 +17,37 @@ window.Conteudo = (function () {
   const VERSAO_DADOS = 2;
   const ouvintes = [];
 
+  /* Revisões de linguagem da semente. O itinerário guardado num
+     telemóvel é dado, não código: mudar a semente não o alcança, e
+     subir VERSAO_DADOS apagaria os participantes e o que a organização
+     já editou. Por isso troca-se só o texto que ainda é, palavra por
+     palavra, o da semente antiga — o resto fica como está.
+     26.09.2026: «autocarro» deu lugar a «transfer», com outros termos
+     que não eram do registo deste passeio.
+
+     Tem de ficar acima de «let dados = carregar()»: carregar() corre
+     aqui, no topo, e um const lido antes da declaração lança — o erro
+     é apanhado em silêncio e a app recomeça da semente, sem o que
+     estava guardado. */
+  const REVISOES = {
+    'Um autocarro privado leva o grupo até à LO.VE., em Follina.':
+      'Um transfer privado leva o grupo até à LO.VE., em Follina.',
+    'Autocarro para o jantar': 'Transfer para o jantar',
+    'De autocarro': 'Transfer privado',
+    'Os carros ficam aqui. Segue-se para Veneza de autocarro privado.':
+      'Os carros ficam aqui. Segue-se para Veneza em transfer privado.',
+    'O grupo chega em duas levas, até às 18:30, para facilitar o estacionamento. Aperitivo à chegada.':
+      'Os carros chegam em dois momentos, até às 18:30, para facilitar o estacionamento. Aperitivo à chegada.',
+    'Almoço de pé': 'Almoço volante',
+    'Buffet de pé, a caminho de Veneza.': 'Almoço volante, a caminho de Veneza.',
+    'Pequeno-almoço, almoço e jantar estão incluídos todos os dias.':
+      'Todas as refeições estão asseguradas, do pequeno-almoço ao jantar.',
+    'Um guia que fala inglês acompanha o grupo em todos os dias.':
+      'Um guia de língua inglesa acompanha o grupo todos os dias.',
+    'É aqui que o passeio entra na Dolomita a sério. Do chalet, as Pale di San Martino ficam mesmo em frente.':
+      'É aqui que o passeio entra verdadeiramente nas Dolomitas. Do chalet, as Pale di San Martino ficam mesmo em frente.'
+  };
+
   let dados = carregar();
   projetar();
 
@@ -88,10 +119,36 @@ window.Conteudo = (function () {
     return d;
   }
 
+  /* Percorre o que está guardado e troca as frases antigas. Devolve
+     quantas trocou, para se saber se vale a pena gravar. */
+  function rever(o) {
+    let trocas = 0;
+    (function andar(v) {
+      if (Array.isArray(v)) {
+        v.forEach(function (x, i) {
+          if (typeof x === 'string' && REVISOES[x]) { v[i] = REVISOES[x]; trocas++; }
+          else andar(x);
+        });
+      } else if (v && typeof v === 'object') {
+        Object.keys(v).forEach(function (k) {
+          const x = v[k];
+          if (typeof x === 'string' && REVISOES[x]) { v[k] = REVISOES[x]; trocas++; }
+          else andar(x);
+        });
+      }
+    })(o);
+    return trocas;
+  }
+
   function carregar() {
     try {
       const g = JSON.parse(localStorage.getItem(CHAVE));
-      if (g && g.versao === VERSAO_DADOS) return Object.assign(base(), g);
+      if (g && g.versao === VERSAO_DADOS) {
+        if (rever(g)) {
+          try { localStorage.setItem(CHAVE, JSON.stringify(g)); } catch (e) { /* quota */ }
+        }
+        return Object.assign(base(), g);
+      }
     } catch (e) { /* conteúdo corrompido: recomeça-se da semente */ }
     return base();
   }

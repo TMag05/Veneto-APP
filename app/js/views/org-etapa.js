@@ -274,7 +274,7 @@
           UI.campo({ rotulo: 'Fim', nome: 'fim', valor: m.fim, tipo: 'hora' }) +
         '</div>' +
         UI.campo({ rotulo: 'Título', nome: 'titulo', valor: m.titulo, placeholder: 'Almoço' }) +
-        UI.campo({ rotulo: 'Local', nome: 'local', valor: m.local, placeholder: 'Rifugio Averau' }) +
+        UI.campo({ rotulo: 'Local', nome: 'local', valor: m.local, placeholder: 'Rifugio Bassano' }) +
         UI.campo({ rotulo: 'Tipo', nome: 'tipo', valor: m.tipo, tipo: 'lista', opcoes: TIPOS_MOMENTO }) +
         UI.campo({ rotulo: 'Paragem', nome: 'poi', valor: m.poi, tipo: 'lista', opcoes: opcoesPoi }) +
         UI.campo({ rotulo: 'Nota', nome: 'nota', valor: m.nota, placeholder: 'Uma frase, no máximo' }) +
@@ -312,7 +312,7 @@
 
         '<div class="faixa faixa--recuada" style="margin-top:32px">' +
           '<h2 class="etiqueta">Coordenadas</h2>' +
-          '<p class="corpo-ui silencioso" style="margin-top:8px">Cole aqui o endereço do Google Maps ou as coordenadas. São elas que geram o mapa e a navegação.</p>' +
+          '<p class="corpo-ui silencioso" style="margin-top:8px">Cole aqui o endereço do Google Maps ou as coordenadas. São elas que desenham o percurso do dia e os links de recurso.</p>' +
           '<div style="margin-top:16px">' +
             UI.campo({ rotulo: 'Colar do Google Maps', nome: 'colar', valor: '',
               placeholder: 'https://maps.app.goo.gl/… ou 46.5194, 12.0086' }) +
@@ -328,11 +328,11 @@
           (poi.lat && poi.lng
             ? '<a class="botao botao--secundario botao--largo" style="margin-top:16px" href="' + UI.linkLocal(p.id) + '" target="_blank" rel="noopener">' +
                 Icone('externo', 20) + 'Confirmar no Google Maps</a>'
-            : '<p class="meta" style="margin-top:16px">Sem coordenadas, esta paragem não aparece no mapa nem gera percurso.</p>') +
+            : '<p class="meta" style="margin-top:16px">Sem coordenadas, esta paragem não entra no desenho do dia nem no percurso.</p>') +
         '</div>' +
 
         '<div class="faixa" style="margin-top:32px">' +
-          '<div class="seccao-cabecalho"><h2 class="etiqueta">Conteúdo editorial</h2></div>' +
+          '<div class="seccao-cabecalho"><h2 class="etiqueta">Texto da paragem</h2></div>' +
           '<div class="pilha-2">' +
             UI.campo({ rotulo: 'Subtítulo', nome: 'subtitulo', valor: poi.subtitulo,
               placeholder: 'Uma frase. Aparece em itálico por baixo do nome' }) +

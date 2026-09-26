@@ -62,14 +62,12 @@
             }).join('') +
           '</div>' +
           '<p class="meta" style="margin-top:16px">' +
-            (companheiros.length
-              ? 'No mapa mostra-se o carro. Na galeria mostra-se quem tirou a fotografia.'
-              : 'No mapa mostra-se o carro, não as pessoas.') + '</p>' +
+            'Nas fotografias do grupo, é o carro que identifica quem as tirou.' + '</p>' +
         '</div>' +
 
         '<div class="faixa">' +
           '<div class="cartao">' +
-            '<p class="etiqueta">Algo errado?</p>' +
+            '<p class="etiqueta">Algum dado incorreto?</p>' +
             '<p class="corpo-ui" style="margin-top:8px">Modelo, cor e matrícula são registados pela organização. ' +
               'Peça a correção pelo concierge.</p>' +
             '<a class="botao botao--texto" href="#/concierge">Abrir o concierge &rsaquo;</a>' +

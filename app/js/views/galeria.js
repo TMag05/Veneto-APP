@@ -116,8 +116,8 @@
               if (!novoId) { if (motivo === 'limite') noLimite++; else falhou++; }
               if (--porFazer === 0) {
                 App.repintar();
-                if (noLimite) UI.abrirFolha('Chega por hoje',
-                  '<p class="corpo-ui silencioso">São cem fotografias neste dia, o máximo. Amanhã recomeça.</p>');
+                if (noLimite) UI.abrirFolha('Cem fotografias neste dia',
+                  '<p class="corpo-ui silencioso">É o máximo por dia. Amanhã recomeça.</p>');
                 else if (falhou) UI.abrirFolha('Não foi possível guardar',
                   '<p class="corpo-ui silencioso">' + (falhou === 1 ? 'Uma fotografia não coube' : 'Algumas fotografias não couberam') +
                   ' no telemóvel. Liberte espaço e tente de novo.</p>');

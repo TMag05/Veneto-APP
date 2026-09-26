@@ -54,7 +54,7 @@
         }).join('') +
 
         '<div class="faixa">' +
-          '<p class="meta">Guardadas neste telemóvel em tamanho original. Sobem com o resto do conteúdo.</p>' +
+          '<p class="meta">Guardadas neste telemóvel em tamanho original. Sobem com o resto do itinerário.</p>' +
         '</div>' +
 
         '<input type="file" id="ent-foto-dia" accept="image/*" multiple style="display:none">';

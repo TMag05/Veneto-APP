@@ -158,7 +158,7 @@
         '<div style="margin:auto 0">' +
           '<h1 class="capa-titulo">Assistência</h1>' +
           '<p class="corpo-editorial" style="margin-top:12px;opacity:0.9">' +
-            'A equipa tem um carro-oficina em estrada durante todo o passeio.</p>' +
+            'A equipa tem um carro-oficina na estrada durante todo o passeio.</p>' +
 
           '<div class="pilha-2" style="margin-top:32px">' +
             (numero
