@@ -19,7 +19,7 @@ window.SEMENTE = (function () {
 
   const evento = {
     nome: 'Dolomites Grand Tour',
-    subtitulo: 'O passeio anual Aston Martin Portugal',
+    subtitulo: 'Há estradas que só se contam a quem lá esteve.',
     ano: 2026,
     inicio: '2026-10-01',
     fim: '2026-10-05',
