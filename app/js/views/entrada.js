@@ -59,9 +59,20 @@ function fabrica(org) {
 
   function html() {
     preparar();
-    return '<div class="entrada material-escuro">' +
+    const claro = Estado.get().tema === 'claro';
+    return '<div class="entrada">' +
+      /* O tema escolhe-se já aqui: quem abre a app ao sol não tem de
+         entrar primeiro para a conseguir ler. O símbolo é o do tema
+         em uso, no traço dos punções da barra. */
+      '<button class="entrada__tema" type="button" data-acao="tema" ' +
+        'aria-label="' + (claro ? 'Tema claro. Mudar para o escuro' : 'Tema escuro. Mudar para o claro') + '">' +
+        PUNCOES.svg(claro ? 'sol' : 'lua', 26) + '</button>' +
       '<div>' +
-        UI.logo('logo--entrada') +
+        /* O logótipo é sempre claro sobre escuro: no tema claro,
+           assenta numa chapa escura, como uma capa. */
+        '<div class="entrada__chapa"><div class="entrada__chapa-fundo material-escuro">' +
+          UI.logo('logo--entrada') +
+        '</div></div>' +
         (DADOS.evento.subtitulo
           ? '<p class="subtitulo" style="margin-top:22px">' + UI.h(DADOS.evento.subtitulo) + '</p>' : '') +
         '<p class="meta num" style="margin-top:8px">' + UI.intervaloEvento() +
@@ -305,6 +316,9 @@ function fabrica(org) {
     html: html,
     montar: montar,
     acoes: {
+      tema: function () {
+        Estado.definir({ tema: Estado.get().tema === 'claro' ? 'escuro' : 'claro' });
+      },
       modo: function (valor) {
         modo = valor;
         mensagem = '';

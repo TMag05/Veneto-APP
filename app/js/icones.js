@@ -95,7 +95,18 @@ window.PUNCOES = (function () {
     // Três estratos de comprimentos diferentes: lê-se como menu e como
     // camadas de dolomia.
     mais:
-      '<path d="M11 15 H37 M5 24 H43 M14 33 H34"/>'
+      '<path d="M11 15 H37 M5 24 H43 M14 33 H34"/>',
+
+    // O tema, na entrada. Não são separadores: usam o traço dos
+    // punções para ficarem da mesma família que a barra.
+    // Sol: disco e oito raios curtos, afastados do disco.
+    sol:
+      '<circle cx="24" cy="24" r="8"/>' +
+      '<path d="M24 4 V9 M24 39 V44 M4 24 H9 M39 24 H44 M9.9 9.9 L13.4 13.4 M34.6 34.6 L38.1 38.1 M9.9 38.1 L13.4 34.6 M34.6 13.4 L38.1 9.9"/>',
+
+    // Lua: um crescente, aberto para cima e para a direita.
+    lua:
+      '<path d="M29.8 8 A17 17 0 1 0 40 29.8 A13 13 0 0 1 29.8 8 Z"/>'
   };
 
   // Devolve o SVG completo de um punção. Tamanho por omissão: 26.
