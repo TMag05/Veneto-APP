@@ -1409,7 +1409,7 @@ a { color: var(--verde); text-decoration: none; }
    --------------------------------------------------------- */
 
 .logo { display: block; width: 100%; height: auto; }
-.logo--entrada { max-width: 200px; margin: 0 auto; }
+.logo--entrada { max-width: 264px; margin: 0 auto; }
 .logo--chegada { max-width: 150px; margin-bottom: var(--esp-3); }
 .logo--album   { max-width: 168px; }
 
