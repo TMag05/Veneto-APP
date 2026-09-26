@@ -845,24 +845,16 @@ a { color: var(--verde); text-decoration: none; }
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
 }
-.estrada--capa .estrada__traco, .estrada--grande .estrada__traco { stroke-width: var(--traco-estrada-capa); }
+.estrada--grande .estrada__traco { stroke-width: var(--traco-estrada-capa); }
 
-/* A capa do separador é o traçado. O desenho ocupa o que sobra por
-   cima do título — não passa por baixo dele, que é o que obrigaria
-   a um véu e apagaria metade do traço. */
-.capa--estrada {
-  background: var(--estrada-chapa);
-  min-height: 340px;
-  justify-content: space-between;
-  gap: var(--esp-2);
-}
-.capa--estrada::after { display: none; }
-.capa--estrada .estrada {
-  flex: 1;
-  min-height: 0;
-  background: none;
-  border-radius: 0;
-  padding: 0;
+/* A capa das Etapas é uma ilustração, não uma fotografia: mostra-se
+   inteira, na proporção dela, e o véu só escurece o fundo, onde
+   assenta o título. */
+.capa--ilustracao { aspect-ratio: 1294 / 832; min-height: 0; }
+/* A ilustração é clara: o véu sobe mais e fecha mais, para o
+   subtítulo passar AA por cima dela. */
+.capa--ilustracao::after {
+  background: linear-gradient(to top, var(--veu-cheio), var(--veu-forte) 42%, var(--veu-leve) 70%, transparent);
 }
 
 /* Uma estrada na lista do dia: o traço à esquerda, o nome à direita. */
