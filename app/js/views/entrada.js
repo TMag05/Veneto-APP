@@ -50,10 +50,6 @@ Vistas.entrada = (function () {
     preparar();
     return '<div class="entrada">' +
       '<div>' +
-        '<p class="assinatura-am">Aston Martin</p>' +
-      '</div>' +
-
-      '<div>' +
         UI.logo('logo--entrada') +
         (DADOS.evento.subtitulo
           ? '<p class="subtitulo" style="margin-top:22px">' + UI.h(DADOS.evento.subtitulo) + '</p>' : '') +
