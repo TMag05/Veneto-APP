@@ -850,7 +850,7 @@ a { color: var(--verde); text-decoration: none; }
 /* A capa das Etapas é uma ilustração, não uma fotografia: mostra-se
    inteira, na proporção dela, e o véu só escurece o fundo, onde
    assenta o título. */
-.capa--ilustracao { aspect-ratio: 1294 / 832; min-height: 0; }
+.capa--ilustracao { aspect-ratio: 1294 / 714; min-height: 0; }
 /* A ilustração é clara: o véu sobe mais e fecha mais, para o
    subtítulo passar AA por cima dela. */
 .capa--ilustracao::after {
