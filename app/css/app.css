@@ -487,10 +487,11 @@ a { color: var(--verde); text-decoration: none; }
    --------------------------------------------------------- */
 
 /* A capa é um cartão de fotografia, inserido das margens e de cantos
-   redondos, com o título assente no fundo dela. */
+   redondos, com o título assente no fundo dela. Todas têm a mesma
+   altura, com ou sem subtítulo, para os separadores abrirem iguais. */
 .capa {
   position: relative;
-  min-height: 200px;
+  min-height: 216px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -847,10 +848,8 @@ a { color: var(--verde); text-decoration: none; }
 }
 .estrada--grande .estrada__traco { stroke-width: var(--traco-estrada-capa); }
 
-/* A capa das Etapas é uma ilustração, não uma fotografia: mostra-se
-   inteira, na proporção dela, e o véu só escurece o fundo, onde
-   assenta o título. */
-.capa--ilustracao { aspect-ratio: 1294 / 714; min-height: 0; }
+/* A capa das Etapas é uma ilustração, não uma fotografia. Tem a
+   altura das outras capas e a ilustração é cortada ao centro. */
 /* A ilustração é clara: o véu sobe mais e fecha mais, para o
    subtítulo passar AA por cima dela. */
 .capa--ilustracao::after {

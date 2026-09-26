@@ -451,7 +451,9 @@
 
   Vistas.hoje = {
     nav: 'hoje',
-    semCabecalho: comDia,
+    /* Antes e depois do passeio o ecrã abre com uma capa, e a capa é o
+       cabeçalho; durante, só o dia sobre a paisagem dispensa a barra. */
+    semCabecalho: function () { return Estado.fase() !== 'durante' || comDia(); },
     cabecalho: function () {
       const dia = Estado.fase() === 'durante' ? Estado.diaAtivo() : null;
       return {

@@ -413,19 +413,39 @@
      não mentirem quando a organização o mudar. */
   const EXTENSO = ['', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete'];
 
-  function resumoDoPasseio() {
-    const aoVolante = DADOS.dias.filter(function (d) { return d.distancia > 0; });
-    const km = aoVolante.reduce(function (t, d) { return t + d.distancia; }, 0);
+  function aoVolante() {
+    return DADOS.dias.filter(function (d) { return d.distancia > 0; });
+  }
+
+  function pontoMaisAlto() {
     let alto = null;
-    aoVolante.forEach(function (d) {
+    aoVolante().forEach(function (d) {
       const P = PERCURSOS.para(d);
       (P ? P.picos : []).forEach(function (p) { if (!alto || p.altitude > alto.altitude) alto = p; });
     });
-    if (!aoVolante.length) return 'O percurso de cada dia, pela estrada real.';
-    const n = aoVolante.length;
+    return alto;
+  }
+
+  function doAlto(alto) {
+    return alto.altitude + '\u00A0m ' + (/^Cima\b/.test(alto.nome) ? 'da ' : 'do ') + alto.nome;
+  }
+
+  /* O subtítulo da capa: uma linha, como a dos outros separadores. */
+  function subtituloDaCapa() {
+    const alto = pontoMaisAlto();
+    if (alto) return 'Até aos ' + doAlto(alto) + '.';
+    return 'A estrada de cada dia, vista de cima.';
+  }
+
+  function resumoDoPasseio() {
+    const dias0 = aoVolante();
+    const km = dias0.reduce(function (t, d) { return t + d.distancia; }, 0);
+    const alto = pontoMaisAlto();
+    if (!dias0.length) return 'O percurso de cada dia, pela estrada real.';
+    const n = dias0.length;
     const dias = (EXTENSO[n] || n) + (n === 1 ? ' dia' : ' dias');
     return km + '\u00A0km em ' + dias + ' ao volante' +
-      (alto ? ', até aos ' + alto.altitude + '\u00A0m ' + (/^Cima\b/.test(alto.nome) ? 'da ' : 'do ') + alto.nome : '') + '. ' +
+      (alto ? ', até aos ' + doAlto(alto) : '') + '. ' +
       'Cada dia tem a estrada vista de cima e, por baixo, as subidas e as altitudes.';
   }
 
@@ -442,6 +462,7 @@
           UI.foto({ foto: 'assets/fotos/san-boldo-ilustracao.jpg' }, 'capa__imagem') +
           '<div class="capa__texto">' +
             '<h1 class="capa-titulo">Etapas</h1>' +
+            '<p class="subtitulo" style="margin-top:8px">' + UI.h(subtituloDaCapa()) + '</p>' +
           '</div>' +
         '</div>';
 
