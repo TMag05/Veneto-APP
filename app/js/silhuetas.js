@@ -9,6 +9,10 @@ window.Silhuetas = (function () {
   const CONTORNO = 'rgba(30,27,24,0.22)';
   const PNEU = '#26241F';
   const JANTE = '#B9B3A3';
+  const CUBO = '#3A3833';
+  const CAVA = '#141311';
+  const VIDRO = 'rgba(20,18,16,0.62)';
+  const SOMBRA = 'rgba(20,18,16,0.4)';
 
   /* Cada forma: corpo (perfil), vidro (greenhouse) e eixos das rodas. */
   const FORMAS = {
@@ -21,14 +25,30 @@ window.Silhuetas = (function () {
       vidro: 'M 182 54 C 198 42 216 35 240 34 C 262 33 282 39 296 50 Z',
       rodas: [[104, 105, 27], [306, 105, 27]]
     },
+    /* Traçado sobre a fotografia de perfil do Vantage de 2024:
+       carroçaria, vidros, espelho, faróis, soleira e linhas de porta. */
     sport: {
       nome: 'Desportivo',
-      corpo: 'M 14 108 C 10 98 15 90 27 86 C 50 78 72 72 92 68 C 122 58 148 53 170 51 ' +
-             'C 186 37 208 29 236 29 C 262 29 282 36 296 48 C 314 63 332 71 352 77 ' +
-             'C 374 83 388 90 389 103 L 387 112 L 335 112 A 33 33 0 0 0 269 112 ' +
-             'L 133 112 A 33 33 0 0 0 67 112 L 18 112 Z',
-      vidro: 'M 186 49 C 200 39 218 34 238 34 C 258 34 276 40 288 51 Z',
-      rodas: [[100, 105, 28], [302, 105, 28]]
+      corpo: 'M 13.1 53.8 C 23.7 51.1 37.4 49 54.5 46.6 C 81.9 40.8 109.3 32.6 136.7 28.2 ' +
+             'C 153.8 25.8 170.9 25.1 184.6 27.8 C 201.7 31.9 222.3 42.2 241.1 53.8 ' +
+             'C 256.5 55.2 273.6 55.2 287.3 56.6 C 314.7 59 348.9 63.4 366 69.6 ' +
+             'C 378 73.7 384.9 78.5 387.3 85.3 C 389 94.2 387.3 104.5 386.6 112 L 389.3 115.5 ' +
+             'C 388.6 118.2 385.9 119.2 382.5 119.6 L 342.8 120.3 A 35.6 35.6 0 1 0 279.8 120.3 ' +
+             'L 109.3 117.5 A 35.3 35.3 0 1 0 42.2 117.5 L 23.7 117.5 ' +
+             'C 17.5 117.5 14.1 114.1 12.7 107.9 C 11.4 97.7 12.1 84 13.1 70.3 C 13.4 65.1 12.1 59.3 13.1 53.8 Z',
+      vidro: 'M 92.8 42.9 C 105.9 36.7 126.4 31.2 146.9 28.8 C 167.5 27.1 184.6 29.2 198.3 34 ' +
+             'C 212 39.5 229.1 47.7 242.1 55.2 C 222.3 55.2 191.4 53.8 157.2 52.5 C 133.2 51.1 109.3 47.7 92.8 42.9 Z',
+      espelho: 'M 201 50.4 C 201 45.6 207.2 43.6 213.4 44.3 C 218.1 45.3 219.5 50.4 217.1 53.8 ' +
+               'C 214.7 55.5 208.6 55.9 204.5 55.2 C 202.1 54.5 201 52.5 201 50.4 Z',
+      escuro: 'M 109.3 114.8 L 279.8 117.5 L 277 120.3 L 110.6 118.2 Z ' +
+              'M 348.2 118.2 L 383.2 116.8 L 389.3 115.5 L 386.6 120.3 L 349.6 121.6 Z ' +
+              'M 12.7 87.4 C 20.3 88.1 34 90.8 37.4 97.7 L 40.8 114.8 L 23.7 116.8 C 17.5 116.8 14.1 113.4 12.7 107.9 Z',
+      luzes: 'M 13.4 62.7 C 23.7 63.4 34 64.8 41.5 66.8 C 37.4 68.9 23.7 68.2 14.1 67.5 Z ' +
+             'M 337.3 64.5 C 348.9 66.8 362.6 73.7 374.3 81.2 C 371.5 82.6 366 80.5 359.2 77.1 C 348.9 72 342.1 68.2 337.3 64.5 Z',
+      linhas: 'M 126.4 53.8 C 123.7 70.3 126.4 90.8 140.8 108.6 M 242.1 55.9 C 247.6 70.3 249 90.8 249 109.3 ' +
+              'M 253.1 77.1 C 259.9 76.4 270.2 76.4 276.3 77.8 M 105.9 63.4 C 157.2 65.5 225.7 67.5 294.1 70.3',
+      cavas: 'M 279.8 120.3 A 35.6 35.6 0 1 1 342.8 120.3 Z M 42.2 117.5 A 35.3 35.3 0 1 1 109.3 117.5 Z',
+      rodas: [[75, 103.5, 32.5], [311.3, 103.5, 32.5]]
     },
     suv: {
       nome: 'SUV',
@@ -109,19 +129,41 @@ window.Silhuetas = (function () {
 
     let rodas = '';
     if (o.rodas !== false) {
-      rodas = f.rodas.map(function (r) {
-        return '<circle cx="' + r[0] + '" cy="' + r[1] + '" r="' + r[2] + '" fill="' + PNEU + '"/>' +
-               '<circle cx="' + r[0] + '" cy="' + r[1] + '" r="' + (r[2] * 0.46).toFixed(1) + '" fill="' + JANTE + '"/>';
-      }).join('');
+      rodas = (f.cavas ? '<path d="' + f.cavas + '" fill="' + CAVA + '"/>' : '') + f.rodas.map(roda).join('');
     }
 
+    /* Os pormenores só se desenham com rodas: sem elas, a silhueta é pequena de mais para os ler. */
+    const pormenor = o.rodas !== false;
     return '<svg class="silhueta" viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg" ' +
       'role="img" aria-label="' + escapar(titulo) + '">' +
       rodas +
       '<path d="' + f.corpo + '" fill="' + c.hex + '" stroke="' + CONTORNO +
       '" stroke-width="1" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>' +
-      '<path d="' + f.vidro + '" fill="rgba(30,27,24,0.16)"/>' +
+      (f.escuro ? '<path d="' + f.escuro + '" fill="' + SOMBRA + '"/>' : '') +
+      '<path d="' + f.vidro + '" fill="' + (f.espelho ? VIDRO : 'rgba(30,27,24,0.16)') + '"/>' +
+      (f.luzes ? '<path d="' + f.luzes + '" fill="' + SOMBRA + '"/>' : '') +
+      (pormenor && f.linhas ? '<path d="' + f.linhas + '" fill="none" stroke="' + SOMBRA +
+        '" stroke-width="0.75" vector-effect="non-scaling-stroke" stroke-linecap="round"/>' : '') +
+      (f.espelho ? '<path d="' + f.espelho + '" fill="' + c.hex + '" stroke="' + CONTORNO +
+        '" stroke-width="1" vector-effect="non-scaling-stroke"/>' : '') +
       '</svg>';
+  }
+
+  /* Pneu, jante de dez raios e cubo. */
+  function roda(r) {
+    const x = r[0], y = r[1], R = r[2];
+    const f = function (n) { return n.toFixed(1); };
+    let raios = '';
+    for (let k = 0; k < 10; k++) {
+      const a = k * Math.PI / 5;
+      raios += 'M ' + f(x + Math.cos(a) * R * 0.2) + ' ' + f(y + Math.sin(a) * R * 0.2) +
+               ' L ' + f(x + Math.cos(a) * R * 0.72) + ' ' + f(y + Math.sin(a) * R * 0.72) + ' ';
+    }
+    return '<circle cx="' + x + '" cy="' + y + '" r="' + R + '" fill="' + PNEU + '"/>' +
+      '<circle cx="' + x + '" cy="' + y + '" r="' + f(R * 0.74) + '" fill="' + CUBO + '" stroke="' + JANTE +
+      '" stroke-width="' + f(R * 0.05) + '"/>' +
+      '<path d="' + raios + '" stroke="' + JANTE + '" stroke-width="' + f(R * 0.07) + '" stroke-linecap="round"/>' +
+      '<circle cx="' + x + '" cy="' + y + '" r="' + f(R * 0.2) + '" fill="' + JANTE + '"/>';
   }
 
   function escapar(t) {
