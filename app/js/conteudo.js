@@ -30,6 +30,8 @@ window.Conteudo = (function () {
      é apanhado em silêncio e a app recomeça da semente, sem o que
      estava guardado. */
   const REVISOES = {
+    /* 26.09.2026: o subtítulo da entrada passa a dizer de quem é o passeio. */
+    'Da Grande Guerra à Laguna de Veneza': 'O passeio anual Aston Martin Portugal',
     'Um autocarro privado leva o grupo até à LO.VE., em Follina.':
       'Um transfer privado leva o grupo até à LO.VE., em Follina.',
     'Autocarro para o jantar': 'Transfer para o jantar',

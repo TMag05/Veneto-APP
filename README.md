@@ -161,7 +161,7 @@ Sete dos oito movimentos de [O Luxo é Atmosfera](PESQUISA-LUXO.html) estão imp
 
 **O conteúdo é dado, não é código.** Foi a alteração estrutural desta ronda. O itinerário não existia quando a app foi feita e passou a poder ser criado dentro dela, sem programador no meio.
 
-**A app não veste a marca Aston Martin, veste a região.** A presença da marca está em dois sítios: as silhuetas dos carros e o rodapé do álbum. A assinatura do ecrã de entrada saiu a 26.09.2026.
+**A app não veste a marca Aston Martin, veste a região.** A presença da marca está em três sítios: o subtítulo da entrada (*O passeio anual Aston Martin Portugal*), as silhuetas dos carros e o rodapé do álbum. A assinatura em maiúsculas da entrada saiu a 26.09.2026.
 
 **Uma cor de acento por ecrã.** O acento da app é agora um cobre (`--ottone`, #D9915F) — o latão anterior era frio demais ao lado da fotografia da montanha. É ele que marca o separador aberto, as setas das listas e o botão principal. O álbum mantém o momento `Radicchio`, o percurso e os traçados das estradas são `Verde`, e o SOS é o único ecrã inteiramente vermelho.
 

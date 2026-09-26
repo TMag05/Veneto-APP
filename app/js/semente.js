@@ -19,7 +19,7 @@ window.SEMENTE = (function () {
 
   const evento = {
     nome: 'Dolomites Grand Tour',
-    subtitulo: 'Da Grande Guerra à Laguna de Veneza',
+    subtitulo: 'O passeio anual Aston Martin Portugal',
     ano: 2026,
     inicio: '2026-10-01',
     fim: '2026-10-05',
