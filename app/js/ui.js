@@ -279,11 +279,12 @@ window.UI = (function () {
      --------------------------------------------------------- */
 
   function escolhaCarro(modelo, cor) {
+    const vista = cor || 'magnetic';
     return '<h3 class="etiqueta">Modelo</h3>' +
       '<div class="silhueta-grelha" style="margin-top:12px">' + Silhuetas.MODELOS.map(function (m) {
         return '<button class="silhueta-opcao" type="button" data-acao="modelo" data-valor="' + m.id + '" ' +
           'aria-pressed="' + (m.id === modelo ? 'true' : 'false') + '">' +
-          Silhuetas.svg(m.id, cor) +
+          Silhuetas.svg(m.id, vista) +
           '<span class="silhueta-opcao__nome">' + h(m.nome) + '</span></button>';
       }).join('') + '</div>' +
 
