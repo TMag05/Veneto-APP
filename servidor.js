@@ -9,7 +9,7 @@ const fs = require('fs');
 const path = require('path');
 
 const RAIZ = path.join(__dirname, 'app');
-const PORTA = parseInt(process.argv[2], 10) || 8123;
+const PORTA = parseInt(process.argv[2], 10) || parseInt(process.env.PORT, 10) || 8123;
 
 const TIPOS = {
   '.html': 'text/html; charset=utf-8',
