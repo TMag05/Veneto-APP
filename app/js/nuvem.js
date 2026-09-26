@@ -21,8 +21,9 @@ window.Nuvem = (function () {
      --------------------------------------------------------- */
 
   const CONFIG = {
-    apiKey: '',
-    projectId: ''
+    apiKey: 'AIzaSyAA1KNq9kYIKgGJySsbk7jWRed_I8_xEZs',
+    projectId: 'dolomitesgt',
+    storageBucket: 'dolomitesgt.firebasestorage.app'
   };
 
   function simulada() { return !CONFIG.apiKey || !CONFIG.projectId; }
@@ -551,8 +552,163 @@ window.Nuvem = (function () {
        Resolve com uma lista de metadados.
      --------------------------------------------------------- */
 
-  function porLigar() {
-    return Promise.reject(new Error('sem servidor'));
+  /* ---------------------------------------------------------
+     Fotografias
+     --------------------------------------------------------- */
+
+  function valorFirestore(v) {
+    if (typeof v === 'string') return { stringValue: v };
+    if (typeof v === 'number') return Number.isInteger(v) ? { integerValue: String(v) } : { doubleValue: v };
+    if (typeof v === 'boolean') return { booleanValue: v };
+    if (v === null || v === undefined) return { nullValue: null };
+    return { stringValue: String(v) };
+  }
+
+  function paraDocFoto(f) {
+    const fields = {};
+    Object.keys(f).forEach(function (k) {
+      if (f[k] !== undefined) fields[k] = valorFirestore(f[k]);
+    });
+    return { fields: fields };
+  }
+
+  function deDocFoto(doc) {
+    const f = doc.fields || {};
+    const res = { id: doc.name.split('/').pop() };
+    Object.keys(f).forEach(function (k) {
+      const val = f[k];
+      if (val.stringValue !== undefined) res[k] = val.stringValue;
+      else if (val.integerValue !== undefined) res[k] = Number(val.integerValue);
+      else if (val.doubleValue !== undefined) res[k] = val.doubleValue;
+      else if (val.booleanValue !== undefined) res[k] = val.booleanValue;
+    });
+    return res;
+  }
+
+  function obterSessao() {
+    if (window.Estado && window.Estado.sessaoValida) {
+      return window.Estado.sessaoValida();
+    }
+    const s = window.Estado && window.Estado.get ? window.Estado.get().sessao : null;
+    if (s) return Promise.resolve(s);
+    return Promise.reject(erro('sem-sessao'));
+  }
+
+  function storageUrl(caminho) {
+    return 'https://firebasestorage.googleapis.com/v0/b/' + CONFIG.storageBucket +
+      '/o?uploadType=media&name=' + encodeURIComponent(caminho);
+  }
+
+  function subirObjeto(caminho, blob, tipo, sessao) {
+    if (!blob) return Promise.reject(erro('sem-ficheiro'));
+    const headers = {
+      'Content-Type': tipo || blob.type || 'image/jpeg',
+      'Cache-Control': 'public, max-age=31536000, immutable'
+    };
+    if (sessao && sessao.idToken) headers['Authorization'] = 'Bearer ' + sessao.idToken;
+    return pedir(storageUrl(caminho), {
+      method: 'POST',
+      headers: headers,
+      body: blob
+    });
+  }
+
+  function apagarObjeto(caminho, sessao) {
+    const headers = {};
+    if (sessao && sessao.idToken) headers['Authorization'] = 'Bearer ' + sessao.idToken;
+    return fetch('https://firebasestorage.googleapis.com/v0/b/' + CONFIG.storageBucket +
+      '/o/' + encodeURIComponent(caminho), {
+      method: 'DELETE',
+      headers: headers
+    }).catch(function () { /* ignora se já não existe */ });
+  }
+
+  function enviarFoto(registo, meta) {
+    if (simulada()) return Promise.reject(erro('sem-servidor'));
+    return obterSessao().then(function (sessao) {
+      const autorId = meta.autorId || sessao.uid;
+      const cMini = Fotos.caminho(meta.dia, autorId, meta.sha, 'mini');
+      const cVista = Fotos.caminho(meta.dia, autorId, meta.sha, 'vista');
+      const cOrig = Fotos.caminho(meta.dia, autorId, meta.sha, 'original');
+
+      const pMini = subirObjeto(cMini, registo.mini, 'image/jpeg', sessao);
+      const pVista = subirObjeto(cVista, registo.vista || registo.mini, 'image/jpeg', sessao);
+      const pOrig = subirObjeto(cOrig, registo.original, registo.tipo || 'image/jpeg', sessao);
+
+      return Promise.all([pMini, pVista, pOrig]).then(function () {
+        const dadosFoto = {
+          id: meta.id,
+          dia: meta.dia || '',
+          poi: meta.poi || '',
+          autorId: autorId,
+          sha: meta.sha || '',
+          criado: meta.criado || Date.now(),
+          tipo: registo.tipo || 'image/jpeg',
+          largura: registo.largura || 0,
+          altura: registo.altura || 0,
+          caminhoMini: cMini,
+          caminhoVista: cVista,
+          caminhoOriginal: cOrig
+        };
+        return pedir(firestore('fotos/' + meta.id), comSessao(sessao, 'PATCH', paraDocFoto(dadosFoto)))
+          .then(function () {
+            return {
+              caminhoMini: cMini,
+              caminhoVista: cVista,
+              caminhoOriginal: cOrig
+            };
+          });
+      });
+    });
+  }
+
+  function apagarFoto(meta) {
+    if (simulada()) return Promise.reject(erro('sem-servidor'));
+    return obterSessao().then(function (sessao) {
+      const autorId = meta.autorId || sessao.uid;
+      const cMini = meta.caminhoMini || Fotos.caminho(meta.dia, autorId, meta.sha, 'mini');
+      const cVista = meta.caminhoVista || Fotos.caminho(meta.dia, autorId, meta.sha, 'vista');
+      const cOrig = meta.caminhoOriginal || Fotos.caminho(meta.dia, autorId, meta.sha, 'original');
+
+      const p1 = apagarObjeto(cMini, sessao);
+      const p2 = apagarObjeto(cVista, sessao);
+      const p3 = apagarObjeto(cOrig, sessao);
+      const pDoc = pedir(firestore('fotos/' + meta.id), comSessao(sessao, 'DELETE'))
+        .catch(function (e) { if (e.codigo !== 'nao-existe') throw e; });
+
+      return Promise.all([p1, p2, p3, pDoc]);
+    });
+  }
+
+  function fotosDoDia(dia, limite) {
+    if (simulada()) return Promise.reject(erro('sem-servidor'));
+    return obterSessao().then(function (sessao) {
+      const query = {
+        structuredQuery: {
+          from: [{ collectionId: 'fotos' }],
+          where: {
+            fieldFilter: {
+              field: { fieldPath: 'dia' },
+              op: 'EQUAL',
+              value: { stringValue: String(dia || '') }
+            }
+          },
+          orderBy: [{ field: { fieldPath: 'criado' }, direction: 'DESCENDING' }],
+          limit: limite || 50
+        }
+      };
+      return pedir('https://firestore.googleapis.com/v1/projects/' + CONFIG.projectId +
+        '/databases/(default)/documents:runQuery', comSessao(sessao, 'POST', query))
+        .then(function (linhas) {
+          return (linhas || [])
+            .filter(function (l) { return l.document; })
+            .map(function (l) { return deDocFoto(l.document); });
+        });
+    });
+  }
+
+  function ligada() {
+    return !simulada() && !!CONFIG.storageBucket && !!(window.Estado && window.Estado.get && window.Estado.get().sessao);
   }
 
   return {
@@ -571,9 +727,9 @@ window.Nuvem = (function () {
     juntarEquipa: emailDaEquipa,
     retirarEquipa: function (sessao, email) { return servidor().retirarEquipa(sessao, normalizar(email)); },
 
-    ligada: function () { return false; },
-    enviarFoto: porLigar,
-    apagarFoto: porLigar,
-    fotosDoDia: porLigar
+    ligada: ligada,
+    enviarFoto: enviarFoto,
+    apagarFoto: apagarFoto,
+    fotosDoDia: fotosDoDia
   };
 })();

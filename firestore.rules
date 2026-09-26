@@ -1,0 +1,61 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+    
+    function isOrganizacao() {
+      return isAuthenticated() && (
+        get(/databases/$(database)/documents/contas/$(request.auth.uid)).data.papel == 'organizacao'
+      );
+    }
+
+    // Contas de utilizadores e perfis
+    match /contas/{uid} {
+      allow read: if isOwner(uid) || isOrganizacao();
+      allow create: if isAuthenticated() && request.auth.uid == uid;
+      allow update: if isOwner(uid);
+      allow delete: if isOrganizacao();
+    }
+
+    // Lista de emails que podem registar-se como organização
+    match /equipa/{email} {
+      allow read: if true;
+      allow write: if isOrganizacao();
+    }
+
+    // Conteúdo / Edições do evento
+    match /edicoes/{edicao} {
+      allow read: if true;
+      allow write: if isOrganizacao();
+    }
+
+    // Fotografias partilhadas do grupo
+    match /fotos/{fotoId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow delete: if isAuthenticated() && (
+        resource.data.autorId == request.auth.uid || isOrganizacao()
+      );
+    }
+
+    // Chegadas das equipas
+    match /chegadas/{id} {
+      allow read: if isOrganizacao();
+      allow create: if isAuthenticated();
+    }
+
+    // Pedidos ao concierge
+    match /pedidos/{id} {
+      allow read: if isOwner(resource.data.autorId) || isOrganizacao();
+      allow create: if isAuthenticated();
+      allow update: if isOrganizacao();
+    }
+  }
+}
