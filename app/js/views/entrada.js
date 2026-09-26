@@ -128,7 +128,6 @@ Vistas.entrada = (function () {
       campoSenha(true) +
       '<div>' +
         '<h2 class="etiqueta">O carro em que viaja</h2>' +
-        '<p class="meta" style="margin-top:4px">É por ele que o grupo reconhece as suas fotografias.</p>' +
         '<div style="margin-top:24px">' + UI.escolhaCarro(rascunho.modelo, rascunho.cor) + '</div>' +
       '</div>' +
       aviso() +
