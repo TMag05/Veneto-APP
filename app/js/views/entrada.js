@@ -119,7 +119,7 @@ Vistas.entrada = (function () {
 
   function formCriar() {
     return '<form id="form-entrada" class="pilha-3" novalidate>' +
-      cabeca('Criar acesso', 'Uma vez só. Depois, a app abre sem perguntar nada.') +
+      cabeca('Criar acesso') +
       '<label class="campo">' +
         '<span class="campo__rotulo">Nome</span>' +
         '<input class="campo__entrada" name="nome" autocomplete="name" required value="' + UI.h(rascunho.nome) + '" placeholder="Nome próprio e apelido">' +
