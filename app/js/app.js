@@ -17,11 +17,12 @@
     ['roadbook/:id/:momento', 'roadbookDia'],
     ['poi/:id', 'poi'],
     ['momento/:dia/:n', 'momento'],
-    ['estradas', 'estradas'],
+    ['etapas', 'etapas'],
     ['estrada/:id', 'estrada'],
-    /* O separador chamou-se Mapa até 20.09.2026. Os links já
-       partilhados continuam a abrir. */
-    ['mapa', 'estradas'],
+    /* O separador chamou-se Mapa até 20.09.2026 e Estradas até
+       26.09.2026. Os links já partilhados continuam a abrir. */
+    ['estradas', 'etapas'],
+    ['mapa', 'etapas'],
     ['participantes', 'participantes'],
     ['galeria', 'galeria'],
     ['foto/:id', 'foto'],
@@ -51,7 +52,7 @@
   const ABAS_CONVIDADO = [
     { rota: '#/hoje', icone: 'hoje', rotulo: 'Hoje', nav: 'hoje' },
     { rota: '#/roadbook', icone: 'roadbook', rotulo: 'Roadbook', nav: 'roadbook' },
-    { rota: '#/estradas', icone: 'mapa', rotulo: 'Etapas', nav: 'estradas' },
+    { rota: '#/etapas', icone: 'mapa', rotulo: 'Etapas', nav: 'etapas' },
     { rota: '#/galeria', icone: 'galeria', rotulo: 'Galeria', nav: 'galeria' },
     { rota: '#/mais', icone: 'mais', rotulo: 'Mais', nav: 'mais' }
   ];

@@ -1,5 +1,5 @@
 /* =========================================================
-   Estradas — o retrato do que se conduz
+   Etapas — o retrato do que se conduz
    Não é um mapa de navegação: é o desenho do percurso de cada
    dia e o traçado das estradas que lhe dão nome. O grupo anda em
    caravana, atrás dos batedores — aqui não há nada para validar,
@@ -243,8 +243,8 @@
      O separador
      --------------------------------------------------------- */
 
-  Vistas.estradas = {
-    nav: 'estradas',
+  Vistas.etapas = {
+    nav: 'etapas',
     semCabecalho: true,
     html: function () {
       const principal = ESTRADAS.por('san-boldo');
@@ -289,11 +289,11 @@
   }
 
   Vistas.estrada = {
-    nav: 'estradas',
+    nav: 'etapas',
     cabecalho: function (p) {
       const e = ESTRADAS.por(p.id);
       return {
-        voltar: '#/estradas',
+        voltar: '#/etapas',
         titulo: e ? e.nome : 'Estrada',
         linha: false,
         acao: { acao: 'partilhar', icone: 'partilhar', rotulo: 'Partilhar' }
@@ -304,7 +304,7 @@
       if (!e) {
         return '<div class="faixa" style="padding-top:24px">' +
           '<p class="corpo-editorial">Estrada não encontrada.</p>' +
-          '<a class="botao botao--secundario botao--largo" style="margin-top:24px" href="#/estradas">Voltar às etapas</a>' +
+          '<a class="botao botao--secundario botao--largo" style="margin-top:24px" href="#/etapas">Voltar às etapas</a>' +
         '</div>';
       }
 
@@ -343,8 +343,8 @@
   };
 
   Vistas.participantes = {
-  nav: 'estradas',
-  cabecalho: { voltar: '#/estradas', titulo: 'Participantes', tituloSempre: true },
+  nav: 'etapas',
+  cabecalho: { voltar: '#/etapas', titulo: 'Participantes', tituloSempre: true },
   html: function () {
     const capa = '<div class="capa">' +
       UI.foto({ semente: 'participantes', variante: 'paisagem' }, 'foto--32 capa__imagem') +
