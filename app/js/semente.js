@@ -12,7 +12,7 @@
    hotéis, restaurantes) com as correções de docs/, e a revisão da
    direção de 27.09.2026: os títulos e os interlúdios dos três dias
    de estrada são os dela, e o almoço de 3 de outubro é na Malga Ces.
-   A chegada e a partida são dias de logística, sem número. Os textos das
+   Os cinco dias são numerados, do 1 ao 5 (27.09.2026). Os textos das
    paragens vêm de docs/pesquisa-locais-passeio-dolomitas-2026.md;
    onde a pesquisa não chega, fica só o subtítulo. Nada inventado.
    ========================================================= */
@@ -209,7 +209,7 @@ window.SEMENTE = (function () {
     ],
     dias: [
       {
-        data: '2026-10-01', titulo: 'Chegada', logistico: true,
+        data: '2026-10-01', titulo: 'Chegada',
         subtitulo: 'Do aeroporto às colinas do Prosecco.',
         resumo: 'Do Marco Polo ao Hotel Villa Soligo, em transfer privado. A primeira noite é nas colinas do Prosecco.',
         hotel: 'Hotel Villa Soligo',
@@ -299,7 +299,7 @@ window.SEMENTE = (function () {
         ]
       },
       {
-        data: '2026-10-05', titulo: 'Partida', logistico: true,
+        data: '2026-10-05', titulo: 'Partida',
         subtitulo: 'Da laguna ao Marco Polo.',
         resumo: 'Check-out até às 10:00 e transfer para o aeroporto.',
         imagem: { grafico: 'partida' },

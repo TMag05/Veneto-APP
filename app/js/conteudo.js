@@ -16,8 +16,9 @@ window.Conteudo = (function () {
      maqueta de Cortina, e dá lugar ao itinerário de 2026. Subiu
      para 3 a 27.09.2026, com a revisão da direção, ainda em testes:
      cada telemóvel volta a carregar a semente. Subiu para 4 no mesmo
-     dia, com os títulos e os dias de logística. */
-  const VERSAO_DADOS = 4;
+     dia, com os títulos e os dias de logística, e para 5 quando os
+     cinco dias voltaram a ter número. */
+  const VERSAO_DADOS = 5;
   const ouvintes = [];
 
   /* Revisões de linguagem da semente. O itinerário guardado num
@@ -273,9 +274,9 @@ window.Conteudo = (function () {
     window.POIS = dados.pois;
 
     /* «numero» é a posição no itinerário e liga o dia ao seu percurso
-       e às suas estradas. O convidado vê «etiqueta»: só os dias de
-       estrada contam — a chegada e a partida são logística, sem
-       número (decisão da direção, 27.09.2026). */
+       e às suas estradas. O convidado vê «etiqueta»: os dias marcados
+       como logística ficam sem número. Hoje nenhum está: os cinco
+       dias contam, do 1 ao 5 (27.09.2026). */
     let ordem = 0;
     const dias = dados.dias.map(function (d, i) {
       const medida = medirDia(d, i + 1);
