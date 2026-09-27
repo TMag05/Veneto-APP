@@ -8,7 +8,7 @@
 /* Subir esta versão sempre que se publica: força a reinstalação do
    cache e é o que faz chegar conteúdo novo aos telemóveis. Deve
    acompanhar o ?v= dos ficheiros em index.html. */
-const VERSAO = 'passeio-v119';
+const VERSAO = 'passeio-v120';
 
 const CONCHA = [
   './',
@@ -78,9 +78,14 @@ const CONCHA = [
   './js/views/org-contactos.js'
 ];
 
+/* A concha vem sempre da rede, nunca do cache HTTP do browser: os
+   endereços daqui não levam o ?v=, e uma cópia antiga guardada pelo
+   browser entraria no cache novo como se fosse a versão publicada. */
 self.addEventListener('install', function (e) {
   e.waitUntil(
-    caches.open(VERSAO).then(function (c) { return c.addAll(CONCHA); }).then(function () { return self.skipWaiting(); })
+    caches.open(VERSAO).then(function (c) {
+      return c.addAll(CONCHA.map(function (u) { return new Request(u, { cache: 'reload' }); }));
+    }).then(function () { return self.skipWaiting(); })
   );
 });
 

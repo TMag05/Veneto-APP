@@ -8,11 +8,20 @@
     ],
     "headers": [
       {
-        "source": "**/*.@(js|css|woff2|jpg|png|svg)",
+        "source": "**/*.@(js|css)",
         "headers": [
           {
             "key": "Cache-Control",
-            "value": "max-age=31536000, immutable"
+            "value": "no-cache"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(woff2|jpg|png|svg)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=86400"
           }
         ]
       },
