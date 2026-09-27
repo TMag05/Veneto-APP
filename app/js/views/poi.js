@@ -95,13 +95,10 @@
 
       (x.seguinte || '') +
 
-      /* Rede de segurança para quem se separe da caravana, não o CTA
-         do ecrã — por isso vive no fim, em linha, e não numa barra
-         permanente por cima do texto. */
-      '<div class="faixa" style="margin-top:32px">' +
-        '<a class="botao botao--texto" href="' + UI.linkLocal(p.id) + '" target="_blank" rel="noopener">' +
-          Icone('externo', 20) + 'Abrir no Google Maps</a>' +
-      '</div>' +
+      /* A localização, no Google Maps ou no Waze. Não é o CTA do
+         ecrã — o grupo segue os batedores —, por isso vive no fim,
+         em linha, e não numa barra por cima do texto. */
+      '<div class="faixa" style="margin-top:32px">' + UI.atalhosLocal(p.id) + '</div>' +
 
       (x.editar || editar('#/org/paragem/' + p.id, 'Editar esta paragem'));
   }

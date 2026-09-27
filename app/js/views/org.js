@@ -19,7 +19,7 @@
         '<p class="etiqueta">Organização</p>' +
         '<h1 class="titulo-editorial" style="margin-top:4px">' + UI.h(e.nome || 'Passeio sem nome') + '</h1>' +
         '<p class="meta" style="margin-top:4px">' +
-          UI.h([e.base, UI.intervaloEvento()].filter(Boolean).join(' · ')) + '</p>' +
+          UI.h([e.lugar || e.base, UI.intervaloEvento()].filter(Boolean).join(' · ')) + '</p>' +
       '</div>' +
     '</div>' +
     '<div class="faixa" style="margin-top:20px">' +
@@ -204,6 +204,8 @@
           '<div class="pilha-2">' +
             UI.campo({ rotulo: 'Nome do passeio', nome: 'nome', valor: e.nome, placeholder: 'Dolomites Grand Tour' }) +
             UI.campo({ rotulo: 'Subtítulo', nome: 'subtitulo', valor: e.subtitulo || '', placeholder: 'Há estradas que só se contam a quem lá esteve.' }) +
+            UI.campo({ rotulo: 'Onde é', nome: 'lugar', valor: e.lugar || '', placeholder: 'Veneto, Itália',
+              nota: 'Por baixo da data, na primeira abertura.' }) +
             UI.campo({ rotulo: 'Local / base', nome: 'base', valor: e.base, placeholder: 'Onde o grupo dorme' }) +
             '<div class="par-campos">' +
               UI.campo({ rotulo: 'Início', nome: 'inicio', valor: e.inicio, tipo: 'data' }) +
@@ -235,9 +237,6 @@
           '<div class="seccao-cabecalho"><h2 class="etiqueta">Briefing</h2></div>' +
           '<p class="corpo-ui silencioso">O que o convidado lê nos dias que antecedem a partida.</p>' +
           '<div class="pilha-2" style="margin-top:16px">' +
-            UI.campo({ rotulo: 'Como se anda na estrada', nome: 'formato',
-              valor: e.formato === undefined ? SEMENTE.evento.formato : e.formato, tipo: 'area', linhas: 3,
-              nota: 'Aparece por cima do programa. Deixar vazio para não mostrar.' }) +
             UI.campo({ rotulo: 'O que levar', nome: 'levar', valor: (e.levar || []).join('\n'), tipo: 'area', linhas: 6,
               placeholder: 'Um item por linha' }) +
             UI.campo({ rotulo: 'Notas práticas', nome: 'notas', valor: (e.notas || []).join('\n'), tipo: 'area', linhas: 3,

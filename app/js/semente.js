@@ -24,12 +24,11 @@ window.SEMENTE = (function () {
     inicio: '2026-10-01',
     fim: '2026-10-05',
     base: 'Hotel Villa Soligo',
+    /* Onde é o passeio, por baixo da data na primeira abertura. */
+    lugar: 'Veneto, Itália',
     hotel: 'Hotel Villa Soligo',
     /* Quem responde do outro lado. Uma pessoa, com nome e cara. */
     concierge: { nome: '', papel: '', foto: '', promessa: 'Respondemos em menos de dez minutos. Sempre uma pessoa.' },
-    /* Como se anda na estrada. Há batedores e o grupo segue em
-       caravana: a app é o guia do dia, não o de condução. */
-    formato: 'Na estrada, segue-se a caravana, atrás dos batedores. A app diz o que vem a seguir — o caminho é com eles.',
     /* Briefing que o convidado lê nos dias anteriores. */
     levar: [
       'Carta de condução e documento de identificação',
@@ -41,7 +40,8 @@ window.SEMENTE = (function () {
     notas: [
       'Todas as manhãs, antes de partir, há um briefing: as regras da estrada e o resumo do dia.',
       'Todas as refeições estão asseguradas, do pequeno-almoço ao jantar.',
-      'Um guia de língua inglesa acompanha o grupo todos os dias.'
+      'Um guia de língua inglesa acompanha o grupo todos os dias.',
+      'Código de vestuário: casual todos os dias. O jantar de encerramento, no JW Marriott, é casual chic.'
     ]
   };
 
@@ -55,7 +55,6 @@ window.SEMENTE = (function () {
 
     { nome: 'Aeroporto Marco Polo', local: 'Veneza', tipo: 'logistica', lat: 45.5035, lng: 12.3426,
       subtitulo: 'Onde o passeio começa e acaba.',
-      nota: 'Quem chega em voo privado aterra em Treviso, no Antonio Canova.',
       imagem: { grafico: 'chegada' } },
 
     { nome: 'LO.VE.', local: 'Via dei Colli 3, Follina', tipo: 'logistica', lat: 45.9370, lng: 12.1410,
@@ -64,7 +63,6 @@ window.SEMENTE = (function () {
 
     { nome: 'Hotel Villa Soligo', local: 'Soligo', tipo: 'hotel', lat: 45.9116, lng: 12.1566,
       subtitulo: 'A casa do passeio, nas colinas do Prosecco.',
-      nota: 'Há um aperitivo de boas-vindas todos os dias.',
       imagem: { foto: 'assets/fotos/hotel-villa-soligo.jpg' } },
 
     { nome: 'Tempio Canoviano', local: 'Possagno', tipo: 'monumento', lat: 45.8582, lng: 11.8782,
@@ -175,8 +173,8 @@ window.SEMENTE = (function () {
       imagem: { foto: 'assets/fotos/jw-marriott.jpg' } },
 
     { nome: 'Sagra', local: 'Terraço do JW Marriott', tipo: 'restaurante', lat: 45.4052, lng: 12.3206,
-      subtitulo: 'O jantar de gala, com Veneza à vista.',
-      nota: 'Sem código de vestuário.',
+      subtitulo: 'O jantar de encerramento, com Veneza à vista.',
+      nota: 'Casual chic.',
       imagem: { foto: 'assets/fotos/sagra.jpg' } }
   ];
 
@@ -190,8 +188,10 @@ window.SEMENTE = (function () {
      O itinerário, dia a dia
      As paragens e os momentos apontam para a biblioteca pelo
      nome. «paragens» são os troços ao volante — é deles que se
-     tiram os quilómetros, o GPX e os links de recurso. Uma hora
-     vazia é uma hora ainda por confirmar.
+     tiram os quilómetros do dia. Uma hora vazia é uma hora ainda
+     por confirmar. Com «horaOculta», a hora serve só o relógio da
+     app: ao convidado mostra-se a da partida, a da chegada ao
+     hotel e a do jantar, e mais nenhuma (27.09.2026).
      --------------------------------------------------------- */
   const roteiro = {
     locais: [
@@ -202,94 +202,92 @@ window.SEMENTE = (function () {
     dias: [
       {
         data: '2026-10-01', titulo: 'Chegada',
-        subtitulo: 'Dos aeroportos às colinas do Prosecco.',
-        resumo: 'Os carros levantam-se em Follina e a primeira noite é no Hotel Villa Soligo.',
+        subtitulo: 'Do aeroporto às colinas do Prosecco.',
+        resumo: 'Do Marco Polo ao Hotel Villa Soligo, em transfer privado. A primeira noite é nas colinas do Prosecco.',
         hotel: 'Hotel Villa Soligo',
         imagem: { grafico: 'chegada' },
-        paragens: ['LO.VE.', 'Hotel Villa Soligo'],
+        paragens: ['Hotel Villa Soligo'],
         momentos: [
-          { titulo: 'Chegada a Veneza', local: 'Marco Polo, ou Treviso para voos privados', tipo: 'logistica', paragem: 'Aeroporto Marco Polo',
-            nota: 'Um transfer privado leva o grupo até à LO.VE., em Follina.' },
-          { titulo: 'Levantamento dos carros', local: 'LO.VE., Follina', tipo: 'logistica', paragem: 'LO.VE.' },
-          { titulo: 'Chegada ao hotel', local: 'Hotel Villa Soligo', tipo: 'paragem', paragem: 'Hotel Villa Soligo',
+          { titulo: 'Chegada a Veneza', local: 'Aeroporto Marco Polo', tipo: 'logistica', paragem: 'Aeroporto Marco Polo',
+            nota: 'Três transfers privados levam ao Hotel Villa Soligo, conforme os voos: manhã, hora de almoço e fim da tarde. Quem já estiver em Veneza junta-se ao grupo no aeroporto às 18:00, à chegada do TP862; quem vem em aviação privada ou de carro segue para o hotel a partir das 16:00.' },
+          { hora: '20:30', titulo: 'Chegada ao hotel', local: 'Hotel Villa Soligo', tipo: 'paragem', paragem: 'Hotel Villa Soligo',
             nota: 'Aperitivo de boas-vindas e check-in.' },
-          { hora: '20:00', titulo: 'Jantar no hotel', local: 'Hotel Villa Soligo', tipo: 'refeicao', paragem: 'Hotel Villa Soligo' }
+          { hora: '21:00', titulo: 'Jantar no hotel', local: 'Hotel Villa Soligo', tipo: 'refeicao', paragem: 'Hotel Villa Soligo' }
         ]
       },
       {
         data: '2026-10-02', titulo: 'Do Prosecco ao Grappa',
         subtitulo: 'Canova, o Sacrario e a Strada dei 100 Giorni.',
-        resumo: 'Das colinas do Prosecco aos Pré-Alpes do Grappa, e de volta pelo Passo di San Boldo.',
+        resumo: 'Da região vinícola de Conegliano-Valdobbiadene, Património Mundial da UNESCO, ao Monte Grappa, a 1776 metros, e ao Passo di San Boldo. O dia acaba ao jantar, no Da Gigetto.',
         hotel: 'Hotel Villa Soligo',
         imagem: { foto: 'assets/fotos/sacrario-grappa.jpg' },
         paragens: ['Hotel Villa Soligo', 'Tempio Canoviano', 'Sacrario del Monte Grappa', 'Passo di San Boldo', 'Molinetto della Croda', 'Hotel Villa Soligo'],
         momentos: [
           { hora: '08:30', titulo: 'Partida', local: 'Hotel Villa Soligo', tipo: 'partida', paragem: 'Hotel Villa Soligo',
             nota: 'Abastecimento pelo caminho.' },
-          { hora: '10:00', fim: '11:15', titulo: 'Tempio Canoviano', local: 'Possagno', tipo: 'visita', paragem: 'Tempio Canoviano',
+          { horaOculta: true, hora: '10:00', fim: '11:15', titulo: 'Tempio Canoviano', local: 'Possagno', tipo: 'visita', paragem: 'Tempio Canoviano',
             nota: 'Visita ao templo e ao Museo Canova.' },
-          { hora: '12:30', fim: '13:15', titulo: 'Sacrario del Monte Grappa', local: 'Cima Grappa', tipo: 'visita', paragem: 'Sacrario del Monte Grappa' },
-          { hora: '13:15', fim: '14:45', titulo: 'Almoço', local: 'Rifugio Bassano', tipo: 'refeicao', paragem: 'Rifugio Bassano' },
-          { hora: '14:45', titulo: 'Pelo Passo di San Boldo', local: 'Strada dei 100 Giorni', tipo: 'estrada', paragem: 'Passo di San Boldo' },
-          { hora: '16:45', titulo: 'Molinetto della Croda', local: 'Refrontolo', tipo: 'visita', paragem: 'Molinetto della Croda',
+          { horaOculta: true, hora: '12:30', fim: '13:15', titulo: 'Sacrario del Monte Grappa', local: 'Cima Grappa', tipo: 'visita', paragem: 'Sacrario del Monte Grappa' },
+          { horaOculta: true, hora: '13:15', fim: '14:45', titulo: 'Almoço', local: 'Rifugio Bassano', tipo: 'refeicao', paragem: 'Rifugio Bassano' },
+          { horaOculta: true, hora: '14:45', titulo: 'Passo di San Boldo', local: 'Strada dei 100 Giorni', tipo: 'estrada', paragem: 'Passo di San Boldo' },
+          { horaOculta: true, hora: '16:45', titulo: 'Molinetto della Croda', local: 'Refrontolo', tipo: 'visita', paragem: 'Molinetto della Croda',
             nota: 'Fotografia do grupo e de cada carro, e um aperitivo.' },
           { hora: '18:00', titulo: 'Chegada ao hotel', local: 'Hotel Villa Soligo', tipo: 'paragem', paragem: 'Hotel Villa Soligo',
             nota: 'Os carros chegam em dois momentos, até às 18:30, para facilitar o estacionamento. Aperitivo à chegada.' },
-          { hora: '20:15', titulo: 'Transfer para o jantar', local: 'À porta do hotel', tipo: 'logistica' },
+          { horaOculta: true, hora: '20:15', titulo: 'Transfer para o jantar', local: 'À porta do hotel', tipo: 'logistica' },
           { hora: '20:30', titulo: 'Jantar', local: 'Ristorante Da Gigetto, Miane', tipo: 'refeicao', paragem: 'Ristorante Da Gigetto' },
-          { hora: '23:30', titulo: 'Regresso ao hotel', local: 'Transfer privado', tipo: 'logistica', paragem: 'Hotel Villa Soligo' }
+          { horaOculta: true, hora: '23:30', titulo: 'Regresso ao hotel', local: 'Transfer privado', tipo: 'logistica', paragem: 'Hotel Villa Soligo' }
         ]
       },
       {
         data: '2026-10-03', titulo: 'Dos 170 aos 2000 metros',
         subtitulo: 'Das colinas às Pale di San Martino.',
-        resumo: 'Um ferreiro em Miane, o almoço de frente para as Pale e o regresso pelos vales das Dolomitas.',
+        resumo: 'O dia mais alpino, pelos passos Croce d\'Aune, Rolle, Valles, Cereda e Forcella Aurine. Almoço no Chalet Piereni, de frente para as Pale di San Martino, e o jantar de destaque em La Candola.',
         hotel: 'Hotel Villa Soligo',
         imagem: { foto: 'assets/fotos/chalet-piereni.jpg' },
         paragens: ['Hotel Villa Soligo', 'Ateliê de Valentino Moro', 'Chalet Piereni', 'Hotel Villa Soligo'],
         momentos: [
           { hora: '08:30', titulo: 'Partida', local: 'Hotel Villa Soligo', tipo: 'partida', paragem: 'Hotel Villa Soligo',
             nota: 'Abastecimento pelo caminho.' },
-          { hora: '09:15', fim: '10:15', titulo: 'Ateliê de Valentino Moro', local: 'Miane', tipo: 'visita', paragem: 'Ateliê de Valentino Moro' },
-          { hora: '10:15', titulo: 'A caminho das Dolomitas', local: 'Pelos Pré-Alpes', tipo: 'estrada' },
-          { hora: '13:00', fim: '14:30', titulo: 'Almoço', local: 'Chalet Piereni, Val Canali', tipo: 'refeicao', paragem: 'Chalet Piereni' },
-          { hora: '14:30', titulo: 'Pelos vales das Dolomitas', local: 'O regresso', tipo: 'estrada' },
-          { hora: '16:00', titulo: 'Paragem curta', local: 'A meio do caminho', tipo: 'paragem' },
+          { horaOculta: true, hora: '09:15', fim: '10:15', titulo: 'Ateliê de Valentino Moro', local: 'Miane', tipo: 'visita', paragem: 'Ateliê de Valentino Moro' },
+          { horaOculta: true, hora: '10:15', titulo: 'A caminho das Dolomitas', local: 'Pelos Pré-Alpes', tipo: 'estrada' },
+          { horaOculta: true, hora: '13:00', fim: '14:30', titulo: 'Almoço', local: 'Chalet Piereni, Val Canali', tipo: 'refeicao', paragem: 'Chalet Piereni' },
+          { horaOculta: true, hora: '14:30', titulo: 'Vales das Dolomitas', local: 'O regresso', tipo: 'estrada' },
+          { horaOculta: true, hora: '16:00', titulo: 'Paragem curta', local: 'A meio do caminho', tipo: 'paragem' },
           { hora: '18:00', titulo: 'Chegada ao hotel', local: 'Hotel Villa Soligo', tipo: 'paragem', paragem: 'Hotel Villa Soligo',
             nota: 'Aperitivo à chegada.' },
-          { hora: '20:00', titulo: 'Transfer para o jantar', local: 'À porta do hotel', tipo: 'logistica' },
+          { horaOculta: true, hora: '20:00', titulo: 'Transfer para o jantar', local: 'À porta do hotel', tipo: 'logistica' },
           { hora: '20:15', titulo: 'Jantar', local: 'La Candola, Eremo di San Gallo', tipo: 'refeicao', paragem: 'La Candola' },
-          { hora: '23:30', titulo: 'Regresso ao hotel', local: 'Transfer privado', tipo: 'logistica', paragem: 'Hotel Villa Soligo' }
+          { horaOculta: true, hora: '23:30', titulo: 'Regresso ao hotel', local: 'Transfer privado', tipo: 'logistica', paragem: 'Hotel Villa Soligo' }
         ]
       },
       {
         data: '2026-10-04', titulo: 'Do Prosecco à laguna',
         subtitulo: 'San Boldo, o Cansiglio e Veneza de barco.',
-        resumo: 'A Strada dei 100 Giorni no sentido inverso, o almoço no alto do Cansiglio e a chegada a Veneza pelo Canal Grande.',
+        resumo: 'A etapa de maior amplitude: dos 170 metros de Soligo aos 1547 do Monte Pizzoc, e depois até Veneza, ao nível do mar. Acaba com a chegada de barco à Piazza San Marco e o jantar no JW Marriott, na Isola delle Rose.',
         hotel: 'JW Marriott Venice',
         imagem: { foto: 'assets/fotos/piazza-san-marco.jpg' },
         paragens: ['Hotel Villa Soligo', 'Passo di San Boldo', 'La Casera', 'Rifugio Città di Vittorio Veneto', 'LO.VE.'],
         momentos: [
           { hora: '08:30', titulo: 'Partida', local: 'Hotel Villa Soligo', tipo: 'partida', paragem: 'Hotel Villa Soligo',
             nota: 'Check-out feito antes de sair. Abastecimento pelo caminho.' },
-          { hora: '09:15', titulo: 'Pelo Passo di San Boldo', local: 'Strada dei 100 Giorni, no sentido inverso', tipo: 'estrada', paragem: 'Passo di San Boldo' },
-          { hora: '10:45', fim: '11:30', titulo: 'La Casera', local: 'Nevegal', tipo: 'paragem', paragem: 'La Casera',
+          { horaOculta: true, hora: '09:15', titulo: 'Passo di San Boldo', local: 'Strada dei 100 Giorni, no sentido inverso', tipo: 'estrada', paragem: 'Passo di San Boldo' },
+          { horaOculta: true, hora: '10:45', fim: '11:30', titulo: 'La Casera', local: 'Nevegal', tipo: 'paragem', paragem: 'La Casera',
             nota: 'Pausa curta.' },
-          { hora: '11:30', titulo: 'Pelo Cansiglio', local: 'Planalto do Cansiglio', tipo: 'estrada' },
-          { hora: '13:00', fim: '14:00', titulo: 'Almoço volante', local: 'Rifugio Città di Vittorio Veneto, Monte Pizzoc', tipo: 'refeicao', paragem: 'Rifugio Città di Vittorio Veneto',
+          { horaOculta: true, hora: '11:30', titulo: 'Cansiglio', local: 'Planalto do Cansiglio', tipo: 'estrada' },
+          { horaOculta: true, hora: '13:00', fim: '14:00', titulo: 'Almoço volante', local: 'Rifugio Città di Vittorio Veneto, Monte Pizzoc', tipo: 'refeicao', paragem: 'Rifugio Città di Vittorio Veneto',
             nota: 'Buffet, com vista até Veneza.' },
-          { hora: '14:00', titulo: 'Partida', local: 'Para Follina', tipo: 'estrada' },
-          { hora: '15:30', titulo: 'Entrega dos carros', local: 'LO.VE., Follina', tipo: 'logistica', paragem: 'LO.VE.',
+          { horaOculta: true, hora: '14:00', titulo: 'Partida', local: 'Para Follina', tipo: 'estrada' },
+          { horaOculta: true, hora: '15:30', titulo: 'Entrega dos carros', local: 'LO.VE., Follina', tipo: 'logistica', paragem: 'LO.VE.',
             nota: 'Os carros ficam aqui. Segue-se para Veneza em transfer privado.' },
-          { hora: '17:30', fim: '18:30', titulo: 'Pelo Canal Grande', local: 'Embarque no Tronchetto', tipo: 'visita', paragem: 'Canal Grande' },
-          { hora: '18:30', fim: '19:30', titulo: 'Piazza San Marco', local: 'Veneza', tipo: 'visita', paragem: 'Piazza San Marco',
+          { horaOculta: true, hora: '17:30', fim: '18:30', titulo: 'Canal Grande', local: 'Embarque no Tronchetto', tipo: 'visita', paragem: 'Canal Grande' },
+          { horaOculta: true, hora: '18:30', fim: '19:30', titulo: 'Piazza San Marco', local: 'Veneza', tipo: 'visita', paragem: 'Piazza San Marco',
             nota: 'Visita à cidade e aperitivo reservado no Caffè Florian.' },
           { hora: '19:30', titulo: 'Barco para o hotel', local: 'JW Marriott, Isola delle Rose', tipo: 'logistica', paragem: 'JW Marriott Venice',
             imagem: { grafico: 'travessia-veneza' }, nota: 'Check-in à chegada.' },
-          { hora: '21:00', titulo: 'Aperitivo no terraço', local: 'Sagra, JW Marriott', tipo: 'refeicao', paragem: 'Sagra',
+          { horaOculta: true, hora: '21:00', titulo: 'Aperitivo no terraço', local: 'Sagra, JW Marriott', tipo: 'refeicao', paragem: 'Sagra',
             nota: 'Com Veneza à vista.' },
-          { hora: '21:30', titulo: 'Jantar de gala', local: 'Sagra, JW Marriott', tipo: 'refeicao', paragem: 'Sagra',
-            nota: 'Sem código de vestuário.' }
+          { hora: '21:30', titulo: 'Jantar de encerramento', local: 'Sagra, JW Marriott', tipo: 'refeicao', paragem: 'Sagra' }
         ]
       },
       {

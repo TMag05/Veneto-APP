@@ -266,7 +266,7 @@
 
     return '<div class="cartao-org" data-momento="' + i + '">' +
       '<div class="par par--espalhado" style="align-items:center">' +
-        '<span class="etiqueta">' + UI.h(m.hora || '--:--') + (m.alterado ? ' · alterado' : '') + '</span>' +
+        '<span class="etiqueta">' + UI.h(m.hora || '--:--') + (m.horaOculta ? ' · oculta' : '') + (m.alterado ? ' · alterado' : '') + '</span>' +
         '<div style="display:flex">' +
           '<button class="botao-icone" type="button" data-acao="alterarHora" data-valor="' + i + '" aria-label="Alterar hora e avisar">' +
             Icone('sincronizar', 20) + '</button>' +
@@ -281,6 +281,11 @@
           UI.campo({ rotulo: 'Hora', nome: 'hora', valor: m.hora, tipo: 'hora' }) +
           UI.campo({ rotulo: 'Fim', nome: 'fim', valor: m.fim, tipo: 'hora' }) +
         '</div>' +
+        /* O convidado vê só a hora da partida, da chegada ao hotel e
+           do jantar. As outras ficam para o relógio da app: é por elas
+           que o Hoje sabe o que está a acontecer. */
+        UI.campo({ rotulo: 'A hora, para o convidado', nome: 'horaOculta', valor: m.horaOculta || '', tipo: 'lista',
+          opcoes: [{ valor: '', rotulo: 'Mostrar' }, { valor: 'sim', rotulo: 'Não mostrar' }] }) +
         UI.campo({ rotulo: 'Título', nome: 'titulo', valor: m.titulo, placeholder: 'Almoço' }) +
         UI.campo({ rotulo: 'Local', nome: 'local', valor: m.local, placeholder: 'Rifugio Bassano' }) +
         UI.campo({ rotulo: 'Tipo', nome: 'tipo', valor: m.tipo, tipo: 'lista', opcoes: TIPOS_MOMENTO }) +

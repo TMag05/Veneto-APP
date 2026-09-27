@@ -36,7 +36,7 @@
             (primeiro ? UI.h(primeiro) + ',<br>o passeio' : 'O passeio') + '<br>espera por si.</h1>' +
 
           '<p class="chegada__data chegada__passo" style="--atraso:1.1s">' + UI.intervaloEvento() +
-            (DADOS.evento.base ? ' · ' + UI.h(DADOS.evento.base) : '') + '</p>' +
+            (DADOS.evento.lugar ? ' · ' + UI.h(DADOS.evento.lugar) : '') + '</p>' +
 
           (carro
             ? '<div class="chegada__carro chegada__passo" style="--atraso:1.5s">' +

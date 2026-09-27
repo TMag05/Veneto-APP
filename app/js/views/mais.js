@@ -18,7 +18,17 @@
     semCabecalho: true,
     acoes: {
       tema: function (t) { Estado.definir({ tema: t === 'claro' ? 'claro' : 'escuro' }); },
-      instalar: function () { Instalar.pedir(); }
+      instalar: function () { Instalar.pedir(); },
+      sair: function () {
+        const porta = Estado.ehOrganizacao() ? 'a porta da organização, no fim da entrada' : 'a entrada';
+        UI.abrirFolha('Terminar sessão',
+          '<p class="corpo-ui silencioso">Para voltar a entrar, use ' + porta + ', com o email e a palavra-passe.</p>' +
+          '<button class="botao botao--principal botao--largo" style="margin-top:24px" type="button" id="btn-sair">Terminar sessão</button>');
+        document.getElementById('btn-sair').addEventListener('click', function () {
+          UI.fecharFolha();
+          Estado.terminarSessao();
+        });
+      }
     },
     html: function () {
       const e = Estado.get();
@@ -93,6 +103,7 @@
         '<div class="faixa">' +
           '<div class="lista">' +
             UI.linhaLista({ titulo: 'Definições', nota: 'Sobre a app', icone: 'definicoes', href: '#/definicoes' }) +
+            UI.linhaLista({ titulo: 'Terminar sessão', nota: e.perfil.email, icone: 'fechar', acao: 'sair' }) +
           '</div>' +
           '<p class="meta num" style="margin-top:24px">' + UI.h(DADOS.evento.nome || 'Passeio') + ' · versão ' + versao() +
             (fase === 'pre' ? ' · pré-evento' : (fase === 'pos' ? ' · pós-evento' : '')) + '</p>' +

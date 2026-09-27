@@ -13,8 +13,10 @@ window.Conteudo = (function () {
   const CHAVE = 'passeio.conteudo.v1';
   /* Versão do formato guardado. Subiu para 2 quando o passeio real
      entrou na semente: o que os telemóveis tinham guardado era a
-     maqueta de Cortina, e dá lugar ao itinerário de 2026. */
-  const VERSAO_DADOS = 2;
+     maqueta de Cortina, e dá lugar ao itinerário de 2026. Subiu
+     para 3 a 27.09.2026, com a revisão da direção, ainda em testes:
+     cada telemóvel volta a carregar a semente. */
+  const VERSAO_DADOS = 3;
   const ouvintes = [];
 
   /* Revisões de linguagem da semente. O itinerário guardado num
@@ -127,6 +129,7 @@ window.Conteudo = (function () {
             hora: m.hora || '', fim: m.fim || '', titulo: m.titulo, local: m.local || '',
             tipo: m.tipo || 'paragem', poi: m.paragem ? paragem(m.paragem) : '', nota: m.nota || ''
           };
+          if (m.horaOculta) mo.horaOculta = 'sim';
           if (m.imagem) mo.imagem = clonar(m.imagem);
           return mo;
         })
