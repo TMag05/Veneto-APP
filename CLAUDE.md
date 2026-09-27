@@ -37,7 +37,7 @@ O documento do diretor-geral (`Estrutura-App-Passeio-Dolomitas.docx`) é a espec
 
 **Dentro:** o antes imediato (briefing e revelação diária), o durante (de 1 a 5 de outubro de 2026) e o depois (álbum).
 
-**Fora, e não voltar a trazer:** checkup nas oficinas, transporte da viatura para Itália, inscrições em experiências. Os convidados recebem acesso poucos dias antes de partir.
+**Fora, e não voltar a trazer:** checkup nas oficinas, transporte da viatura para Itália, inscrições em experiências, concierge (o serviço não existe; saiu a 27.09.2026 — ficam os Contactos e o SOS). Os convidados recebem acesso poucos dias antes de partir.
 
 ---
 

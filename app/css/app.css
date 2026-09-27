@@ -1503,37 +1503,6 @@ a { color: var(--verde); text-decoration: none; }
 .revelado { animation: revelar var(--transicao-cerimonia) both; }
 
 /* ---------------------------------------------------------
-   Uma pessoa: o concierge tem cara
-   --------------------------------------------------------- */
-
-.pessoa { display: flex; align-items: center; gap: var(--esp-2); }
-.pessoa__foto {
-  width: 64px;
-  height: 64px;
-  flex: none;
-  border-radius: var(--raio-foto);
-  background: var(--intonaco);
-  background-size: cover;
-  background-position: center;
-  border: 1px solid var(--pietra);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--inchiostro-chiaro);
-}
-.pessoa__texto { display: flex; flex-direction: column; gap: 2px; }
-.pessoa__nome { font-family: var(--font-editorial); font-size: 26px; line-height: 1.15; }
-
-.promessa-tempo {
-  margin: var(--esp-2) 0 0;
-  font-family: var(--font-editorial);
-  font-style: italic;
-  font-size: 19px;
-  line-height: 1.5;
-  color: var(--inchiostro-medio);
-}
-
-/* ---------------------------------------------------------
    A certidão do percurso
    --------------------------------------------------------- */
 

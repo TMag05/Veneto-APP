@@ -32,7 +32,8 @@
     ['participantes', 'participantes'],
     ['galeria', 'galeria'],
     ['foto/:id', 'foto'],
-    ['concierge', 'concierge'],
+    /* O concierge saiu; um link antigo abre os contactos. */
+    ['concierge', 'contactos'],
     ['contactos', 'contactos'],
     ['sos', 'sos'],
     ['carro', 'carro'],

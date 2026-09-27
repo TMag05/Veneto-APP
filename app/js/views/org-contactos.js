@@ -17,7 +17,7 @@
     { valor: 'alerta', rotulo: 'Emergência' },
     { valor: 'oficina', rotulo: 'Assistência' },
     { valor: 'carro', rotulo: 'Carro-vassoura' },
-    { valor: 'mensagem', rotulo: 'Concierge' },
+    { valor: 'mensagem', rotulo: 'Mensagem' },
     { valor: 'caixa', rotulo: 'Logística' }
   ];
 
