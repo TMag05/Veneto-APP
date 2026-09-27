@@ -88,6 +88,9 @@
           }) +
           '<div class="pilha-2" style="margin-top:24px">' +
             UI.campo({ rotulo: 'Data', nome: 'data', valor: d.data, tipo: 'data' }) +
+            /* Só os dias de estrada levam número à vista do convidado. */
+            UI.campo({ rotulo: 'Tipo de dia', nome: 'logistico', valor: d.logistico || '', tipo: 'lista',
+              opcoes: [{ valor: '', rotulo: 'Dia de estrada, com número' }, { valor: 'sim', rotulo: 'Logística, sem número' }] }) +
             UI.campo({ rotulo: 'Título da etapa', nome: 'titulo', valor: d.titulo,
               placeholder: 'Possagno → Grappa → San Boldo' }) +
             UI.campo({ rotulo: 'Subtítulo', nome: 'subtitulo', valor: d.subtitulo,

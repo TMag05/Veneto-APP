@@ -84,7 +84,7 @@
 
   function svgMapa(E, dia) {
     return '<svg viewBox="0 0 ' + L + ' ' + E.A + '" xmlns="http://www.w3.org/2000/svg" role="img" ' +
-      'aria-label="Percurso do dia ' + dia.numero + ', ' + UI.h(dia.titulo) + '">' +
+      'aria-label="Percurso: ' + UI.h([dia.etiqueta, dia.titulo].filter(Boolean).join(', ')) + '">' +
       '<rect width="' + L + '" height="' + E.A + '" fill="var(--intonaco)"/>' +
       relevo(E, dia.numero * 2.1) +
       rota(E, dia) +
@@ -177,7 +177,7 @@
     }).join('');
     return '<div class="etapa-planta">' +
       '<svg viewBox="' + P.viewBox + '" xmlns="http://www.w3.org/2000/svg" role="img" ' +
-        'aria-label="Percurso do dia ' + dia.numero + ', ' + UI.h(dia.titulo) + ', ' + Math.round(P.km) + ' km">' +
+        'aria-label="Percurso: ' + UI.h([dia.etiqueta, dia.titulo].filter(Boolean).join(', ')) + ', ' + Math.round(P.km) + ' km">' +
         tracos + pontos +
       '</svg>' +
       sobreposicao(E, dia) +
@@ -254,7 +254,7 @@
     }).join('');
 
     const maisAlto = P.picos.slice().sort(function (a, b) { return b.altitude - a.altitude; })[0];
-    const rotulo = 'Perfil de altitude do dia ' + dia.numero + ', ' + Math.round(S.kmTotal) + ' km' +
+    const rotulo = 'Perfil de altitude: ' + [dia.etiqueta, dia.titulo].filter(Boolean).join(', ') + ', ' + Math.round(S.kmTotal) + ' km' +
       (maisAlto ? '. Ponto mais alto: ' + maisAlto.nome + ', ' + maisAlto.altitude + ' m' : '');
 
     return '<div class="etapa-perfil" data-perfil="' + dia.numero + '">' +
@@ -387,10 +387,10 @@
 
     return '<div class="faixa" style="margin-top:32px">' +
         '<div class="seccao-cabecalho">' +
-          '<h2 class="titulo-editorial">' + UI.h(d.titulo || 'Dia ' + d.numero) + '</h2>' +
+          '<h2 class="titulo-editorial">' + UI.h(d.titulo || UI.rotuloDia(d)) + '</h2>' +
           (d.distancia ? '<span class="meta num">' + d.distancia + ' km</span>' : '') +
         '</div>' +
-        '<p class="meta">Dia ' + d.numero + (d.data ? ' · ' + UI.dataLonga(d.data) : '') + '</p>' +
+        '<p class="meta">' + UI.h([d.etiqueta, d.data ? UI.dataLonga(d.data) : ''].filter(Boolean).join(' · ')) + '</p>' +
       '</div>' +
 
       (P ? retrato(P, d)

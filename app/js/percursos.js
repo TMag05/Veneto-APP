@@ -103,7 +103,11 @@ window.PERCURSOS = (function () {
        metros» e «pelos vales das Dolomitas», e os únicos passos de
        estrada perto dos 2000 m a partir de Primiero são o Rolle (1984 m)
        e o Valles (2032 m). Desce-se por Falcade e Agordo até Belluno, e
-       volta-se pelo Fadalto — o San Boldo já se faz nos dias 2 e 4. */
+       volta-se pelo Fadalto — o San Boldo já se faz nos dias 2 e 4.
+       Calculado com o almoço no Chalet Piereni: com a Malga Ces
+       (27.09.2026) deixou de bater com as paragens, e o dia volta ao
+       desenho de paragem a paragem até se recalcular pelos cinco passos
+       do texto da direção. */
     3: {
       paragens: ['hotel-villa-soligo', 'atelie-de-valentino-moro', 'chalet-piereni', 'hotel-villa-soligo'],
       km: 245.7, minutos: 273,

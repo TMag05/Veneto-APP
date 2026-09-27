@@ -124,13 +124,13 @@ servidor.js             servidor estático de desenvolvimento
 
 | O quê | Onde | Nota |
 |---|---|---|
-| Coordenadas dos sítios | `semente.js` | Do OpenStreetMap. A do LO.VE. é a da rua (Via dei Colli, Follina), não a do portão |
+| Coordenadas dos sítios | `semente.js` | Do OpenStreetMap. A do LO.VE. é a da rua (Via dei Colli, Follina), não a do portão. A da Malga Ces é aproximada: os links procuram pelo nome até se confirmar |
 | Horas da chegada | `semente.js` › `roteiro` | Hotel às 20:30 e jantar às 21:00, dependentes da pontualidade dos voos. A chegada ao Marco Polo não tem hora, e sem hora a app não mostra nenhuma |
 | Distâncias dos troços | `ui.js` › `troco()` | Linha reta com fator de sinuosidade. Já não se mostram ao convidado; só medem o dia quando não há percurso gravado |
 | Fotografias | `assets/fotos/` | Dezasseis fotografias dos sítios: as oficiais de cada local (hotel, restaurantes, museu, ateliê, refúgios) e Pixabay para Veneza e San Boldo, reduzidas a 1600 px e guardadas pelo service worker. Usadas sem créditos, por decisão da organização, que trata da autorização. Os quatro momentos de logística usam os gráficos de `imagens.js`, com as cores de `tokens.css`. A organização pode trocar qualquer uma na sua área |
 | Silhuetas dos carros | `silhuetas.js` › `FORMAS` | Cinco arquétipos. A versão final deve ter um perfil por modelo |
 | Código da primeira pessoa da equipa | `js/nuvem.js` › `CODIGO_EQUIPA` | Só no servidor simulado, e só com a equipa vazia. No Firebase, a primeira entrada escreve-se na consola |
-| Traçados das estradas | `js/estradas.js` | Só o Passo di San Boldo está confirmado, com geometria do OpenStreetMap. A Strada Cadorna, a Val Canali, os vales do dia 3 e o Cansiglio aparecem sem desenho, até a Stappando confirmar por onde se vai |
+| Traçados das estradas | `js/estradas.js` | Só o Passo di San Boldo está confirmado, com geometria do OpenStreetMap. A Strada Cadorna, as passagens das Dolomitas de 3 de outubro e o Cansiglio aparecem sem desenho, até a Stappando confirmar por onde se vai |
 | O que fazer à chegada | `js/conteudo.js` › `chegada` | Estacionamento, quem recebe, casas de banho e hora de voltar aos carros. Os campos estão criados e editáveis; falta a organização preenchê-los paragem a paragem |
 | Contas dos convidados | `js/nuvem.js` › `CONFIG` | Sem projeto Firebase, as contas vivem num servidor simulado em cada browser: a organização só vê as criadas no seu, e a recuperação da palavra-passe não envia email. Com o projeto, faltam as regras de `contas/{uid}` e a Cloud Function que apaga do Auth a conta que a organização apagou |
 | Envio das fotografias | `js/nuvem.js` | O ficheiro fica guardado no telemóvel, inteiro, com miniatura e vista já geradas e o caminho de destino já calculado. Faltam as quatro funções que falam com o Firebase: até lá a fila diz *pendente* e nunca *enviado* |
@@ -146,7 +146,7 @@ Sete dos oito movimentos de [O Luxo é Atmosfera](PESQUISA-LUXO.html) estão imp
 ## Por fazer, por ordem
 
 1. **Sessão fotográfica do próprio passeio.** As fotografias oficiais dos sítios já estão na app; falta o passeio em si — os carros na estrada, o grupo, a luz de outubro. É o movimento de maior efeito.
-2. **O traçado real dos quatro troços por confirmar**, pedido à Stappando: a subida a Cima Grappa, a Val Canali, os vales da tarde do dia 3 e a subida ao Cansiglio. Chega o GPX ou o nome das estradas — o desenho projeta-se do OpenStreetMap, como se fez ao San Boldo.
+2. **O traçado real dos quatro troços por confirmar**, pedido à Stappando: a subida a Cima Grappa, as passagens das Dolomitas de 3 de outubro (Croce d'Aune, Rolle, Valles, Cereda, Forcella Aurine, por uma ordem ainda por confirmar) e a subida ao Cansiglio. Chega o GPX ou o nome das estradas — o desenho projeta-se do OpenStreetMap, como se fez ao San Boldo.
 2. **Servidor.** Firestore para conteúdo e pedidos; Storage para fotografias; o projeto Firebase para as contas, que já falam REST com email e palavra-passe; papéis de organização e convidado com regras de segurança a sério; Cloud Messaging para as notificações de alteração de programa.
 3. **Publicação e notificação.** O botão que empurra uma alteração para os telemóveis. Sem isto a regra operacional da secção 4 do manifesto não se cumpre.
 4. **Revisão da identidade para a rota real.** `Pietra e Vigna` foi deduzida do Veneto — pedra de Istria, verde Veronese, villas palladianas, tipografia aldina — e a rota de 2026 passa a maior parte do tempo precisamente aí. O que a fundamentação ainda não tem são os dois fios que o passeio acrescenta: a Grande Guerra (o Grappa e San Boldo) e a dolomia das Pale di San Martino. A paleta e as regras ficam; a revisão acrescenta, não substitui. Ver [ENQUADRAMENTO.md](ENQUADRAMENTO.md) §4.

@@ -58,7 +58,7 @@
       const fase = Estado.fase();
 
       const filtros = [{ id: 'todos', rotulo: 'Todas' }]
-        .concat(DADOS.dias.map(function (d) { return { id: d.id, rotulo: 'Dia ' + d.numero }; }))
+        .concat(DADOS.dias.map(function (d) { return { id: d.id, rotulo: UI.rotuloDia(d) }; }))
         .concat([{ id: 'minhas', rotulo: 'Minhas' }]);
 
       return '<div class="capa">' +

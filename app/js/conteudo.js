@@ -15,8 +15,9 @@ window.Conteudo = (function () {
      entrou na semente: o que os telemóveis tinham guardado era a
      maqueta de Cortina, e dá lugar ao itinerário de 2026. Subiu
      para 3 a 27.09.2026, com a revisão da direção, ainda em testes:
-     cada telemóvel volta a carregar a semente. */
-  const VERSAO_DADOS = 3;
+     cada telemóvel volta a carregar a semente. Subiu para 4 no mesmo
+     dia, com os títulos e os dias de logística. */
+  const VERSAO_DADOS = 4;
   const ouvintes = [];
 
   /* Revisões de linguagem da semente. O itinerário guardado num
@@ -122,6 +123,7 @@ window.Conteudo = (function () {
       const dia = {
         id: 'd-' + x.data,
         data: x.data, titulo: x.titulo, subtitulo: x.subtitulo || '', resumo: x.resumo || '',
+        logistico: x.logistico ? 'sim' : '',
         distancia: 0, duracao: '', hotel: x.hotel ? local(x.hotel) : '',
         etapas: (x.paragens || []).map(paragem),
         momentos: x.momentos.map(function (m) {
@@ -270,10 +272,19 @@ window.Conteudo = (function () {
   function projetar() {
     window.POIS = dados.pois;
 
+    /* «numero» é a posição no itinerário e liga o dia ao seu percurso
+       e às suas estradas. O convidado vê «etiqueta»: só os dias de
+       estrada contam — a chegada e a partida são logística, sem
+       número (decisão da direção, 27.09.2026). */
+    let ordem = 0;
     const dias = dados.dias.map(function (d, i) {
       const medida = medirDia(d, i + 1);
+      const ativo = !d.logistico;
+      if (ativo) ordem++;
       return Object.assign({}, d, {
         numero: i + 1,
+        ordem: ativo ? ordem : 0,
+        etiqueta: ativo ? 'Dia ' + ordem : '',
         distancia: d.distancia || medida.km,
         duracao: d.duracao || (window.UI ? UI.duracao(medida.min) : ''),
         imagem: d.imagem || { variante: 'paisagem', semente: d.id },

@@ -100,22 +100,26 @@ window.UI = (function () {
      links por troço e o GPX.
      --------------------------------------------------------- */
 
+  /* Com «pesquisa», procura-se pelo nome: é o que vale enquanto as
+     coordenadas de um sítio forem aproximadas. */
   function linkLocal(poiId) {
     const p = POIS[poiId];
     if (!p) return '#';
+    if (p.pesquisa) return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(p.pesquisa);
     return 'https://www.google.com/maps/search/?api=1&query=' + p.lat + ',' + p.lng;
   }
 
   function linkWaze(poiId) {
     const p = POIS[poiId];
     if (!p) return '#';
+    if (p.pesquisa) return 'https://waze.com/ul?q=' + encodeURIComponent(p.pesquisa) + '&navigate=yes';
     return 'https://waze.com/ul?ll=' + p.lat + ',' + p.lng + '&navigate=yes';
   }
 
-  /* Os dois atalhos, lado a lado. Sem coordenadas, nada. */
+  /* Os dois atalhos, lado a lado. Sem coordenadas nem nome, nada. */
   function atalhosLocal(poiId) {
     const p = POIS[poiId];
-    if (!p || !p.lat || !p.lng) return '';
+    if (!p || (!p.pesquisa && (!p.lat || !p.lng))) return '';
     const link = function (href, rotulo) {
       return '<a class="botao botao--texto" href="' + href + '" target="_blank" rel="noopener">' +
         Icone('externo', 20) + rotulo + '</a>';
@@ -280,12 +284,24 @@ window.UI = (function () {
 
   /* dia-3-passo-di-san-boldo-14h32.jpg — o nome que a câmara dá não
      diz nada a ninguém daqui a um ano. */
+  /* Como se chama um dia: «Dia 1» nos dias de estrada, o título nos
+     de logística (a chegada, a partida). */
+  function rotuloDia(d) {
+    return d ? (d.etiqueta || d.titulo || '') : '';
+  }
+
+  /* O nome de um dia em ficheiros e pastas: dia-1, chegada. */
+  function pastaDia(d) {
+    if (!d) return '';
+    return d.ordem ? 'dia-' + d.ordem : (talho(d.titulo) || 'dia');
+  }
+
   function nomeDeFoto(f, tipo) {
     const dia = DADOS.dia(f.dia);
     const poi = f.poi && POIS[f.poi] ? POIS[f.poi].nome : '';
     const d = new Date(f.criado);
     const hora = String(d.getHours()).padStart(2, '0') + 'h' + String(d.getMinutes()).padStart(2, '0');
-    const partes = [dia ? 'dia-' + dia.numero : '', talho(poi), hora].filter(Boolean);
+    const partes = [pastaDia(dia), talho(poi), hora].filter(Boolean);
     const ext = String(tipo || '').indexOf('/') > 0 ? tipo.split('/')[1].replace('jpeg', 'jpg') : 'jpg';
     return partes.join('-') + '.' + ext;
   }
@@ -428,7 +444,7 @@ window.UI = (function () {
   return {
     h: h, dataLonga: dataLonga, dataCurta: dataCurta, intervaloEvento: intervaloEvento,
     minutos: minutos, horaAgora: horaAgora, plural: plural, duracao: duracao,
-    troco: troco, haversine: haversine, linkLocal: linkLocal, linkWaze: linkWaze, atalhosLocal: atalhosLocal,
+    rotuloDia: rotuloDia, pastaDia: pastaDia, troco: troco, haversine: haversine, linkLocal: linkLocal, linkWaze: linkWaze, atalhosLocal: atalhosLocal,
     descarregar: descarregar,
     foto: foto, imagemDe: imagemDe, logo: logo, horario: horario, distintivo: distintivo, linhaLista: linhaLista,
     campo: campo, ligarCampos: ligarCampos, coordenadas: coordenadas, escolhaCarro: escolhaCarro,

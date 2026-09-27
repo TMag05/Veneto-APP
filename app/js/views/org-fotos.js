@@ -44,7 +44,7 @@
           const f = doDia(d.id);
           return '<div class="faixa">' +
             '<div class="seccao-cabecalho">' +
-              '<h2 class="titulo-ui">Dia ' + d.numero + (d.titulo ? ' · ' + UI.h(d.titulo) : '') + '</h2>' +
+              '<h2 class="titulo-ui">' + UI.h([d.etiqueta, d.titulo].filter(Boolean).join(' · ')) + '</h2>' +
               '<span class="meta num">' + f.length + '</span>' +
             '</div>' +
             (f.length ? '<div class="grelha-fotos" style="margin-bottom:12px">' + f.map(celula).join('') + '</div>' : '') +

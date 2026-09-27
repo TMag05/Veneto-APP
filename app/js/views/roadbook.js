@@ -18,8 +18,8 @@
     return '<a class="cartao-dia" href="#/roadbook/' + d.id + '">' +
       UI.foto(d.imagem, 'cartao-dia__foto') +
       '<span class="cartao-dia__corpo">' +
-        '<span class="etiqueta" style="display:block">Dia ' + d.numero +
-          (d.data ? ' · ' + UI.dataCurta(d.data) : '') + '</span>' +
+        '<span class="etiqueta" style="display:block">' +
+          UI.h([d.etiqueta, d.data ? UI.dataCurta(d.data) : ''].filter(Boolean).join(' · ')) + '</span>' +
         '<span class="cartao-dia__titulo">' + UI.h(d.titulo || 'Etapa ' + d.numero) + '</span>' +
         (d.resumo ? '<span class="cartao-dia__resumo">' + UI.h(d.resumo) + '</span>' : '') +
         (paragens ? '<span class="cartao-dia__meta">' + UI.plural(paragens, 'paragem', 'paragens') + '</span>' : '') +
@@ -78,7 +78,7 @@
       return '<div class="capa">' +
           UI.foto(dia.imagem, 'foto--32 capa__imagem') +
           '<div class="capa__texto">' +
-            '<p class="capa__data">Dia ' + dia.numero + (dia.data ? ' · ' + UI.dataCurta(dia.data) : '') + '</p>' +
+            '<p class="capa__data">' + UI.h([dia.etiqueta, dia.data ? UI.dataCurta(dia.data) : ''].filter(Boolean).join(' · ')) + '</p>' +
             '<h1 class="capa-titulo">' + UI.h(dia.titulo || 'Etapa ' + dia.numero) + '</h1>' +
             (dia.subtitulo ? '<p class="subtitulo" style="margin-top:8px">' + UI.h(dia.subtitulo) + '</p>' : '') +
           '</div>' +
