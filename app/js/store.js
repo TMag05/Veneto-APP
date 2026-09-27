@@ -430,17 +430,6 @@ window.Estado = (function () {
     return outras.concat(minhas).reverse();
   }
 
-  /* ---------------------------------------------------------
-     Pedidos ao concierge
-     --------------------------------------------------------- */
-
-  /* Um pedido é entregue a uma pessoa. Não há resposta automática:
-     fingir uma resposta é pior do que não ter nenhuma. */
-  function pedir(texto) {
-    estado.pedidos.push({ id: 'r' + Date.now(), texto: texto, criado: Date.now(), estado: 'entregue', resposta: null });
-    enfileirar('pedido', 'Pedido ao concierge');
-  }
-
   window.addEventListener('online', sincronizar);
   window.addEventListener('online', verificarSessao);
   window.addEventListener('offline', emitir);
@@ -477,7 +466,6 @@ window.Estado = (function () {
     foto: foto,
     fotosPorEnviar: fotosPorEnviar,
     fotos: fotos,
-    pedir: pedir,
     reiniciar: function () {
       Fotos.limpar().catch(function () { /* nada para limpar */ });
       localStorage.removeItem(CHAVE);

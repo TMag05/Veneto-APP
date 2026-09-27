@@ -216,24 +216,6 @@
         '</div>' +
 
         '<div class="faixa">' +
-          '<div class="seccao-cabecalho"><h2 class="etiqueta">Concierge</h2></div>' +
-          '<p class="corpo-ui silencioso">Quem responde do outro lado. O convidado vê a cara, o nome e a promessa — e é isso que faz a diferença entre um chat e um serviço.</p>' +
-          '<div style="margin-top:16px">' +
-            UI.campoFoto({
-              rotulo: 'Fotografia', id: 'ent-foto-conc', acao: 'fotoConcierge', remover: 'tirarFotoConcierge',
-              valor: (e.concierge && e.concierge.foto) || '', nota: 'Um retrato, não um logótipo.'
-            }) +
-          '</div>' +
-          '<div class="pilha-2" style="margin-top:16px">' +
-            UI.campo({ rotulo: 'Nome', nome: 'c_nome', valor: (e.concierge && e.concierge.nome) || '', placeholder: 'Sara Duarte' }) +
-            UI.campo({ rotulo: 'Função', nome: 'c_papel', valor: (e.concierge && e.concierge.papel) || '', placeholder: 'Concierge do passeio' }) +
-            UI.campo({ rotulo: 'Promessa de resposta', nome: 'c_promessa', valor: (e.concierge && e.concierge.promessa) || '',
-              placeholder: 'Respondemos em menos de dez minutos. Sempre uma pessoa.',
-              nota: 'Só prometer o que se cumpre.' }) +
-          '</div>' +
-        '</div>' +
-
-        '<div class="faixa">' +
           '<div class="seccao-cabecalho"><h2 class="etiqueta">Briefing</h2></div>' +
           '<p class="corpo-ui silencioso">O que o convidado lê nos dias que antecedem a partida.</p>' +
           '<div class="pilha-2" style="margin-top:16px">' +
@@ -267,25 +249,7 @@
         '</div>';
     },
     montar: function (el) {
-      const ent = el.querySelector('#ent-foto-conc');
-      if (ent) {
-        ent.addEventListener('change', function () {
-          const f = ent.files && ent.files[0];
-          if (!f) return;
-          UI.reduzirImagem(f, 480, function (dataUrl) {
-            if (dataUrl) Conteudo.atualizarConcierge({ foto: dataUrl });
-          });
-          ent.value = '';
-        });
-      }
-
       UI.ligarCampos(el, function (nome, valor) {
-        if (nome.indexOf('c_') === 0) {
-          const patch = {};
-          patch[nome.slice(2)] = valor;
-          Conteudo.atualizarConcierge(patch);
-          return;
-        }
         const patch = {};
         patch[nome] = (nome === 'levar' || nome === 'notas')
           ? String(valor).split('\n').map(function (t) { return t.trim(); }).filter(Boolean)
@@ -294,8 +258,6 @@
       });
     },
     acoes: Object.assign({}, acoesComuns, {
-      fotoConcierge: function () { document.getElementById('ent-foto-conc').click(); },
-      tirarFotoConcierge: function () { Conteudo.atualizarConcierge({ foto: '' }); },
 
       exemplo: function () {
         UI.abrirFolha('Carregar exemplo',

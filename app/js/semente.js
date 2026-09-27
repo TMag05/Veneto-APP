@@ -29,8 +29,6 @@ window.SEMENTE = (function () {
     /* Onde é o passeio, por baixo da data na primeira abertura. */
     lugar: 'Veneto, Itália',
     hotel: 'Hotel Villa Soligo',
-    /* Quem responde do outro lado. Uma pessoa, com nome e cara. */
-    concierge: { nome: '', papel: '', foto: '', promessa: 'Respondemos em menos de dez minutos. Sempre uma pessoa.' },
     /* Briefing que o convidado lê nos dias anteriores. */
     levar: [
       'Carta de condução e documento de identificação',
@@ -321,10 +319,6 @@ window.SEMENTE = (function () {
      participantes reais — esses entram na área da organização.
      --------------------------------------------------------- */
   const exemplo = {
-    evento: {
-      concierge: { nome: 'Sara Duarte', papel: 'Concierge do passeio', foto: '',
-        promessa: 'Respondemos em menos de dez minutos. Sempre uma pessoa.' }
-    },
     participantes: [
       ['Tiago', 'Magalhães', 'condutor', '1', 'db12', 'AA-12-BB'],
       ['Inês', 'Magalhães', 'acompanhante', '1'],
@@ -336,7 +330,7 @@ window.SEMENTE = (function () {
       ['Miguel', 'Cardoso', 'acompanhante', '5']
     ],
     contactos: [
-      { nome: 'Concierge do passeio', papel: 'Sara Duarte', telefone: '+39 340 000 0001', icone: 'mensagem' },
+      { nome: 'Organização do passeio', papel: 'Sara Duarte', telefone: '+39 340 000 0001', icone: 'telefone' },
       { nome: 'Assistência técnica', papel: 'Carro-oficina, 24 horas', telefone: '+39 340 000 0002', icone: 'oficina' },
       { nome: 'Carro-vassoura', papel: 'Segue sempre o último do grupo', telefone: '+39 340 000 0003', icone: 'carro' }
     ]

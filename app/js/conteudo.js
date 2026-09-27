@@ -302,7 +302,6 @@ window.Conteudo = (function () {
       contactos: dados.contactos,
       locais: dados.locais,
       biblioteca: SEMENTE.biblioteca,
-      concierge: dados.evento.concierge || { nome: '', papel: '', foto: '', promessa: '' },
       levar: dados.evento.levar || [],
       notas: dados.evento.notas || [],
       fotosIniciais: dados.fotosIniciais || [],
@@ -363,12 +362,6 @@ window.Conteudo = (function () {
     dados.fotosIniciais = (dados.fotosIniciais || []).filter(function (f) { return f.id !== id; });
     guardar();
     Fotos.apagar(id).catch(function () { /* já não existia */ });
-  }
-
-  function atualizarConcierge(patch) {
-    dados.evento.concierge = Object.assign(
-      { nome: '', papel: '', foto: '', promessa: '' }, dados.evento.concierge, patch);
-    guardar();
   }
 
   /* Paragens que já se revelaram ao convidado, por data. */
@@ -733,7 +726,7 @@ window.Conteudo = (function () {
     bruto: function () { return dados; },
     vazio: vazio,
 
-    atualizarEvento: atualizarEvento, atualizarConcierge: atualizarConcierge,
+    atualizarEvento: atualizarEvento,
     apagarEm: apagarEm, diasAteApagar: diasAteApagar,
     juntarFotoInicial: juntarFotoInicial, removerFotoInicial: removerFotoInicial,
     reveladas: reveladas, porRevelar: porRevelar, varianteDe: varianteDe,
