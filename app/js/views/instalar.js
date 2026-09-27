@@ -26,11 +26,12 @@
   /* Onde se está, lido do navegador. O iPad diz-se Mac desde o
      iPadOS 13; distingue-se pelo ecrã tátil. */
   function onde() {
-    if (instalada()) return 'instalada';
     const ua = navigator.userAgent || '';
     const ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
     if (ios) {
       if (/CriOS/.test(ua)) return 'ios-chrome';
+      /* A app já instalada não diz Safari/: mostra-se o caminho do Safari. */
+      if (instalada()) return 'ios-safari';
       /* Firefox, Edge e os browsers dentro de outras apps — Instagram,
          Facebook, LinkedIn — não têm o Safari/ no fim. */
       if (/FxiOS|EdgiOS|OPiOS|GSA\//.test(ua) || !/Safari\//.test(ua)) return 'ios-outro';
@@ -46,7 +47,7 @@
     return 'computador';
   }
 
-  function noTelemovel() { const o = onde(); return o !== 'instalada' && o !== 'computador'; }
+  function noTelemovel() { return !instalada() && onde() !== 'computador'; }
   function noIphone() { return onde().indexOf('ios-') === 0; }
 
   /* O Chrome só oferece a instalação depois de a página carregar,
@@ -107,6 +108,9 @@
   /* A entrada e o Mais mostram a mesma linha. No Android com pedido
      guardado, instala logo; nos outros casos leva aos passos. */
   function linha(nota) {
+    if (instalada()) {
+      return UI.linhaLista({ titulo: 'Como pôr no ecrã principal', nota: nota, icone: 'descarregar', href: '#/instalar' });
+    }
     return UI.linhaLista(pedido
       ? { titulo: 'Instalar no ecrã principal', nota: nota, icone: 'descarregar', acao: 'instalar' }
       : { titulo: 'Instalar no ecrã principal', nota: nota, icone: 'descarregar', href: '#/instalar' });
@@ -116,24 +120,17 @@
      Os passos de cada browser
      --------------------------------------------------------- */
 
-  function passos(lista) {
-    return '<ol class="passos">' + lista.map(function (p) {
-      return '<li class="passos__passo">' +
-        '<span class="passos__numero num" aria-hidden="true"></span>' +
-        '<span class="passos__corpo">' +
-          '<span class="titulo-ui" style="display:block">' + p[0] + '</span>' +
-          (p[1] ? '<span class="corpo-ui silencioso" style="display:block;margin-top:4px">' + p[1] + '</span>' : '') +
-        '</span>' +
-      '</li>';
-    }).join('') + '</ol>';
-  }
-
   const partilhar = '<span class="passos__simbolo" aria-hidden="true">' + Icone('partilhar', 18) + '</span>';
 
   /* O botão ··· do Safari, desenhado: os três pontos em texto
      perdem-se no tamanho de leitura. */
   const reticencias = '<span class="passos__simbolo" aria-label="···">' +
     '<svg width="20" height="8" viewBox="0 0 20 8" aria-hidden="true"><circle cx="3" cy="4" r="2"/><circle cx="10" cy="4" r="2"/><circle cx="17" cy="4" r="2"/></svg></span>';
+
+  /* Os menus do Android, desenhados como no ecrã: ⋮ do Chrome, ≡ do Samsung. */
+  const menuChrome = '<span class="passos__simbolo" aria-label="⋮">' +
+    '<svg width="8" height="20" viewBox="0 0 8 20" aria-hidden="true"><circle cx="4" cy="3" r="2"/><circle cx="4" cy="10" r="2"/><circle cx="4" cy="17" r="2"/></svg></span>';
+  const menuSamsung = '<span class="passos__simbolo" aria-label="≡">' + Icone('mais', 18) + '</span>';
 
   function botaoCopiar() {
     return '<button class="botao botao--secundario botao--largo" type="button" data-acao="copiarLink">Copiar o link</button>';
@@ -202,7 +199,7 @@
       );
     },
     /* A folha de Partilhar, com a linha que interessa. */
-    lista: function () {
+    lista: function (rotulo) {
       let linhas = '';
       [176, 202, 254, 280].forEach(function (y) {
         linhas += '<rect class="esquema__linha-folha" x="56" y="' + y + '" width="148" height="20" rx="6"/>' +
@@ -214,7 +211,7 @@
         [74, 110, 146, 182].map(function (x) { return '<circle class="esquema__ponto-grande" cx="' + x + '" cy="146" r="12"/>'; }).join('') +
         linhas +
         '<rect class="esquema__alvo" x="50" y="226" width="160" height="24" rx="8"/>' +
-        '<text class="esquema__texto esquema__texto--alvo esquema__texto--lista" x="58" y="241.5">Adicionar ao ecrã principal</text>' +
+        '<text class="esquema__texto esquema__texto--alvo esquema__texto--lista" x="58" y="241.5">' + (rotulo || 'Adicionar ao ecrã principal') + '</text>' +
         '<g class="esquema__alvo-icone" transform="translate(192 232)"><rect x="0" y="0" width="12" height="12" rx="3"/><path d="M6 3v6M3 6h6"/></g>'
       );
     },
@@ -237,6 +234,59 @@
         '<rect class="esquema__barra" x="46" y="210" width="168" height="100" rx="20"/>' + teclas
       );
     },
+    /* Chrome no Android: o menu ⋮ à direita do endereço. */
+    menuChrome: function () {
+      return telemovel(
+        '<rect class="esquema__campo" x="56" y="22" width="124" height="24" rx="12"/>' +
+        '<rect class="esquema__linha" x="70" y="31" width="70" height="6" rx="3"/>' +
+        alvo(197, 34, 13) +
+        '<g class="esquema__alvo-ponto">' + [27, 34, 41].map(function (y) { return '<circle cx="197" cy="' + y + '" r="2"/>'; }).join('') + '</g>' +
+        linhasDePagina(64, 13)
+      );
+    },
+    /* O menu do Chrome, aberto de cima, com a linha que interessa. */
+    menuAberto: function () {
+      let linhas = '';
+      [36, 60, 84, 108, 156, 180].forEach(function (y) {
+        linhas += '<rect class="esquema__linha" x="104" y="' + y + '" width="' + (y % 48 ? 70 : 84) + '" height="6" rx="3"/>';
+      });
+      return telemovel(
+        linhasDePagina(30, 14) +
+        '<rect class="esquema__folha" x="92" y="18" width="120" height="186" rx="14"/>' +
+        linhas +
+        '<rect class="esquema__alvo" x="96" y="122" width="112" height="26" rx="8"/>' +
+        '<text class="esquema__texto esquema__texto--alvo" x="104" y="139">Instalar app</text>'
+      );
+    },
+    /* A janela do Android: «Instalar» em baixo, à direita. */
+    confirmarAndroid: function () {
+      return telemovel(
+        linhasDePagina(30, 14) +
+        '<rect class="esquema__veu" x="44" y="8" width="172" height="304" rx="22"/>' +
+        '<rect class="esquema__folha" x="58" y="104" width="144" height="116" rx="18"/>' +
+        '<image href="assets/img/icone-180.png" x="70" y="118" width="32" height="32"/>' +
+        '<text class="esquema__texto" x="110" y="132">Grand Tour</text>' +
+        '<rect class="esquema__linha" x="110" y="140" width="70" height="5" rx="2.5"/>' +
+        '<text class="esquema__texto esquema__texto--suave" x="104" y="200" text-anchor="middle">Cancelar</text>' +
+        '<rect class="esquema__alvo" x="140" y="184" width="54" height="24" rx="12"/>' +
+        '<text class="esquema__texto esquema__texto--alvo" x="167" y="200" text-anchor="middle">Instalar</text>'
+      );
+    },
+    /* Samsung Internet: o menu ≡ na barra de baixo, à direita. */
+    menuSamsung: function () {
+      return telemovel(
+        '<rect class="esquema__campo" x="56" y="22" width="148" height="24" rx="12"/>' +
+        '<rect class="esquema__linha" x="70" y="31" width="70" height="6" rx="3"/>' +
+        linhasDePagina(64, 11) +
+        '<rect class="esquema__barra" x="46" y="266" width="168" height="44" rx="20"/>' +
+        [68, 98, 128, 158].map(function (x) { return '<circle class="esquema__ponto" cx="' + x + '" cy="288" r="4"/>'; }).join('') +
+        alvo(190, 288, 13) +
+        '<g class="esquema__alvo-icone"><path d="M183 283h14M183 288h14M183 293h9"/></g>'
+      );
+    },
+    listaSamsung: function () { return DESENHOS.lista('Adicionar página a'); },
+    ecraSamsung: function () { return DESENHOS.lista('Ecrã principal'); },
+
     /* O ecrã principal, com a montanha entre as outras apps. */
     icone: function () {
       let apps = '';
@@ -257,10 +307,15 @@
     }
   };
 
-  function ultimoPasso() {
-    return Estado.get().autenticado
-      ? ['Abra a app pelo ícone', 'Entre com o email e a palavra-passe do seu acesso.', 'icone']
-      : ['Abra a app pelo ícone', 'É lá que cria o seu acesso.', 'icone'];
+  /* No iPhone, a app do ícone começa do zero; no Android, a sessão
+     do Chrome vem com ela. */
+  function ultimoPasso(android) {
+    const dentro = Estado.get().autenticado;
+    return ['Abra a app pelo ícone',
+      android
+        ? (dentro ? 'Já abre com a sua sessão.' : 'É lá que cria o seu acesso.')
+        : (dentro ? 'Entre com o email e a palavra-passe do seu acesso.' : 'É lá que cria o seu acesso.'),
+      'icone'];
   }
 
   /* [título, nota, desenho] — uma frase de instrução, uma de ajuda. */
@@ -279,6 +334,22 @@
         ['Toque em «Adicionar ao ecrã principal»', 'Desça na lista. Se não aparecer, abra o link no Safari.', 'lista'],
         ['Toque em «Adicionar»', 'Em cima, à direita.', 'adicionar'],
         ultimoPasso()
+      ];
+    },
+    'android-chrome': function () {
+      return [
+        ['Toque no menu ' + menuChrome, 'Em cima, à direita. Se o menu disser «Abrir no Chrome», toque aí primeiro.', 'menuChrome'],
+        ['Toque em «Instalar app»', 'Nalguns telemóveis diz «Adicionar ao ecrã principal».', 'menuAberto'],
+        ['Toque em «Instalar»', 'O telemóvel pede para confirmar.', 'confirmarAndroid'],
+        ultimoPasso(true)
+      ];
+    },
+    'android-samsung': function () {
+      return [
+        ['Toque no menu ' + menuSamsung, 'Na barra de baixo, à direita.', 'menuSamsung'],
+        ['Toque em «Adicionar página a»', 'Desça na lista, se não estiver à vista.', 'listaSamsung'],
+        ['Toque em «Ecrã principal»', 'E confirme em «Adicionar».', 'ecraSamsung'],
+        ultimoPasso(true)
       ];
     }
   };
@@ -315,21 +386,8 @@
     'android-pedido': function () {
       return '<h1 class="instalar__titulo">Instalar no ecrã principal</h1>' +
         '<p class="corpo-ui silencioso" style="margin-top:8px">Um toque, e o telemóvel pede para confirmar.</p>' +
-        '<div style="margin-top:24px"><button class="botao botao--principal botao--largo" type="button" data-acao="instalar">Instalar</button></div>';
-    },
-    'android-chrome': function () {
-      return passos([
-        ['Toque no menu ⋮', 'No canto superior direito do Chrome. Se o menu tiver «Abrir no Chrome», toque aí primeiro.'],
-        ['Escolha «Instalar app»', 'Nalguns telemóveis chama-se «Adicionar ao ecrã principal».'],
-        ['Confirme em «Instalar»', 'A montanha do passeio fica ao lado das outras apps, e a sessão vem com ela.']
-      ]);
-    },
-    'android-samsung': function () {
-      return passos([
-        ['Toque no menu ≡', 'Na barra de baixo, à direita.'],
-        ['Escolha «Adicionar página a»', 'E depois «Ecrã principal».'],
-        ['Confirme em «Adicionar»', 'A montanha do passeio fica ao lado das outras apps.']
-      ]);
+        '<div style="margin-top:24px"><button class="botao botao--principal botao--largo" type="button" data-acao="instalar">Instalar</button></div>' +
+        '<button class="botao botao--texto instalar__outro" type="button" data-acao="corrigir" data-valor="android-chrome" style="margin-top:8px">Ver os passos</button>';
     },
     'android-outro': function () {
       return '<h1 class="instalar__titulo">Abra o link no Chrome</h1>' +
@@ -342,17 +400,14 @@
         '<p class="corpo-ui silencioso" style="margin-top:8px">Abra este link lá, no Safari ou no Chrome.</p>' +
         '<div style="margin-top:24px">' + botaoCopiar() + '</div>';
     },
-    'instalada': function () {
-      return '<h1 class="instalar__titulo">Já está no ecrã principal</h1>' +
-        '<p class="corpo-ui silencioso" style="margin-top:8px">É por lá que a app abre sem rede.</p>';
-    }
   };
 
   /* Quando a app se engana no telemóvel, quem o tem na mão corrige. */
   const ESCOLHAS = [
     ['ios-safari', 'iPhone, Safari'],
     ['ios-chrome', 'iPhone, Chrome'],
-    ['android-chrome', 'Android']
+    ['android-chrome', 'Android, Chrome'],
+    ['android-samsung', 'Samsung Internet']
   ];
 
   function corrigir(o) {
@@ -374,12 +429,7 @@
   let forcado = '';
   let escolher = false;
 
-  function atual() {
-    if (instalou) return 'instalada';
-    const o = onde();
-    if (o === 'instalada') return o;
-    return forcado || o;
-  }
+  function atual() { return forcado || onde(); }
 
   Vistas.instalar = {
     nav: 'mais',
@@ -390,9 +440,15 @@
     },
     html: function () {
       const o = atual();
+      /* Já instalada, os passos ficam para consulta: para mostrar a
+         quem ainda não conseguiu. */
+      const feito = instalou || instalada();
       return '<div class="faixa instalar">' +
+        (feito
+          ? '<p class="instalar__feito corpo-ui">' + Icone('verificado', 20) + '<span>Esta app já está no ecrã principal. Os passos ficam aqui, para mostrar a quem precisar.</span></p>'
+          : '') +
         (PASSOS[o] ? passoAPasso(PASSOS[o]()) : CORPOS[o]()) +
-        (o === 'instalada' ? '' : corrigir(o)) +
+        corrigir(o) +
       '</div>';
     },
     /* Cada visita começa no primeiro passo. */

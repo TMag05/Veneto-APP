@@ -66,12 +66,13 @@
           '</div>' +
         '</div>' +
 
-        /* Some quando a app já abre do ecrã principal. */
-        (Instalar.instalada()
-          ? ''
-          : '<div class="faixa">' +
-              '<div class="lista">' + Instalar.linha('Abre sem rede, como as outras apps') + '</div>' +
-            '</div>') +
+        /* Fica sempre: instalada, é o tutorial para mostrar a quem
+           não conseguiu à primeira. */
+        '<div class="faixa">' +
+          '<div class="lista">' + Instalar.linha(Instalar.instalada()
+            ? 'Os passos, para mostrar a quem precisar'
+            : 'Abre sem rede, como as outras apps') + '</div>' +
+        '</div>' +
 
         '<div class="faixa">' +
           '<div class="seccao-cabecalho"><h2 class="etiqueta">Aspeto</h2></div>' +

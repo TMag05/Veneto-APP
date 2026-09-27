@@ -1760,29 +1760,6 @@ a { color: var(--verde); text-decoration: none; }
    Instalar — os passos do browser em que se está
    --------------------------------------------------------- */
 
-.passos { list-style: none; margin: 0; padding: 0; counter-reset: passo; }
-.passos__passo {
-  counter-increment: passo;
-  display: flex;
-  gap: var(--esp-2);
-  align-items: flex-start;
-}
-.passos__passo + .passos__passo { margin-top: var(--esp-3); }
-.passos__numero {
-  flex: none;
-  width: 32px;
-  height: 32px;
-  display: grid;
-  place-items: center;
-  border-radius: var(--raio-pill);
-  background: var(--acento-suave);
-  color: var(--ottone);
-  font-family: var(--font-ui);
-  font-size: 15px;
-  font-weight: 500;
-}
-.passos__numero::before { content: counter(passo); }
-.passos__corpo { padding-top: 4px; }
 /* O símbolo que se procura no ecrã, desenhado como lá aparece. */
 .passos__simbolo {
   display: inline-grid;
@@ -1809,6 +1786,18 @@ a { color: var(--verde); text-decoration: none; }
 .instalar__escolha { margin-top: var(--esp-3); }
 .instalar__escolha .escolhas { flex-wrap: wrap; overflow: visible; }
 .passos__simbolo circle { fill: currentColor; }
+.esquema__alvo-ponto { fill: var(--ottone); }
+.esquema__veu { fill: var(--veu-leve); }
+.instalar__feito {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: var(--esp-3);
+  padding: 12px 14px;
+  background: var(--istria);
+  border-radius: var(--raio-controlo);
+}
+.instalar__feito svg { flex: none; margin-top: 2px; }
 
 /* O desenho do telemóvel: esquemático, nas cores do tema, com o que
    se toca a cobre. */
