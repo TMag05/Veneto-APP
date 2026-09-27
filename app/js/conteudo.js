@@ -179,6 +179,13 @@ window.Conteudo = (function () {
     try {
       const g = JSON.parse(localStorage.getItem(CHAVE));
       if (g && g.versao === VERSAO_DADOS) {
+        /* Um campo novo do evento na semente chega também a quem já
+           tinha o passeio guardado, sem tocar no que lá estava. */
+        if (g.evento) {
+          Object.keys(SEMENTE.evento).forEach(function (k) {
+            if (g.evento[k] === undefined) g.evento[k] = clonar(SEMENTE.evento[k]);
+          });
+        }
         if (rever(g) + corrigir(g)) {
           try { localStorage.setItem(CHAVE, JSON.stringify(g)); } catch (e) { /* quota */ }
         }

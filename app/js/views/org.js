@@ -205,6 +205,7 @@
             UI.campo({ rotulo: 'Nome do passeio', nome: 'nome', valor: e.nome, placeholder: 'Dolomites Grand Tour' }) +
             UI.campo({ rotulo: 'Subtítulo', nome: 'subtitulo', valor: e.subtitulo || '', placeholder: 'Há estradas que só se contam a quem lá esteve.' }) +
             UI.campo({ rotulo: 'Local / base', nome: 'base', valor: e.base, placeholder: 'Onde o grupo dorme' }) +
+            UI.campo({ rotulo: 'Região', nome: 'regiao', valor: e.regiao || '', placeholder: 'Veneto', nota: 'Aparece ao lado das datas, na primeira abertura.' }) +
             '<div class="par-campos">' +
               UI.campo({ rotulo: 'Início', nome: 'inicio', valor: e.inicio, tipo: 'data' }) +
               UI.campo({ rotulo: 'Fim', nome: 'fim', valor: e.fim, tipo: 'data' }) +

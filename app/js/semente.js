@@ -24,6 +24,8 @@ window.SEMENTE = (function () {
     inicio: '2026-10-01',
     fim: '2026-10-05',
     base: 'Hotel Villa Soligo',
+    /* A região, como a diz a chegada, ao lado das datas. */
+    regiao: 'Veneto',
     hotel: 'Hotel Villa Soligo',
     /* Quem responde do outro lado. Uma pessoa, com nome e cara. */
     concierge: { nome: '', papel: '', foto: '', promessa: 'Respondemos em menos de dez minutos. Sempre uma pessoa.' },

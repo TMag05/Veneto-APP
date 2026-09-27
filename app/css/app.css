@@ -1224,9 +1224,8 @@ a { color: var(--verde); text-decoration: none; }
 
 .chegada__corpo, .chegada__fim { position: relative; }
 .chegada__corpo { margin-top: auto; }
-.chegada .assinatura-am { color: rgba(237,232,224,0.7); }
 
-.chegada__titulo { color: #EDE8E0; margin-top: var(--esp-3); }
+.chegada__titulo { color: #EDE8E0; }
 .chegada__data {
   margin: var(--esp-2) 0 0;
   font-size: 14px;
@@ -1387,7 +1386,7 @@ a { color: var(--verde); text-decoration: none; }
 
 .logo { display: block; width: 100%; height: auto; }
 .logo--entrada { max-width: 264px; margin: 0 auto; }
-.logo--chegada { max-width: 150px; margin-bottom: var(--esp-3); }
+.logo--chegada { position: relative; max-width: 200px; margin: var(--esp-1) auto auto; }
 .logo--album   { max-width: 168px; }
 
 /* ---------------------------------------------------------
