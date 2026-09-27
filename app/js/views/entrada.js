@@ -53,7 +53,7 @@ function fabrica(org) {
         ? (modo === 'criar'
             ? 'Antes de criar o acesso. No iPhone, é na app instalada que ele fica.'
             : 'Antes de entrar. No iPhone, é na app instalada que a sessão fica.')
-        : 'Abre sem rede, como as outras apps.') +
+        : '') +
     '</div>';
   }
 
