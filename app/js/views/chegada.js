@@ -24,13 +24,14 @@
         ? dia.imagem
         : { variante: 'poente', semente: (DADOS.evento.nome || 'chegada') + '-capa' };
 
+      /* O logótipo assenta sozinho no alto, sobre o céu da fotografia;
+         o resto do ecrã fica no fundo, onde a leitura é melhor. */
       return '<div class="chegada" style="background-image:' + UI.imagemDe(capa, 0.62) + '">' +
         '<div class="chegada__veu"></div>' +
 
-        '<div class="chegada__corpo">' +
-          '<p class="assinatura-am chegada__passo" style="--atraso:0.2s">Aston Martin</p>' +
+        UI.logo('logo--chegada chegada__passo', '--atraso:0.3s') +
 
-          UI.logo('logo--chegada chegada__passo', '--atraso:0.5s') +
+        '<div class="chegada__corpo">' +
 
           '<h1 class="capa-titulo chegada__titulo chegada__passo" style="--atraso:0.9s">' +
             (primeiro ? UI.h(primeiro) + ',<br>o passeio' : 'O passeio') + '<br>espera por si.</h1>' +
