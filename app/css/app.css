@@ -1790,6 +1790,44 @@ a { color: var(--verde); text-decoration: none; }
   vertical-align: -3px;
   color: var(--ottone);
 }
+.instalar { padding-top: var(--esp-3); padding-bottom: var(--esp-4); }
+.instalar__titulo {
+  font-family: var(--font-ui);
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.3;
+  margin: 8px 0 0;
+}
+.instalar__desenho { margin: var(--esp-3) 0; }
+.instalar__outro {
+  display: block;
+  width: 100%;
+  color: var(--inchiostro-medio);
+  font-weight: 400;
+}
+.instalar > .instalar__outro { margin-top: var(--esp-2); }
+.instalar__escolha { margin-top: var(--esp-3); }
+.instalar__escolha .escolhas { flex-wrap: wrap; overflow: visible; }
+.passos__simbolo circle { fill: currentColor; }
+
+/* O desenho do telemóvel: esquemático, nas cores do tema, com o que
+   se toca a cobre. */
+.esquema { display: block; width: 100%; max-width: 240px; max-height: 38vh; margin: 0 auto; }
+.esquema__corpo { fill: var(--istria); stroke: var(--borda-forte); stroke-width: 1.5; }
+.esquema__linha { fill: var(--pietra); }
+.esquema__barra, .esquema__folha { fill: var(--intonaco); }
+.esquema__campo, .esquema__linha-folha { fill: var(--pietra); }
+.esquema__linha-folha + .esquema__linha { fill: var(--pietra-forte); }
+.esquema__ponto { fill: var(--inchiostro-chiaro); }
+.esquema__ponto-grande, .esquema__app, .esquema__tecla { fill: var(--pietra); }
+.esquema__icone { fill: none; stroke: var(--inchiostro-chiaro); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.esquema__alvo { fill: var(--acento-suave); stroke: var(--ottone); stroke-width: 2; }
+.esquema__alvo-icone { fill: none; stroke: var(--ottone); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.esquema__texto { fill: var(--inchiostro); font-family: var(--font-ui); font-size: 11px; }
+.esquema__texto--alvo { fill: var(--ottone); font-weight: 500; }
+.esquema__texto--suave { fill: var(--inchiostro-medio); }
+.esquema__texto--pequeno { font-size: 9px; }
+.esquema__texto--lista { font-size: 10px; }
 .instalar__link {
   padding: 12px 14px;
   background: var(--istria);
