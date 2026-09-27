@@ -57,8 +57,8 @@ window.UI = (function () {
 
   /* ---------------------------------------------------------
      Geografia — distâncias aproximadas entre POIs
-     Linha reta corrigida por um fator de sinuosidade. As
-     distâncias reais devem vir dos ficheiros GPX curados.
+     Linha reta corrigida por um fator de sinuosidade. Só servem
+     para medir o dia quando não há percurso gravado.
      --------------------------------------------------------- */
 
   function haversine(a, b) {
@@ -93,43 +93,12 @@ window.UI = (function () {
   }
 
   /* ---------------------------------------------------------
-     Navegação de recurso, troço a troço
-     O grupo segue os batedores; isto só serve quem se afastar da
-     caravana. Cada troço é um link, com âncoras que obrigam o Maps
-     a passar pela estrada do passeio e não pela mais rápida.
-
-     Âncoras da rota de 2026, lidas do programa: a Strada Cadorna
-     para subir ao Grappa; San Boldo pelo lado de Trichiana no dia
-     2 (desce-se pelos túneis até Tovena) e ao contrário no dia 4;
-     o planalto do Cansiglio pelo Alpago. Por confirmar com a
-     organização — os troços do dia 3 pelos vales ainda não têm.
+     A localização de cada paragem
+     O grupo segue os batedores; a app não traça percurso. Cada
+     paragem abre-se no Google Maps ou no Waze, só o sítio — quem
+     conduz escolhe a aplicação. Decisão de 27.09.2026, que tirou os
+     links por troço e o GPX.
      --------------------------------------------------------- */
-
-  const TRICHIANA = [46.0489, 12.1782];
-  const TOVENA = [45.9793, 12.1751];
-
-  const ANCORAS = {
-    'tempio-canoviano>sacrario-del-monte-grappa': [[45.8477, 11.7440]],
-    'sacrario-del-monte-grappa>passo-di-san-boldo': [TRICHIANA],
-    'passo-di-san-boldo>molinetto-della-croda': [TOVENA],
-    'hotel-villa-soligo>passo-di-san-boldo': [TOVENA],
-    'passo-di-san-boldo>la-casera': [TRICHIANA],
-    'la-casera>rifugio-citta-di-vittorio-veneto': [[46.0969, 12.3620], [46.0666, 12.4054]]
-  };
-
-  function linkMaps(deId, paraId) {
-    const de = POIS[deId], para = POIS[paraId];
-    if (!de || !para) return '#';
-    const ancoras = ANCORAS[deId + '>' + paraId] || [];
-    let url = 'https://www.google.com/maps/dir/?api=1' +
-      '&origin=' + de.lat + ',' + de.lng +
-      '&destination=' + para.lat + ',' + para.lng +
-      '&travelmode=driving';
-    if (ancoras.length) {
-      url += '&waypoints=' + ancoras.map(function (a) { return a[0] + ',' + a[1]; }).join('|');
-    }
-    return url;
-  }
 
   function linkLocal(poiId) {
     const p = POIS[poiId];
@@ -137,21 +106,23 @@ window.UI = (function () {
     return 'https://www.google.com/maps/search/?api=1&query=' + p.lat + ',' + p.lng;
   }
 
-  function gpx(dia) {
-    const pontos = dia.etapas.map(function (id) { return Object.assign({ id: id }, POIS[id]); });
-    let s = '<?xml version="1.0" encoding="UTF-8"?>\n';
-    s += '<gpx version="1.1" creator="' + h(DADOS.evento.nome || 'Passeio') +
-      ' — Aston Martin" xmlns="http://www.topografix.com/GPX/1/1">\n';
-    s += '  <metadata><name>' + h(dia.titulo) + '</name><time>' + dia.data + 'T06:00:00Z</time></metadata>\n';
-    pontos.forEach(function (p) {
-      s += '  <wpt lat="' + p.lat + '" lon="' + p.lng + '"><name>' + h(p.nome) + '</name><desc>' + h(p.local) + '</desc></wpt>\n';
-    });
-    s += '  <rte><name>' + h('Dia ' + dia.numero + ' — ' + dia.titulo) + '</name>\n';
-    pontos.forEach(function (p) {
-      s += '    <rtept lat="' + p.lat + '" lon="' + p.lng + '"><name>' + h(p.nome) + '</name></rtept>\n';
-    });
-    s += '  </rte>\n</gpx>\n';
-    return s;
+  function linkWaze(poiId) {
+    const p = POIS[poiId];
+    if (!p) return '#';
+    return 'https://waze.com/ul?ll=' + p.lat + ',' + p.lng + '&navigate=yes';
+  }
+
+  /* Os dois atalhos, lado a lado. Sem coordenadas, nada. */
+  function atalhosLocal(poiId) {
+    const p = POIS[poiId];
+    if (!p || !p.lat || !p.lng) return '';
+    const link = function (href, rotulo) {
+      return '<a class="botao botao--texto" href="' + href + '" target="_blank" rel="noopener">' +
+        Icone('externo', 20) + rotulo + '</a>';
+    };
+    return '<div class="atalhos-local">' +
+      link(linkLocal(poiId), 'Google Maps') + link(linkWaze(poiId), 'Waze') +
+    '</div>';
   }
 
   function descarregar(nome, conteudo, tipo) {
@@ -197,11 +168,15 @@ window.UI = (function () {
 
   /* A hora de um momento, como se lê: início e fim, só o fim
      («até às 10:00»), só o início, ou ainda por confirmar. */
+  /* A hora que o convidado vê. Com «horaOculta», nenhuma: a hora
+     fica só para o relógio da app. Sem hora, nada — não se escreve
+     «a confirmar». */
   function horario(m) {
+    if (m.horaOculta) return '';
     if (m.hora && m.fim) return m.hora + ' – ' + m.fim;
     if (m.hora) return m.hora;
     if (m.fim) return 'Até às ' + m.fim;
-    return 'A confirmar';
+    return '';
   }
 
   function distintivo(texto, variante) {
@@ -278,14 +253,21 @@ window.UI = (function () {
      quem os mostra decide o que fazer.
      --------------------------------------------------------- */
 
+  /* A escolha não passa só por cor: a opção escolhida leva borda
+     de acento e um visto, e o nome do modelo repete-se por baixo. */
   function escolhaCarro(modelo) {
+    const escolhido = Silhuetas.MODELOS.find(function (m) { return m.id === modelo; });
     return '<h3 class="etiqueta">Modelo</h3>' +
       '<div class="silhueta-grelha" style="margin-top:12px">' + Silhuetas.MODELOS.map(function (m) {
+        const sim = m.id === modelo;
         return '<button class="silhueta-opcao" type="button" data-acao="modelo" data-valor="' + m.id + '" ' +
-          'aria-pressed="' + (m.id === modelo ? 'true' : 'false') + '">' +
+          'aria-pressed="' + (sim ? 'true' : 'false') + '">' +
+          (sim ? '<span class="silhueta-opcao__marca">' + Icone('verificado', 20) + '</span>' : '') +
           Silhuetas.svg(m.id) +
           '<span class="silhueta-opcao__nome">' + h(m.nome) + '</span></button>';
-      }).join('') + '</div>';
+      }).join('') + '</div>' +
+      '<p class="corpo-ui silhueta-escolha" aria-live="polite">' +
+        (escolhido ? 'Escolhido: ' + h(escolhido.nome) : 'Toque no modelo do seu carro.') + '</p>';
   }
 
   /* Um nome reduzido a letras, números e hífenes. Serve de
@@ -446,8 +428,8 @@ window.UI = (function () {
   return {
     h: h, dataLonga: dataLonga, dataCurta: dataCurta, intervaloEvento: intervaloEvento,
     minutos: minutos, horaAgora: horaAgora, plural: plural, duracao: duracao,
-    troco: troco, haversine: haversine, linkMaps: linkMaps, linkLocal: linkLocal,
-    gpx: gpx, descarregar: descarregar,
+    troco: troco, haversine: haversine, linkLocal: linkLocal, linkWaze: linkWaze, atalhosLocal: atalhosLocal,
+    descarregar: descarregar,
     foto: foto, imagemDe: imagemDe, logo: logo, horario: horario, distintivo: distintivo, linhaLista: linhaLista,
     campo: campo, ligarCampos: ligarCampos, coordenadas: coordenadas, escolhaCarro: escolhaCarro,
     reduzirImagem: reduzirImagem, derivadas: derivadas, campoFoto: campoFoto, talho: talho, nomeDeFoto: nomeDeFoto,

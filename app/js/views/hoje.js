@@ -16,14 +16,6 @@
     refeicao: 'Refeição', prova: 'Prova', logistica: 'Logística'
   };
 
-  /* O troço desde a paragem anterior, ou nada se o sítio é o mesmo. */
-  function trocoAte(dia, m, i) {
-    const de = m.poi && POIS[m.poi] ? poiAnterior(dia.momentos, i) : null;
-    if (!de || de === m.poi) return null;
-    const t = UI.troco(de, m.poi);
-    return t.km > 0 ? { de: de, km: t.km, min: t.min } : null;
-  }
-
   /* Já começou? Sem hora de início mas com fim («até às 10:00») é
      porque está a decorrer; sem hora nenhuma, ainda está por vir. */
   function comecou(m) {
@@ -31,19 +23,19 @@
     return UI.horaAgora() >= UI.minutos(m.hora);
   }
 
-  /* «A seguir, às 18:00» — ou só «A seguir» se a hora não está fechada. */
+  /* «A seguir, às 18:00» — ou só «A seguir» se a hora não está
+     fechada, ou se não é das que se mostram. */
   function rotuloSeguinte(rotulo, s) {
+    if (s.horaOculta) return rotulo;
     if (s.hora) return rotulo + ', às ' + s.hora;
     if (s.fim) return rotulo + ', até às ' + s.fim;
     return rotulo;
   }
 
-  /* O momento em si: hora, o que acontece, onde, a alteração, a nota
-     e o ritmo desde a paragem anterior. Serve à página do momento e
-     aos capítulos do roadbook. */
+  /* O momento em si: hora, o que acontece, onde, a alteração e a
+     nota. Serve à página do momento e aos capítulos do roadbook. */
   function corpoMomento(dia, m, i, rotulo, nivel) {
     const tag = nivel || 'h3';
-    const t = trocoAte(dia, m, i);
     return '<div class="capitulo__cab num">' +
         '<span class="capitulo__hora">' + UI.h(UI.horario(m)) + '</span>' +
         '<span class="capitulo__tipo">' + UI.h(rotulo !== undefined ? rotulo : (TIPOS_MOMENTO[m.tipo] || '')) + '</span>' +
@@ -52,8 +44,7 @@
       (m.local ? '<p class="meta capitulo__local">' + UI.h(m.local) + '</p>' : '') +
       (m.alterado ? '<p class="corpo-ui capitulo__nota">' + UI.distintivo('Alterado', 'rosso') + ' Era às ' +
         UI.h(m.alterado.antes.replace(':', 'h')) + '. ' + UI.h(m.alterado.razao) + '.</p>' : '') +
-      (m.nota ? '<p class="corpo-ui silencioso capitulo__nota">' + UI.h(m.nota) + '</p>' : '') +
-      (t ? '<p class="capitulo__ritmo num">' + t.km + ' km desde ' + UI.h(POIS[t.de].nome) + ' · ' + UI.duracao(t.min) + '</p>' : '');
+      (m.nota ? '<p class="corpo-ui silencioso capitulo__nota">' + UI.h(m.nota) + '</p>' : '');
   }
 
   /* O momento a partir do endereço #/momento/dia/n. */
@@ -99,16 +90,17 @@
 
     return '<a class="' + classes.join(' ') + '" href="#/momento/' + dia.id + '/' + i + '">' +
       '<span class="momento__horas">' +
-        '<span class="momento__hora num">' + UI.h(m.hora || '—') + '</span>' +
-        (m.fim ? '<span class="meta num momento__fim">' + (m.hora ? '' : 'até ') + UI.h(m.fim) + '</span>' : '') +
+        (m.horaOculta ? '' :
+          '<span class="momento__hora num">' + UI.h(m.hora || '') + '</span>' +
+          (m.fim ? '<span class="meta num momento__fim">' + (m.hora ? '' : 'até ') + UI.h(m.fim) + '</span>' : '')) +
       '</span>' +
       '<span class="momento__corpo">' + corpo + '</span>' +
       '<span class="momento__seta">' + Icone('seta', 20) + '</span>' +
     '</a>';
   }
 
-  /* O dia em blocos. Entre duas paragens, o ritmo do troço — dado
-     ambiente, não instrução: o grupo segue a caravana. */
+  /* O dia em blocos. Sem percurso entre eles: o grupo segue a
+     caravana, e cada paragem tem a sua localização na página dela. */
   function blocos(dia, comEstadoTemporal) {
     const atual = comEstadoTemporal ? indiceAtual(dia) : -1;
     const jaComecou = atual >= 0 && comecou(dia.momentos[atual]);
@@ -119,14 +111,12 @@
         if (atual < 0 || i < atual) est = 'passado';
         else if (i === atual) est = jaComecou ? 'agora' : 'seguinte';
       }
-      const t = trocoAte(dia, m, i);
-      return (t ? '<p class="ritmo num">' + t.km + ' km · ' + UI.duracao(t.min) + '</p>' : '') +
-        bloco(dia, m, i, est);
+      return bloco(dia, m, i, est);
     }).join('') + '</div>';
   }
 
   /* A paragem de onde o grupo vem: o último momento anterior com
-     paragem associada. É daí que se conta o troço. */
+     paragem associada. */
   function poiAnterior(momentos, i) {
     for (let n = i - 1; n >= 0; n--) {
       const p = momentos[n].poi;
@@ -193,7 +183,6 @@
      está entre dois momentos — na estrada, a caminho dele. */
   function cartaoAgora(dia, i) {
     const m = dia.momentos[i];
-    const t = trocoAte(dia, m, i);
 
     return '<a class="agora" href="#/momento/' + dia.id + '/' + i + '">' +
       '<span class="agora__cab num">' +
@@ -204,7 +193,6 @@
         ' Era às ' + UI.h(m.alterado.antes.replace(':', 'h')) + '. ' + UI.h(m.alterado.razao) + '.</span>' : '') +
       '<span class="agora__titulo">' + UI.h(m.titulo) + '</span>' +
       (m.local ? '<span class="agora__local">' + UI.h(m.local) + '</span>' : '') +
-      (t ? '<span class="agora__ritmo num">' + t.km + ' km desde ' + UI.h(POIS[t.de].nome) + ' · ' + UI.duracao(t.min) + '</span>' : '') +
       '<span class="agora__seta">' + Icone('seta', 22) + '</span>' +
     '</a>';
   }
@@ -263,12 +251,7 @@
 
   function rodapeDia(dia) {
     return '<div class="faixa">' +
-      '<div class="dados">' +
-        '<div><div class="dado__valor num">' + dia.distancia + ' km</div><div class="dado__rotulo meta">Percurso</div></div>' +
-        '<div><div class="dado__valor num">' + UI.h(dia.duracao) + '</div><div class="dado__rotulo meta">Ao volante</div></div>' +
-        '<div><div class="dado__valor num">' + (dia.etapas.length - 1) + '</div><div class="dado__rotulo meta">Troços</div></div>' +
-      '</div>' +
-      '<a class="botao botao--secundario botao--largo" style="margin-top:24px" href="#/roadbook/' + dia.id + '">Abrir o roadbook do dia</a>' +
+      '<a class="botao botao--secundario botao--largo" href="#/roadbook/' + dia.id + '">Abrir o roadbook do dia</a>' +
     '</div>';
   }
 
@@ -325,14 +308,6 @@
     '</div>';
   }
 
-  /* Como se anda na estrada. O campo pode faltar em conteúdo guardado
-     antes de existir; nesse caso vale a semente. Vazio de propósito é
-     vazio — a organização pode querer não o mostrar. */
-  function formato() {
-    const f = DADOS.evento.formato;
-    return f === undefined ? SEMENTE.evento.formato : f;
-  }
-
   function briefingHtml() {
     const faltam = Estado.diasAte();
     const carro = Estado.meuCarro();
@@ -344,7 +319,7 @@
           '<p class="capa__data">' + UI.intervaloEvento() + '</p>' +
           '<h1 class="capa-titulo">' + UI.h(DADOS.evento.nome || 'Passeio') + '</h1>' +
           '<p class="subtitulo" style="margin-top:8px">' +
-            (faltam === null ? UI.h(DADOS.evento.base || 'Por confirmar')
+            (faltam === null ? UI.h(DADOS.evento.lugar || 'Por confirmar')
               : (faltam > 0 ? 'Faltam ' + UI.plural(faltam, 'dia', 'dias') + '.' : 'Começa hoje.')) +
           '</p>' +
         '</div>' +
@@ -374,11 +349,10 @@
       (DADOS.dias.length
         ? '<div class="faixa">' +
             '<div class="seccao-cabecalho"><h2 class="etiqueta">O programa</h2></div>' +
-            (formato() ? '<p class="corpo-editorial silencioso" style="margin-bottom:16px">' + UI.h(formato()) + '</p>' : '') +
             '<div class="lista">' + DADOS.dias.map(function (d) {
               return UI.linhaLista({
                 titulo: 'Dia ' + d.numero + (d.titulo ? ' — ' + d.titulo : ''),
-                nota: [d.data ? UI.dataCurta(d.data) : null, d.distancia ? d.distancia + ' km' : null].filter(Boolean).join(' · '),
+                nota: d.data ? UI.dataCurta(d.data) : '',
                 href: '#/dia/' + d.id
               });
             }).join('') + '</div>' +
@@ -478,6 +452,7 @@
       if (!dia) return '<div class="faixa"><p class="corpo-editorial">Dia não encontrado.</p></div>';
       const hoje = Estado.chave(Estado.agora()) === dia.data;
       return capaDia(dia) +
+        (dia.resumo ? '<div class="faixa"><p class="corpo-editorial">' + UI.h(dia.resumo) + '</p></div>' : '') +
         '<div class="faixa">' + meteo(dia) + '</div>' +
         '<div class="faixa">' + blocos(dia, hoje) + '</div>' +
         rodapeDia(dia);
