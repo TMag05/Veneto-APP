@@ -1,0 +1,27 @@
+# Publica a app no Firebase Hosting sempre que o main muda.
+# Precisa do secret FIREBASE_SERVICE_ACCOUNT_DOLOMITESGT no GitHub:
+# a chave JSON de uma conta de serviço do projeto dolomitesgt.
+# Só publica o hosting; as regras do Firestore e do Storage
+# continuam a publicar-se à mão.
+name: Publicar
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: publicar
+  cancel-in-progress: false
+
+jobs:
+  hosting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DOLOMITESGT }}
+          projectId: dolomitesgt
+          channelId: live
