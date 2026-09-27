@@ -675,17 +675,10 @@ a { color: var(--verde); text-decoration: none; }
 .etapa__titulo { font-family: var(--font-editorial); font-size: 22px; line-height: 1.25; margin: 0; }
 .etapa__meta { margin-top: 4px; display: flex; gap: var(--esp-2); flex-wrap: wrap; }
 
-/* Ritmo do dia: distância e tempo entre duas paragens. Dado ambiente,
-   não instrução — o grupo segue os batedores. Alinha com a coluna do
-   título, por baixo da hora. */
-.ritmo {
-  margin: 0;
-  padding: var(--esp-1) 0 var(--esp-1) calc(58px + var(--esp-2));
-  font-size: 12px;
-  color: var(--inchiostro-chiaro);
-  border-bottom: 1px solid var(--pietra);
-}
-.etapa__conteudo .ritmo { padding: 0 0 var(--esp-1); border-bottom: 0; }
+/* A localização de uma paragem: Google Maps e Waze, lado a lado,
+   em texto. Não é o CTA de nenhum ecrã. */
+.atalhos-local { display: flex; flex-wrap: wrap; column-gap: var(--esp-3); }
+.capitulo .atalhos-local { margin-top: var(--esp-1); }
 
 /* Cada momento do dia, no roadbook, com o que o bloco do Hoje não
    diz. Tem endereço próprio: é o destino dos blocos do Hoje. */
@@ -728,7 +721,6 @@ a { color: var(--verde); text-decoration: none; }
 .capitulo[data-estado="passado"] .capitulo__titulo { color: var(--inchiostro-medio); }
 .capitulo__local { margin: 4px 0 0; }
 .capitulo__nota { margin: var(--esp-1) 0 0; }
-.capitulo__ritmo { margin: var(--esp-1) 0 0; font-size: 12px; color: var(--inchiostro-chiaro); }
 .capitulo__paragem { margin-top: var(--esp-2); }
 .capitulo__paragem .cartao-dia__titulo { font-size: 22px; }
 .capitulo__convite {
@@ -1121,9 +1113,22 @@ a { color: var(--verde); text-decoration: none; }
   padding: var(--esp-2);
   background: var(--istria);
   text-align: left;
-  transition: border-color var(--transicao);
+  position: relative;
+  transition: border-color var(--transicao), box-shadow var(--transicao);
 }
-.silhueta-opcao[aria-pressed="true"] { border-color: var(--verde); }
+/* Borda de acento a dobrar e um visto: a escolha lê-se sem cor. */
+.silhueta-opcao[aria-pressed="true"] {
+  border-color: var(--ottone);
+  box-shadow: inset 0 0 0 1px var(--ottone);
+}
+.silhueta-opcao__marca {
+  position: absolute;
+  top: var(--esp-1);
+  right: var(--esp-1);
+  display: flex;
+  color: var(--ottone);
+}
+.silhueta-escolha { margin-top: var(--esp-2); }
 .silhueta-opcao__nome { font-size: 15px; font-weight: 500; margin-top: var(--esp-1); }
 
 
@@ -1366,7 +1371,6 @@ a { color: var(--verde); text-decoration: none; }
   letter-spacing: -0.01em;
 }
 .agora__local { display: block; margin-top: var(--esp-1); font-size: 15px; color: var(--inchiostro-medio); }
-.agora__ritmo { display: block; margin-top: var(--esp-2); font-size: 12px; color: var(--inchiostro-chiaro); }
 .agora__seta {
   position: absolute;
   right: 20px;
