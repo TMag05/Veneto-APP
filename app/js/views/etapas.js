@@ -341,24 +341,64 @@
     ].filter(Boolean).join(' · ');
   }
 
+  /* Na lista do dia, uma estrada é uma linha como as outras. O
+     desenho vive só na página dela: repetido em miniatura, em cada
+     dia que a faz, perdia a escala e parecia uma mancha. */
   function entradaEstrada(e) {
-    if (!ESTRADAS.desenhavel(e)) {
-      return UI.linhaLista({
-        titulo: e.nome,
-        nota: [e.subtitulo, 'traçado por confirmar'].filter(Boolean).join(' · '),
-        icone: 'bussola',
-        href: '#/estrada/' + e.id
-      });
+    return UI.linhaLista({
+      titulo: e.nome,
+      nota: ESTRADAS.desenhavel(e)
+        ? [e.subtitulo, resumoDe(e)].filter(Boolean).join(' · ')
+        : [e.subtitulo, 'traçado por confirmar'].filter(Boolean).join(' · '),
+      icone: 'bussola',
+      href: '#/estrada/' + e.id
+    });
+  }
+
+  /* O retrato de uma estrada, na linguagem dos mapas dos dias: a
+     chapa escura, uma grelha de 50 em 50 metros, o traço fino e as
+     duas pontas marcadas. A escala sai do próprio traçado: «metros»
+     é a largura real do troço desenhado, medida no OpenStreetMap. */
+  function retratoEstrada(e) {
+    const vb = e.viewBox.split(' ').map(Number);
+    const W = vb[2], A = vb[3];
+    const nums = e.traco.match(/-?\d+(\.\d+)?/g).map(Number);
+    const xs = nums.filter(function (n, i) { return i % 2 === 0; });
+    const porMetro = e.metros ? (Math.max.apply(null, xs) - Math.min.apply(null, xs)) / e.metros : 0;
+
+    let grelha = '';
+    if (porMetro) {
+      const passo = 50 * porMetro;
+      for (let x = passo; x < W; x += passo) grelha += '<line class="etapa-grelha" x1="' + x.toFixed(1) + '" y1="0" x2="' + x.toFixed(1) + '" y2="' + A + '"/>';
+      for (let y = passo; y < A; y += passo) grelha += '<line class="etapa-grelha" x1="0" y1="' + y.toFixed(1) + '" x2="' + W + '" y2="' + y.toFixed(1) + '"/>';
     }
-    const resumo = resumoDe(e);
-    return '<a class="estrada-cartao" href="#/estrada/' + e.id + '">' +
-      ESTRADAS.svg(e, 'estrada--lista') +
-      '<span class="estrada-cartao__corpo">' +
-        '<span class="cartao-dia__titulo">' + UI.h(e.nome) + '</span>' +
-        (e.subtitulo ? '<span class="cartao-dia__resumo">' + UI.h(e.subtitulo) + '</span>' : '') +
-        (resumo ? '<span class="cartao-dia__meta num">' + UI.h(resumo) + '</span>' : '') +
-      '</span>' +
-    '</a>';
+    const ponta = function (x, y) {
+      return '<circle class="etapa-ponto" cx="' + x + '" cy="' + y + '" r="14"/>';
+    };
+
+    return '<div class="etapa-retrato estrada-retrato">' +
+      '<div class="etapa-planta">' +
+        '<svg viewBox="' + e.viewBox + '" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Traçado do ' + UI.h(e.nome) + '">' +
+          grelha +
+          '<path class="estrada__traco" d="' + e.traco + '"/>' +
+          ponta(nums[0], nums[1]) + ponta(nums[nums.length - 2], nums[nums.length - 1]) +
+        '</svg>' +
+        (porMetro ? '<span class="estrada-retrato__escala meta num">' +
+          '<span class="estrada-retrato__barra" style="width:' + (50 * porMetro / W * 100).toFixed(2) + '%"></span>50 m</span>' : '') +
+        '<span class="estrada-retrato__norte meta">' +
+          '<svg viewBox="0 0 12 16" width="12" height="16" aria-hidden="true"><path d="M6 15V2M2 6l4-4 4 4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>N</span>' +
+      '</div>' +
+    '</div>';
+  }
+
+  /* «Dia 1 e Dia 3»: os dias pela numeração que o convidado vê. */
+  function diasDaEstrada(e) {
+    const nomes = e.dias.map(function (n) {
+      const d = DADOS.dias[n - 1];
+      return d ? UI.rotuloDia(d) : '';
+    }).filter(Boolean);
+    if (!nomes.length) return '';
+    return nomes.length > 1 ? 'no ' + nomes.slice(0, -1).join(', no ') + ' e no ' + nomes[nomes.length - 1] : 'no ' + nomes[0];
   }
 
   function entradaParagem(id) {
@@ -517,19 +557,14 @@
       }
 
       const x = e.dados || {};
-      const n = e.dias.slice();
-      const dias = n.length > 1
-        ? 'nos dias ' + n.slice(0, -1).join(', ') + ' e ' + n[n.length - 1]
-        : 'no dia ' + n[0];
+      const dias = diasDaEstrada(e);
 
-      return (ESTRADAS.desenhavel(e)
-        ? '<div class="faixa" style="padding-top:16px">' + ESTRADAS.svg(e, 'estrada--grande') + '</div>'
-        : '') +
+      return (ESTRADAS.desenhavel(e) ? retratoEstrada(e) : '') +
 
         '<div class="faixa" style="margin-top:24px">' +
           '<h1 class="titulo-poi">' + UI.h(e.nome) + '</h1>' +
           (e.subtitulo ? '<p class="subtitulo" style="margin-top:6px">' + UI.h(e.subtitulo) + '</p>' : '') +
-          '<p class="meta" style="margin-top:12px">Percorre-se ' + UI.h(dias) + '.</p>' +
+          (dias ? '<p class="meta" style="margin-top:12px">Percorre-se ' + UI.h(dias) + '.</p>' : '') +
         '</div>' +
 
         (Object.keys(x).length

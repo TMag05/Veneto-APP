@@ -29,6 +29,9 @@ window.ESTRADAS = (function () {
       paragem: 'passo-di-san-boldo',
       estado: 'confirmado',
       viewBox: '0 0 1000 792',
+      /* A largura real do troço desenhado, de ponta a ponta: é o que
+         dá a escala ao retrato. */
+      metros: 184,
       traco:
         'M 930 107.5 L 873.6 117.3 L 820.8 133.2 L 779.9 151.8 L 746.4 178.4 ' +
         'L 701.3 234.5 L 614.5 332.8 L 523 421 L 468.2 465.1 L 450.9 490.2 L 440.5 521.1 ' +

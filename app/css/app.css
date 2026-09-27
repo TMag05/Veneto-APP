@@ -838,7 +838,6 @@ a { color: var(--verde); text-decoration: none; }
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
 }
-.estrada--grande .estrada__traco { stroke-width: var(--traco-estrada-capa); }
 
 /* A capa das Etapas é uma ilustração, não uma fotografia. Tem a
    altura das outras capas e a ilustração é cortada ao centro. */
@@ -848,20 +847,25 @@ a { color: var(--verde); text-decoration: none; }
   background: linear-gradient(to top, var(--veu-cheio), var(--veu-forte) 42%, var(--veu-leve) 70%, transparent);
 }
 
-/* Uma estrada na lista do dia: o traço à esquerda, o nome à direita. */
-.estrada-cartao {
-  display: grid;
-  grid-template-columns: 96px 1fr;
-  align-items: center;
-  gap: var(--esp-2);
-  padding: 12px 0;
-  border-bottom: 1px solid var(--borda);
-  color: var(--inchiostro);
+/* O retrato de uma estrada, na página dela: a chapa dos mapas dos
+   dias, com a escala e o norte por cima, em HTML. */
+.estrada-retrato { margin-top: var(--esp-2); }
+.estrada-retrato .etapa-planta { padding: var(--esp-2); }
+.estrada-retrato__escala,
+.estrada-retrato__norte {
+  position: absolute;
+  display: flex;
+  color: var(--estrada-escrita);
 }
-.estrada-cartao .estrada { padding: var(--esp-1); border-radius: var(--raio-foto); }
-.estrada-cartao__corpo { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-
-.estrada--grande { margin: 0; }
+.estrada-retrato__escala {
+  left: var(--esp-2);
+  bottom: var(--esp-2);
+  width: calc(100% - 2 * var(--esp-2));
+  flex-direction: column;
+  gap: 4px;
+}
+.estrada-retrato__barra { display: block; height: 2px; background: currentColor; }
+.estrada-retrato__norte { top: var(--esp-2); right: var(--esp-2); align-items: center; gap: 4px; }
 
 .estrada-dados { display: flex; flex-direction: column; gap: 10px; }
 .estrada-dado { display: flex; align-items: baseline; justify-content: space-between; gap: var(--esp-2); }
