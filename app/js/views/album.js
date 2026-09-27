@@ -41,7 +41,7 @@
         return Fotos.ler(f.id).then(function (r) {
           if (!r || !r.original) return lista;
           const dia = DADOS.dia(f.dia);
-          const pasta = porPasta && dia ? 'dia-' + dia.numero + '/' : '';
+          const pasta = porPasta && dia ? UI.pastaDia(dia) + '/' : '';
           /* Dentro da pasta do dia, o nome não repete o dia. */
           const nome = pasta ? UI.nomeDeFoto(f, r.tipo).replace(/^dia-\d+-?/, '') : UI.nomeDeFoto(f, r.tipo);
           lista.push({
@@ -109,7 +109,7 @@
         if (!f.length) return '';
         return '<div class="faixa">' +
           '<div class="seccao-cabecalho">' +
-            '<h2 class="titulo-editorial">' + UI.h(d.titulo || 'Dia ' + d.numero) + '</h2>' +
+            '<h2 class="titulo-editorial">' + UI.h(d.titulo || UI.rotuloDia(d)) + '</h2>' +
             '<span class="meta num">' + f.length + '</span>' +
           '</div>' +
           (d.data ? '<p class="meta" style="margin-bottom:16px">' + UI.dataLonga(d.data) + '</p>' : '') +
@@ -196,7 +196,7 @@
       descarregarDia: function (diaId) {
         const d = DADOS.dia(diaId);
         const fotos = Estado.fotos().filter(function (f) { return f.dia === diaId; });
-        descarregarZip(fotos, nomeDoPasseio() + '-dia-' + (d ? d.numero : '') + '.zip', false);
+        descarregarZip(fotos, nomeDoPasseio() + '-' + (d ? UI.pastaDia(d) : 'dia') + '.zip', false);
       }
     }
   };

@@ -206,7 +206,7 @@
       '<div class="hoje-dia__fundo" style="background-image:' + UI.imagemDe(imagemDoMomento(dia, i), 0.46) + '"></div>' +
 
       '<div class="hoje-dia__abertura">' +
-        '<p class="hoje-dia__data">Dia ' + dia.numero + (dia.data ? ' · ' + UI.dataCurta(dia.data) : '') + '</p>' +
+        '<p class="hoje-dia__data">' + UI.h([dia.etiqueta, dia.data ? UI.dataCurta(dia.data) : ''].filter(Boolean).join(' · ')) + '</p>' +
         '<h1 class="hoje-dia__titulo">' + UI.h(dia.titulo || 'Etapa ' + dia.numero) + '</h1>' +
       '</div>' +
 
@@ -242,7 +242,7 @@
     return '<div class="capa">' +
       UI.foto(dia.imagem, 'foto--32 capa__imagem') +
       '<div class="capa__texto">' +
-        '<p class="capa__data">' + (dia.data ? UI.dataLonga(dia.data) : 'Dia ' + dia.numero) + '</p>' +
+        '<p class="capa__data">' + UI.h([dia.etiqueta, dia.data ? UI.dataLonga(dia.data) : ''].filter(Boolean).join(' · ')) + '</p>' +
         '<h1 class="capa-titulo">' + UI.h(dia.titulo || 'Etapa ' + dia.numero) + '</h1>' +
         (dia.subtitulo ? '<p class="subtitulo" style="margin-top:8px">' + UI.h(dia.subtitulo) + '</p>' : '') +
       '</div>' +
@@ -327,7 +327,7 @@
 
       (DADOS.dias.length || DADOS.carros.length ? '<div class="faixa" style="margin-top:24px">' +
         '<div class="dados">' +
-          '<div><div class="dado__valor num">' + DADOS.dias.length + '</div><div class="dado__rotulo meta">Etapas</div></div>' +
+          '<div><div class="dado__valor num">' + DADOS.dias.filter(function (d) { return d.ordem; }).length + '</div><div class="dado__rotulo meta">Etapas</div></div>' +
           '<div><div class="dado__valor num">' +
             DADOS.dias.reduce(function (t, d) { return t + (d.distancia || 0); }, 0) +
             '</div><div class="dado__rotulo meta">Km</div></div>' +
@@ -351,7 +351,7 @@
             '<div class="seccao-cabecalho"><h2 class="etiqueta">O programa</h2></div>' +
             '<div class="lista">' + DADOS.dias.map(function (d) {
               return UI.linhaLista({
-                titulo: 'Dia ' + d.numero + (d.titulo ? ' — ' + d.titulo : ''),
+                titulo: [d.etiqueta, d.titulo].filter(Boolean).join(' — '),
                 nota: d.data ? UI.dataCurta(d.data) : '',
                 href: '#/dia/' + d.id
               });

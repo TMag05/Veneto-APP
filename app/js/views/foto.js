@@ -44,7 +44,7 @@
       const a = autorDe(f);
       const dia = DADOS.dia(f.dia);
       const poi = f.poi && POIS[f.poi] ? POIS[f.poi].nome : '';
-      const linha = [poi, dia ? 'Dia ' + dia.numero : '', hora(f.criado)].filter(Boolean).join(' · ');
+      const linha = [poi, UI.rotuloDia(dia), hora(f.criado)].filter(Boolean).join(' · ');
 
       return '<div class="foto-ecra">' +
           '<img class="foto-ecra__base" data-foto="' + UI.h(f.id) + '" data-tamanho="mini" alt="" aria-hidden="true">' +

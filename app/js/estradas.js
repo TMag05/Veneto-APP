@@ -84,8 +84,9 @@ window.ESTRADAS = (function () {
       id: 'val-canali',
       nome: 'Val Canali',
       subtitulo: 'A subida às Pale di San Martino',
-      dias: [3],
-      /* «Localizado na Val Canali» — pesquisa §6. */
+      /* Era a estrada do almoço no Chalet Piereni. Com a Malga Ces, a
+         27.09.2026, saiu do itinerário: fica aqui, sem dia. */
+      dias: [],
       paragem: 'chalet-piereni',
       estado: 'por confirmar',
       dados: {},
@@ -94,13 +95,15 @@ window.ESTRADAS = (function () {
 
     'vales-dolomitas': {
       id: 'vales-dolomitas',
-      nome: 'Os vales das Dolomitas',
-      subtitulo: 'A tarde do terceiro dia',
+      nome: 'As passagens das Dolomitas',
+      subtitulo: 'Croce d\'Aune, Rolle, Valles, Cereda e Forcella Aurine',
       dias: [3],
       paragem: '',
       estado: 'por confirmar',
       dados: {},
-      nota: 'Três horas e meia de estrada pelos vales, com o percurso ainda por confirmar.'
+      /* Os cinco passos vêm do texto da direção, de 27.09.2026; a ordem
+         e as estradas entre eles ainda não. */
+      nota: 'Os passos do dia mais alpino, com o traçado ainda por confirmar.'
     },
 
     'cansiglio': {

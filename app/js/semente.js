@@ -9,8 +9,10 @@
    na sua área; quando houver servidor, é de lá que isto vem.
 
    Fontes: a proposta da Stappando de 27.04.2026 (dias, horas,
-   hotéis, restaurantes) com as correções de docs/ — o almoço do
-   dia 3 é no Chalet Piereni, não no Malga Ces. Os textos das
+   hotéis, restaurantes) com as correções de docs/, e a revisão da
+   direção de 27.09.2026: os títulos e os interlúdios dos três dias
+   de estrada são os dela, e o almoço de 3 de outubro é na Malga Ces.
+   A chegada e a partida são dias de logística, sem número. Os textos das
    paragens vêm de docs/pesquisa-locais-passeio-dolomitas-2026.md;
    onde a pesquisa não chega, fica só o subtítulo. Nada inventado.
    ========================================================= */
@@ -123,7 +125,15 @@ window.SEMENTE = (function () {
       ],
       imagem: { foto: 'assets/fotos/valentino-moro.jpg' } },
 
-    /* Almoço do dia 3. Substitui o Malga Ces, que chegou a estar previsto. */
+    /* Almoço do dia 3 de outubro, como no texto da direção de 27.09.2026.
+       As coordenadas são aproximadas, por confirmar no OpenStreetMap;
+       os links do Maps e do Waze procuram pelo nome («pesquisa»). */
+    { nome: 'Malga Ces', local: 'San Martino di Castrozza', tipo: 'restaurante', lat: 46.2605, lng: 11.7835,
+      pesquisa: 'Malga Ces, San Martino di Castrozza',
+      subtitulo: 'Almoço com vista para as Pale di San Martino.' },
+
+    /* Chegou a ser o almoço do dia 3 de outubro; a direção voltou à
+       Malga Ces a 27.09.2026. Fica na biblioteca, fora do itinerário. */
     { nome: 'Chalet Piereni', local: 'Val Canali', tipo: 'restaurante', lat: 46.2029, lng: 11.8580,
       subtitulo: 'Almoço de frente para as Pale di San Martino.',
       historia: [
@@ -201,7 +211,7 @@ window.SEMENTE = (function () {
     ],
     dias: [
       {
-        data: '2026-10-01', titulo: 'Chegada',
+        data: '2026-10-01', titulo: 'Chegada', logistico: true,
         subtitulo: 'Do aeroporto às colinas do Prosecco.',
         resumo: 'Do Marco Polo ao Hotel Villa Soligo, em transfer privado. A primeira noite é nas colinas do Prosecco.',
         hotel: 'Hotel Villa Soligo',
@@ -216,9 +226,9 @@ window.SEMENTE = (function () {
         ]
       },
       {
-        data: '2026-10-02', titulo: 'Do Prosecco ao Grappa',
+        data: '2026-10-02', titulo: 'Trilhos da Grande Guerra',
         subtitulo: 'Canova, o Sacrario e a Strada dei 100 Giorni.',
-        resumo: 'Da região vinícola de Conegliano-Valdobbiadene, Património Mundial da UNESCO, ao Monte Grappa, a 1776 metros, e ao Passo di San Boldo. O dia acaba ao jantar, no Da Gigetto.',
+        resumo: 'Da região vinícola de Conegliano-Valdobbiadene (património UNESCO) até ao Monte Grappa (1776 m) e ao Passo di San Boldo, terminando no jantar no Gigetto.',
         hotel: 'Hotel Villa Soligo',
         imagem: { foto: 'assets/fotos/sacrario-grappa.jpg' },
         paragens: ['Hotel Villa Soligo', 'Tempio Canoviano', 'Sacrario del Monte Grappa', 'Passo di San Boldo', 'Molinetto della Croda', 'Hotel Villa Soligo'],
@@ -240,18 +250,18 @@ window.SEMENTE = (function () {
         ]
       },
       {
-        data: '2026-10-03', titulo: 'Dos 170 aos 2000 metros',
+        data: '2026-10-03', titulo: 'As passagens das Dolomitas',
         subtitulo: 'Das colinas às Pale di San Martino.',
-        resumo: 'O dia mais alpino, pelos passos Croce d\'Aune, Rolle, Valles, Cereda e Forcella Aurine. Almoço no Chalet Piereni, de frente para as Pale di San Martino, e o jantar de destaque em La Candola.',
+        resumo: 'O dia mais alpino, cruzando Croce d\'Aune, Rolle, Valles, Cereda e Forcella Aurine, com almoço na Malga Ces (vista para as Pale di San Martino) e jantar de destaque em La Candola.',
         hotel: 'Hotel Villa Soligo',
-        imagem: { foto: 'assets/fotos/chalet-piereni.jpg' },
-        paragens: ['Hotel Villa Soligo', 'Ateliê de Valentino Moro', 'Chalet Piereni', 'Hotel Villa Soligo'],
+        imagem: { variante: 'poente', semente: 'd-2026-10-03' },
+        paragens: ['Hotel Villa Soligo', 'Ateliê de Valentino Moro', 'Malga Ces', 'Hotel Villa Soligo'],
         momentos: [
           { hora: '08:30', titulo: 'Partida', local: 'Hotel Villa Soligo', tipo: 'partida', paragem: 'Hotel Villa Soligo',
             nota: 'Abastecimento pelo caminho.' },
           { horaOculta: true, hora: '09:15', fim: '10:15', titulo: 'Ateliê de Valentino Moro', local: 'Miane', tipo: 'visita', paragem: 'Ateliê de Valentino Moro' },
           { horaOculta: true, hora: '10:15', titulo: 'A caminho das Dolomitas', local: 'Pelos Pré-Alpes', tipo: 'estrada' },
-          { horaOculta: true, hora: '13:00', fim: '14:30', titulo: 'Almoço', local: 'Chalet Piereni, Val Canali', tipo: 'refeicao', paragem: 'Chalet Piereni' },
+          { horaOculta: true, hora: '13:00', fim: '14:30', titulo: 'Almoço', local: 'Malga Ces, San Martino di Castrozza', tipo: 'refeicao', paragem: 'Malga Ces' },
           { horaOculta: true, hora: '14:30', titulo: 'Vales das Dolomitas', local: 'O regresso', tipo: 'estrada' },
           { horaOculta: true, hora: '16:00', titulo: 'Paragem curta', local: 'A meio do caminho', tipo: 'paragem' },
           { hora: '18:00', titulo: 'Chegada ao hotel', local: 'Hotel Villa Soligo', tipo: 'paragem', paragem: 'Hotel Villa Soligo',
@@ -262,9 +272,9 @@ window.SEMENTE = (function () {
         ]
       },
       {
-        data: '2026-10-04', titulo: 'Do Prosecco à laguna',
+        data: '2026-10-04', titulo: 'Do alto ao mar — Soligo a Veneza',
         subtitulo: 'San Boldo, o Cansiglio e Veneza de barco.',
-        resumo: 'A etapa de maior amplitude: dos 170 metros de Soligo aos 1547 do Monte Pizzoc, e depois até Veneza, ao nível do mar. Acaba com a chegada de barco à Piazza San Marco e o jantar no JW Marriott, na Isola delle Rose.',
+        resumo: 'A etapa de maior amplitude altimétrica: dos 150 m de Villa Soligo até ao Rifugio Pizzoc (1600 m) e depois a descida até Veneza (0 m), culminando na chegada de barco à Piazza San Marco e no jantar no JW Marriott, na Isola delle Rose.',
         hotel: 'JW Marriott Venice',
         imagem: { foto: 'assets/fotos/piazza-san-marco.jpg' },
         paragens: ['Hotel Villa Soligo', 'Passo di San Boldo', 'La Casera', 'Rifugio Città di Vittorio Veneto', 'LO.VE.'],
@@ -291,7 +301,7 @@ window.SEMENTE = (function () {
         ]
       },
       {
-        data: '2026-10-05', titulo: 'Partida',
+        data: '2026-10-05', titulo: 'Partida', logistico: true,
         subtitulo: 'Da laguna ao Marco Polo.',
         resumo: 'Check-out até às 10:00 e transfer para o aeroporto.',
         imagem: { grafico: 'partida' },

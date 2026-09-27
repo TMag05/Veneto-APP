@@ -85,7 +85,7 @@
             const paragens = (d.etapas || []).length;
             return '<div class="linha-org">' +
               '<a class="linha-org__corpo" href="#/org/etapa/' + d.id + '">' +
-                '<span class="etiqueta">Etapa ' + (i + 1) + (d.data ? ' · ' + UI.dataCurta(d.data) : '') + '</span>' +
+                '<span class="etiqueta">' + UI.h([d.etiqueta || 'Logística', d.data ? UI.dataCurta(d.data) : ''].filter(Boolean).join(' · ')) + '</span>' +
                 '<span class="titulo-ui" style="display:block;margin-top:4px">' +
                   UI.h(d.titulo || 'Etapa sem título') + '</span>' +
                 '<span class="meta" style="display:block;margin-top:2px">' +
