@@ -169,7 +169,8 @@ window.Fotos = (function () {
      e fica guardado aqui para a próxima vez — e para funcionar sem
      rede. Se não se puder guardar, mostra-se pelo endereço.
        fonte.descarregar(id, tamanho) → Promise<Blob> | null
-       fonte.endereco(id, tamanho)    → endereço http | '' */
+       fonte.endereco(id, tamanho)    → endereço http | ''
+       fonte.falhou(id)               → a imagem não carregou */
   let fonte = null;
   function definirFonte(f) { fonte = f; }
 
@@ -232,9 +233,15 @@ window.Fotos = (function () {
      telemóvel é uma descarga. */
   let observadores = [];
 
+  /* Uma imagem que não carrega pode ser de uma fotografia que alguém
+     apagou entretanto: a fonte confirma e, se for, tira-a. */
   function pintarUma(img) {
     url(img.dataset.foto, img.dataset.tamanho).then(function (u) {
-      if (u && img.isConnected) img.src = u;
+      if (!u || !img.isConnected) return;
+      img.addEventListener('error', function () {
+        if (fonte && fonte.falhou) fonte.falhou(img.dataset.foto);
+      }, { once: true });
+      img.src = u;
     });
   }
 

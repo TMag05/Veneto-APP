@@ -772,6 +772,15 @@ window.Nuvem = (function () {
     });
   }
 
+  /* Uma fotografia do grupo ainda existe? A leitura é pública, e por
+     isso não precisa de sessão. */
+  function fotoExiste(id) {
+    if (simulada() || !id) return Promise.reject(erro('sem-servidor'));
+    return pedir(firestore('fotos/' + encodeURIComponent(id)) + '?key=' + CONFIG.apiKey + '&mask.fieldPaths=id')
+      .then(function () { return true; })
+      .catch(function (e) { if (e.codigo === 'nao-existe') return false; throw e; });
+  }
+
   /* O endereço público de um objeto, para um <img>. As regras deixam
      ler as fotografias sem sessão. */
   function enderecoFoto(caminho) {
@@ -830,6 +839,7 @@ window.Nuvem = (function () {
     fotosDoDia: fotosDoDia,
     fotosDoGrupo: fotosDoGrupo,
     descarregarFoto: descarregarFoto,
-    enderecoFoto: enderecoFoto
+    enderecoFoto: enderecoFoto,
+    fotoExiste: fotoExiste
   };
 })();

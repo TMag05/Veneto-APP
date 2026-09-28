@@ -1003,14 +1003,6 @@ a { color: var(--verde); text-decoration: none; }
   background: var(--pastilha-foto);
   color: var(--sobre-foto);
 }
-.grelha-fotos__autor {
-  position: absolute;
-  left: 3px;
-  bottom: 3px;
-  width: 26px;
-  opacity: 0.9;
-}
-
 /* ---------------------------------------------------------
    Uma fotografia, em ecrã próprio
    A miniatura já carregada segura o lugar e a vista entra por
