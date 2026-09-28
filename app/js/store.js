@@ -406,21 +406,21 @@ window.Estado = (function () {
   }
 
   /* Sobe as que faltam, uma de cada vez para não afogar a ligação.
-     Sai logo a seguir a tirar a fotografia. Se falhar — um vale sem
-     rede, uma ligação que cai a meio —, volta a tentar sozinha, cada
-     vez mais espaçado, e também sempre que a app volta a ficar à
-     vista ou o telemóvel volta a ter rede. Sem servidor não faz nada
-     e ninguém dá por isso. */
+     Sai logo a seguir a tirar a fotografia — é nesse momento que o
+     grupo a deve ver. Se falhar — um vale sem rede, uma ligação que
+     cai a meio —, sobe no primeiro momento em que a ligação voltar:
+     quando o telemóvel avisa que voltou, quando a app volta a ficar à
+     vista, e, porque esse aviso nem sempre chega (no iPhone, ou com
+     rede que não passa dados), de quinze em quinze segundos, sem
+     espaçar. Sem rede, a tentativa nem sai do telemóvel. Sem servidor
+     não faz nada e ninguém dá por isso. */
   let aEnviarFotos = false;
   let repetir = null;
-  let espera = 0;
-  const ESPERAS = [30, 60, 120, 300]; /* segundos; depois, de cinco em cinco minutos */
+  const REPETIR = 15; /* segundos */
 
   function tentarDeNovo() {
     if (repetir) return;
-    const s = ESPERAS[Math.min(espera, ESPERAS.length - 1)];
-    espera++;
-    repetir = setTimeout(function () { repetir = null; enviarFotos(); }, s * 1000);
+    repetir = setTimeout(function () { repetir = null; enviarFotos(); }, REPETIR * 1000);
   }
 
   function enviarFotos() {
@@ -439,7 +439,6 @@ window.Estado = (function () {
       Object.assign(meta, caminhos, { estadoEnvio: 'enviado' });
       estado.fila = estado.fila.filter(function (i) { return !(i.tipo === 'foto' && i.ref === meta.id); });
       aEnviarFotos = false;
-      espera = 0;
       guardar();
       emitir();
       enviarFotos();
@@ -453,19 +452,20 @@ window.Estado = (function () {
 
   /* ---------------------------------------------------------
      As fotografias do grupo
-     As que os outros telemóveis enviaram. Os metadados ficam numa
-     chave própria, fora do estado — são centenas, e o estado grava-se
-     a cada toque —; as imagens ficam no arquivo (Fotos), trazidas do
-     Storage à medida que aparecem no ecrã. Sem rede, vê-se o que já
-     cá está.
+     As que os outros telemóveis enviaram, disponíveis para todos no
+     momento em que chegam ao servidor. Os metadados ficam numa chave
+     própria, fora do estado — são centenas, e o estado grava-se a
+     cada toque —; as imagens vêm do Storage à medida que aparecem no
+     ecrã.
 
-     Pede-se só o que chegou desde a última vez; uma vez por hora, a
-     coleção inteira, que é o que faz desaparecer as que foram
-     apagadas.
+     Pede-se só o que chegou desde a última vez: ao abrir a Galeria, e
+     de cinco em cinco segundos enquanto ela está aberta. Uma vez
+     por hora, a coleção inteira, que é o que faz desaparecer as que
+     foram apagadas.
      --------------------------------------------------------- */
 
   const CHAVE_GRUPO = 'veneto.grupo.v1';
-  const INTERVALO = 60 * 1000;          /* nunca mais do que um pedido por minuto */
+  const INTERVALO = 5 * 1000;           /* nunca mais do que um pedido a cada cinco segundos */
   const COMPLETA = 60 * 60 * 1000;      /* a coleção inteira, de hora a hora */
   const FOLGA = 10 * 60 * 1000;         /* relógios de telemóveis diferentes */
 
