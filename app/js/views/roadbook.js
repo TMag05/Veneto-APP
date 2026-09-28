@@ -20,7 +20,7 @@
       '<span class="cartao-dia__corpo">' +
         '<span class="etiqueta" style="display:block">' +
           UI.h([d.etiqueta, d.data ? UI.dataCurta(d.data) : ''].filter(Boolean).join(' · ')) + '</span>' +
-        '<span class="cartao-dia__resumo">Conta-se a seu tempo.</span>' +
+        '<span class="cartao-dia__resumo">Revelado a seu tempo…</span>' +
       '</span>' +
     '</div>';
   }

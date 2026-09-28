@@ -293,7 +293,7 @@
       '<div class="selado">' +
         '<div class="selado__icone">' + Icone('selado', 24) + '</div>' +
         '<p class="etiqueta">' + UI.h(nomeFechado(dia)) + '</p>' +
-        '<p class="corpo-editorial" style="margin-top:12px">O que este dia guarda conta-se a seu tempo.</p>' +
+        '<p class="corpo-editorial" style="margin-top:12px">Revelado a seu tempo…</p>' +
       '</div>' +
     '</div>';
   }
@@ -306,7 +306,7 @@
       '<span class="lista-linha__corpo">' +
         '<span class="titulo-ui" style="display:block">' + UI.h(dia.etiqueta || '') + '</span>' +
         '<span class="meta" style="display:block;margin-top:2px">' +
-          UI.h([dia.data ? UI.dataCurta(dia.data) : '', 'a seu tempo'].filter(Boolean).join(' · ')) + '</span>' +
+          UI.h([dia.data ? UI.dataCurta(dia.data) : '', 'revelado a seu tempo…'].filter(Boolean).join(' · ')) + '</span>' +
       '</span>' +
     '</div>';
   }
