@@ -760,16 +760,6 @@ a { color: var(--verde); text-decoration: none; }
    Mapa
    --------------------------------------------------------- */
 
-.mapa-moldura {
-  position: relative;
-  margin: 12px var(--margem) 0;
-  background: var(--mapa-fundo);
-  border: 1px solid var(--borda);
-  border-radius: 22px;
-  overflow: hidden;
-  touch-action: pan-y;
-}
-.mapa-moldura svg { width: 100%; height: auto; display: block; }
 .mapa-legenda {
   display: flex;
   gap: var(--esp-3);

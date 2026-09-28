@@ -43,53 +43,31 @@
   function px(E, poi) { const f = E.pad || PAD; return (poi.lng - E.lngMin) / (E.lngMax - E.lngMin) * (L - 2 * f) + f; }
   function py(E, poi) { const f = E.pad || PAD; return (E.latMax - poi.lat) / (E.latMax - E.latMin) * (E.A - 2 * f) + f; }
 
-  /* Curvas de nível sugeridas — textura, não cartografia. */
-  function relevo(E, semente) {
-    let s = '<g stroke="var(--pietra)" fill="none" stroke-width="1.5" opacity="0.55">';
-    for (let i = 0; i < 9; i++) {
-      const y = (E.A / 9) * i + 30;
-      let d = 'M -20 ' + y.toFixed(0);
-      for (let x = 1; x <= 8; x++) {
-        const xx = -20 + x * (L + 40) / 8;
-        const yy = y + Math.sin(x * 0.9 + i * 1.3 + semente) * (14 + i);
-        d += ' Q ' + (xx - (L + 40) / 16).toFixed(0) + ' ' + (yy - 22).toFixed(0) + ' ' + xx.toFixed(0) + ' ' + yy.toFixed(0);
-      }
-      s += '<path d="' + d + '"/>';
-    }
-    return s + '</g>';
-  }
-
-  function rota(E, dia) {
+  /* Um dia sem percurso gravado desenha-se na mesma chapa e com o
+     mesmo traço dos outros — mas a tracejado, de paragem a paragem,
+     porque a estrada ainda não é conhecida. Sem perfil: não se
+     inventa uma altitude. */
+  function retratoProvisorio(E, dia) {
+    const vistos = {};
     const pontos = dia.etapas.map(function (id) { return POIS[id]; }).filter(Boolean);
-    if (pontos.length < 2) return '';
     const d = pontos.map(function (p, i) {
       return (i ? 'L ' : 'M ') + px(E, p).toFixed(1) + ' ' + py(E, p).toFixed(1);
     }).join(' ');
-    return '<path d="' + d + '" fill="none" stroke="var(--verde)" stroke-width="3.5" ' +
-      'stroke-linejoin="round" stroke-linecap="square"/>';
-  }
-
-  function marcadores(E, dia) {
-    const vistos = {};
-    return dia.etapas.map(function (id) {
-      if (vistos[id]) return '';
+    const marcas = dia.etapas.map(function (id) {
+      if (vistos[id] || !POIS[id]) return '';
       vistos[id] = true;
-      const p = POIS[id];
-      if (!p) return '';
-      const x = px(E, p), y = py(E, p);
-      return '<rect x="' + (x - 7).toFixed(1) + '" y="' + (y - 7).toFixed(1) + '" width="14" height="14" ' +
-        'fill="var(--verde)" stroke="#0D0F11" stroke-width="2"/>';
+      return '<circle class="etapa-ponto" cx="' + px(E, POIS[id]).toFixed(1) + '" cy="' + py(E, POIS[id]).toFixed(1) + '" r="14"/>';
     }).join('');
-  }
-
-  function svgMapa(E, dia) {
-    return '<svg viewBox="0 0 ' + L + ' ' + E.A + '" xmlns="http://www.w3.org/2000/svg" role="img" ' +
-      'aria-label="Percurso: ' + UI.h([dia.etiqueta, dia.titulo].filter(Boolean).join(', ')) + '">' +
-      '<rect width="' + L + '" height="' + E.A + '" fill="var(--intonaco)"/>' +
-      relevo(E, dia.numero * 2.1) +
-      rota(E, dia) +
-      marcadores(E, dia) +
-    '</svg>';
+    return '<div class="etapa-retrato">' +
+      '<div class="etapa-planta">' +
+        '<svg viewBox="0 0 ' + L + ' ' + E.A + '" xmlns="http://www.w3.org/2000/svg" role="img" ' +
+          'aria-label="Paragens: ' + UI.h([dia.etiqueta, dia.titulo].filter(Boolean).join(', ')) + ', com o traçado por confirmar">' +
+          '<path class="estrada__traco estrada__traco--provavel" d="' + d + '"/>' + marcas +
+        '</svg>' +
+        sobreposicao(E, dia) +
+      '</div>' +
+    '</div>' +
+    '<p class="meta faixa" style="margin-top:var(--esp-1)">O traçado deste dia está por confirmar com a organização: a tracejado, só a ordem das paragens.</p>';
   }
 
   /* As etiquetas vão por cima, em HTML, para respeitarem a escala
@@ -435,7 +413,7 @@
 
       (P ? retrato(P, d)
         : d.etapas.length > 1
-          ? '<div class="mapa-moldura">' + svgMapa(E, d) + sobreposicao(E, d) + '</div>'
+          ? retratoProvisorio(E, d)
           : '') +
 
       '<div class="faixa" style="margin-top:16px">' +
