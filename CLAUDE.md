@@ -78,7 +78,7 @@ Português europeu. Italiano só em nomes próprios — `Passo di San Boldo`, `P
 
 Sem género presumido: um vocativo genérico como «Bem-vindo» erra metade dos convidados — ou se usa o nome, ou a frase não leva vocativo. Nenhuma promessa que a app não cumpra: não se escreve «recebe uma notificação» enquanto não houver notificações.
 
-**O texto que já está nos telemóveis não muda sozinho.** O itinerário é dado, guardado à primeira abertura. Uma revisão de linguagem à semente entra também na tabela `REVISOES` de `conteudo.js`, que troca só o texto que ainda é, palavra por palavra, o antigo.
+**O texto que já está nos telemóveis não muda sozinho.** O itinerário é dado, guardado à primeira abertura. Uma revisão de linguagem à semente entra também na tabela `REVISOES` de `conteudo.js`, que troca só o texto que ainda é, palavra por palavra, o antigo; uma mudança de dados entra em `CORRECOES`, que corre uma vez por telemóvel. **Com os convidados na app, nunca se sobe `VERSAO_DADOS` sem pôr a versão anterior em `COMPATIVEIS`:** subir apaga, em cada telemóvel, os participantes e tudo o que a organização editou.
 
 ---
 
