@@ -331,6 +331,25 @@
      briefing: o que vai acontecer, o que levar, quem vai.
      --------------------------------------------------------- */
 
+  /* O que levar, em destaque até ao Dia 1: é a única coisa que o
+     convidado tem de fazer antes de partir, e por isso leva a esfera
+     do cobre. No Dia 1 o Hoje passa ao programa e isto desaparece; a
+     lista continua em Mais. */
+  function destaqueLevar() {
+    if (!DADOS.levar.length) return '';
+    return '<div class="faixa" style="margin-top:24px">' +
+      '<a class="destaque" href="#/preparacao">' +
+        '<span class="esfera" aria-hidden="true"></span>' +
+        '<span class="destaque__corpo">' +
+          '<span class="etiqueta destaque__etiqueta">Antes de partir</span>' +
+          '<span class="titulo-ui destaque__titulo">O que levar</span>' +
+          '<span class="meta">' + UI.plural(DADOS.levar.length, 'coisa', 'coisas') + ' a não esquecer.</span>' +
+        '</span>' +
+        '<span class="destaque__seta">' + Icone('seta', 20) + '</span>' +
+      '</a>' +
+    '</div>';
+  }
+
   function briefingHtml() {
     const faltam = Estado.diasAte();
     const carro = Estado.meuCarro();
@@ -347,6 +366,8 @@
           '</p>' +
         '</div>' +
       '</div>' +
+
+      destaqueLevar() +
 
       /* Sem o número de carros: saiu a 28.09.2026, a pedido da organização. */
       (DADOS.dias.length ? '<div class="faixa" style="margin-top:24px">' +

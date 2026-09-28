@@ -43,6 +43,10 @@
   --rosso-forte: #8E2B24;
   --radicchio: #C08494;
   --ottone: #D9915F;
+  /* A esfera do cobre: a luz por cima e a sombra por baixo, para o
+     ponto que chama a atenção para o que ainda falta fazer. */
+  --esfera-luz: #F6D2B4;
+  --esfera-sombra: #7A4526;
 
   /* Texto sobre preenchimento de acento. No escuro os acentos são
      cores claras — cobre, salmão, radicchio — e por isso a tinta por
@@ -158,6 +162,8 @@
   --rosso: #8A4034;
   --radicchio: #6B2E3E;
   --ottone: #9A5526;
+  --esfera-luz: #D9915F;
+  --esfera-sombra: #5E3217;
 
   /* Os acentos são escuros: a tinta por cima deles é clara */
   --sobre-acento: #FBF8F2;

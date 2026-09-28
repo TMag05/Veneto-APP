@@ -529,9 +529,16 @@
     },
     html: function () {
       /* A capa é a ilustração do San Boldo: os tornantes e os túneis
-         da Strada dei 100 Giorni, em relevo de papel. */
-      const capa = '<div class="capa capa--ilustracao">' +
-          UI.foto({ foto: 'assets/fotos/san-boldo-ilustracao.jpg' }, 'capa__imagem') +
+         da Strada dei 100 Giorni, em relevo de papel. Até o primeiro
+         dia que o faz se revelar, é uma paisagem sem nome — a estrada
+         reconhece-se, e seria spoiler. */
+      const sanBoldo = ESTRADAS.por('san-boldo');
+      const aVista = !sanBoldo || DADOS.dias.some(function (d) {
+        return sanBoldo.dias.indexOf(d.numero) >= 0 && Estado.diaVisivel(d);
+      });
+      const capa = '<div class="capa' + (aVista ? ' capa--ilustracao' : '') + '">' +
+          UI.foto(aVista ? { foto: 'assets/fotos/san-boldo-ilustracao.jpg' } : { semente: 'etapas', variante: 'paisagem' },
+            (aVista ? '' : 'foto--32 ') + 'capa__imagem') +
           '<div class="capa__texto">' +
             '<h1 class="capa-titulo">Etapas</h1>' +
             '<p class="subtitulo" style="margin-top:8px">' + UI.h(subtituloDaCapa()) + '</p>' +

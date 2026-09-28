@@ -18,8 +18,9 @@ window.Conteudo = (function () {
      cada telemóvel volta a carregar a semente. Subiu para 4 no mesmo
      dia, com os títulos e os dias de logística, e para 5 quando os
      cinco dias voltaram a ter número, e para 6 com as coordenadas da
-     Malga Ces. */
-  const VERSAO_DADOS = 6;
+     Malga Ces. Subiu para 7 no lançamento aos convidados, com a lista
+     do que levar da organização. */
+  const VERSAO_DADOS = 7;
   const ouvintes = [];
 
   /* Revisões de linguagem da semente. O itinerário guardado num
@@ -708,33 +709,6 @@ window.Conteudo = (function () {
     guardar();
   }
 
-  /* ---------------------------------------------------------
-     Exemplo — o passeio real, com pessoas de exemplo por cima,
-     para mostrar a app antes de a organização carregar as reais.
-     --------------------------------------------------------- */
-
-  function carregarExemplo() {
-    const ex = SEMENTE.exemplo;
-    dados = base();
-    Object.assign(dados.evento, clonar(ex.evento || {}));
-
-    ex.participantes.forEach(function (p, i) {
-      dados.participantes.push({
-        id: 'p-ex-' + i,
-        nome: p[0], apelido: p[1], nascimento: '', papel: p[2], equipa: p[3],
-        foto: '', telefone: '', email: '',
-        carta: '', apolice: '', matricula: p[5] || '',
-        modelo: p[4] || 'db12'
-      });
-    });
-
-    ex.contactos.forEach(function (c, i) {
-      dados.contactos.push(Object.assign({ id: 'c-ex-' + i, notas: '' }, c));
-    });
-
-    guardar();
-  }
-
   function vazio() {
     return !dados.dias.length && !dados.participantes.length && !dados.locais.length;
   }
@@ -761,6 +735,6 @@ window.Conteudo = (function () {
     criarContacto: criarContacto, atualizarContacto: atualizarContacto, removerContacto: removerContacto,
     criarLocal: criarLocal, atualizarLocal: atualizarLocal, removerLocal: removerLocal,
 
-    exportar: exportar, importar: importar, repor: repor, carregarExemplo: carregarExemplo
+    exportar: exportar, importar: importar, repor: repor
   };
 })();

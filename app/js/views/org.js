@@ -235,7 +235,6 @@
             UI.linhaLista({ titulo: 'Descarregar cópia', nota: 'Ficheiro JSON com tudo', icone: 'descarregar', acao: 'exportar' }) +
             UI.linhaLista({ titulo: 'Restaurar de um ficheiro', nota: 'Substitui o que está neste telemóvel', icone: 'sincronizar', acao: 'importar' }) +
             UI.linhaLista({ titulo: 'Lista de participantes', nota: 'Ficheiro CSV para Excel', icone: 'documento', acao: 'csv' }) +
-            UI.linhaLista({ titulo: 'Carregar passeio de exemplo', nota: 'O passeio de origem, com pessoas de exemplo', icone: 'juntar', acao: 'exemplo' }) +
             UI.linhaLista({ titulo: 'Repor tudo', nota: 'Volta ao passeio de origem e apaga o estado local', icone: 'fechar', acao: 'repor' }) +
           '</div>' +
         '</div>' +
@@ -258,17 +257,6 @@
       });
     },
     acoes: Object.assign({}, acoesComuns, {
-
-      exemplo: function () {
-        UI.abrirFolha('Carregar exemplo',
-          '<p class="corpo-ui silencioso">Repõe o passeio de origem e junta-lhe participantes e contactos de exemplo. Não são pessoas reais — apaga o que estiver registado.</p>' +
-          '<button class="botao botao--rosso botao--largo" style="margin-top:24px" type="button" id="btn-exemplo">Carregar</button>');
-        document.getElementById('btn-exemplo').addEventListener('click', function () {
-          UI.fecharFolha();
-          Conteudo.carregarExemplo();
-          App.ir('#/org/itinerario');
-        });
-      },
 
       repor: function () {
         UI.abrirFolha('Repor tudo',

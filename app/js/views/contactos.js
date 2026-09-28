@@ -76,12 +76,17 @@
     '</div>';
   }
 
-  /* Um restaurante diz por onde passa o dia: aparece quando o dia
-     em que lá se come se revela, na véspera, depois do jantar. Os
-     hotéis estão sempre à vista — são logística, e o contacto que
-     se deixa à família. O restaurante liga-se à paragem pelo nome. */
+  /* Um restaurante — ou outro sítio do programa — diz por onde passa
+     o dia: aparece quando o dia em que lá se vai se revela, na
+     véspera, depois do jantar. Os hotéis estão sempre à vista — são
+     logística, e o contacto que se deixa à família. O sítio liga-se
+     à paragem pelo nome. */
   function restauranteVisivel(l) {
-    const id = Object.keys(POIS).find(function (k) { return POIS[k].nome === l.nome; });
+    /* «LO.VE. events&travels» é a paragem «LO.VE.»: o nome da
+       paragem pode ser só o começo do do contacto. */
+    const id = Object.keys(POIS).find(function (k) {
+      return POIS[k].nome === l.nome || String(l.nome).indexOf(POIS[k].nome + ' ') === 0;
+    });
     return !id || Estado.poiVisivel(id);
   }
 
@@ -92,7 +97,7 @@
       const grupos = [
         { titulo: 'Hotéis', locais: DADOS.locais.filter(function (l) { return l.tipo === 'hotel'; }) },
         { titulo: 'Restaurantes', locais: DADOS.locais.filter(function (l) { return l.tipo === 'restaurante' && restauranteVisivel(l); }) },
-        { titulo: 'Outros', locais: DADOS.locais.filter(function (l) { return l.tipo !== 'hotel' && l.tipo !== 'restaurante'; }) }
+        { titulo: 'Outros', locais: DADOS.locais.filter(function (l) { return l.tipo !== 'hotel' && l.tipo !== 'restaurante' && restauranteVisivel(l); }) }
       ].filter(function (g) { return g.locais.length; });
 
       return '<div class="capa">' +
