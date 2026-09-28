@@ -646,11 +646,13 @@ window.Nuvem = (function () {
           dia: meta.dia || '',
           poi: meta.poi || '',
           autorId: autorId,
-          /* O nome e o carro de quem a tirou vão com ela: as regras só
-             deixam cada um ler o próprio perfil, e a Galeria do grupo
-             precisa de dizer de quem é cada fotografia. */
+          /* Quem a tirou vai com ela — o nome, o carro, o lugar no carro
+             e se é da organização: as regras só deixam cada um ler o
+             próprio perfil, e a Galeria do grupo precisa de o dizer. */
           autorNome: meta.autorNome || '',
           autorModelo: meta.autorModelo || '',
+          autorFuncao: meta.autorFuncao || '',
+          autorPapel: meta.autorPapel || '',
           /* A hora a que chegou ao servidor, pelo relógio do telemóvel,
              que a rede acerta. É por ela que os outros telemóveis pedem
              só as novas — a do disparo não serve: uma fotografia tirada
