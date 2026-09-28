@@ -172,7 +172,7 @@
         '<p class="corpo-ui">' +
           (faltam < 0
             ? 'A data de apagar já passou.'
-            : (faltam === 0 ? 'O arquivo apaga-se hoje.' : 'Faltam ' + faltam + ' dias para apagar o arquivo.')) +
+            : (faltam === 0 ? 'O arquivo apaga-se hoje.' : (faltam === 1 ? 'Falta 1 dia' : 'Faltam ' + faltam + ' dias') + ' para apagar o arquivo.')) +
         '</p>' +
         '<p class="meta" style="margin-top:8px">Avise o grupo antes. Depois de apagadas não voltam.</p>' +
       '</div>';
