@@ -1651,6 +1651,9 @@ a { color: var(--verde); text-decoration: none; }
   background: radial-gradient(circle at 34% 30%, var(--esfera-luz) 0%, var(--ottone) 46%, var(--esfera-sombra) 100%);
   box-shadow: var(--sombra-cartao);
 }
+/* Com o símbolo do que se faz, na tinta de cima do acento. */
+.esfera--icone { display: grid; place-items: center; color: var(--sobre-acento); }
+.destaque--botao { width: 100%; text-align: left; }
 .destaque__corpo { flex: 1; display: flex; flex-direction: column; gap: 2px; }
 .destaque__etiqueta { color: var(--ottone); }
 .destaque__titulo { font-size: 19px; }
