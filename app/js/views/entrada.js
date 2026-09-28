@@ -109,10 +109,11 @@ function fabrica(org) {
     return '<div class="entrada">' +
       /* O tema escolhe-se já aqui: quem abre a app ao sol não tem de
          entrar primeiro para a conseguir ler. O símbolo é o do tema
-         em uso, no traço dos punções da barra. */
+         em uso, no traço dos punções da barra, e a palavra ao lado
+         diz para que serve (28.09.2026). */
       '<button class="entrada__tema" type="button" data-acao="tema" ' +
         'aria-label="' + (claro ? 'Tema claro. Mudar para o escuro' : 'Tema escuro. Mudar para o claro') + '">' +
-        PUNCOES.svg(claro ? 'sol' : 'lua', 26) + '</button>' +
+        '<span class="etiqueta">Tema</span>' + PUNCOES.svg(claro ? 'sol' : 'lua', 26) + '</button>' +
       '<div>' +
         /* O logótipo é sempre claro sobre escuro: no tema claro,
            assenta numa chapa escura, como uma capa. */
