@@ -16,12 +16,35 @@ service cloud.firestore {
       );
     }
 
-    // Contas de utilizadores e perfis
+    // O papel com que a conta se cria: convidado, ou organização só
+    // se o email da sessão estiver na equipa.
+    function papelValido(papel) {
+      return papel == 'convidado'
+        || (papel == 'organizacao'
+            && exists(/databases/$(database)/documents/equipa/$(request.auth.token.email)));
+    }
+
+    // Contas de utilizadores e perfis. Quem é dono muda o nome, o
+    // carro e o lugar — nunca o papel: um convidado não se promove a
+    // organização (28.09.2026).
     match /contas/{uid} {
       allow read: if isOwner(uid) || isOrganizacao();
-      allow create: if isAuthenticated() && request.auth.uid == uid;
-      allow update: if isOwner(uid);
+      allow create: if isOwner(uid)
+        && papelValido(request.resource.data.get('papel', 'convidado'));
+      allow update: if isOwner(uid)
+        && request.resource.data.get('papel', 'convidado') == resource.data.get('papel', 'convidado');
       allow delete: if isOrganizacao();
+    }
+
+    // O cartão público de cada convidado, para a lista de quem vai:
+    // só o nome, o carro e o lugar no carro. Lê quem tem sessão;
+    // escreve só o próprio; apaga o próprio ou a organização.
+    match /participantes/{uid} {
+      allow read: if isAuthenticated();
+      allow create, update: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['nome', 'modelo', 'funcao', 'atualizado'])
+        && request.resource.data.nome is string && request.resource.data.nome.size() <= 80;
+      allow delete: if isOwner(uid) || isOrganizacao();
     }
 
     // Lista de emails que podem registar-se como organização

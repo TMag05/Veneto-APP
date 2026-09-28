@@ -268,9 +268,14 @@ window.Nuvem = (function () {
       });
     },
 
+    /* Apagar um acesso leva também o cartão da lista de participantes. */
     apagarConta: function (sessao, uid) {
       return pedir(firestore('contas/' + uid), comSessao(sessao, 'DELETE'))
-        .catch(function (e) { if (e.codigo !== 'nao-existe') throw e; });
+        .catch(function (e) { if (e.codigo !== 'nao-existe') throw e; })
+        .then(function () {
+          return pedir(firestore('participantes/' + uid), comSessao(sessao, 'DELETE'))
+            .catch(function () { /* não tinha cartão */ });
+        });
     },
 
     pedeCodigo: function () { return false; },
@@ -772,6 +777,43 @@ window.Nuvem = (function () {
     });
   }
 
+  /* ---------------------------------------------------------
+     Participantes — o cartão público de cada convidado
+     O perfil (contas/{uid}) tem o email e só o próprio e a
+     organização o leem. Para a lista de quem vai, cada convidado
+     publica ao lado um cartão só com o nome, o carro e o lugar no
+     carro, que qualquer pessoa com sessão pode ler (28.09.2026).
+     A organização não publica: viaja em carros próprios.
+     --------------------------------------------------------- */
+
+  function publicarParticipante(sessao, c) {
+    if (simulada()) return Promise.reject(erro('sem-servidor'));
+    return pedir(firestore('participantes/' + sessao.uid), comSessao(sessao, 'PATCH', { fields: {
+      nome: { stringValue: c.nome || '' },
+      modelo: { stringValue: c.modelo || '' },
+      funcao: { stringValue: c.funcao || '' },
+      atualizado: { integerValue: String(Date.now()) }
+    } }));
+  }
+
+  function participantes() {
+    if (simulada()) return Promise.reject(erro('sem-servidor'));
+    return obterSessao().then(function (sessao) {
+      const todos = [];
+      return (function pagina(marca) {
+        return pedir(firestore('participantes?pageSize=300' + (marca ? '&pageToken=' + encodeURIComponent(marca) : '')),
+          comSessao(sessao, 'GET')).then(function (r) {
+            (r.documents || []).forEach(function (d) {
+              const f = d.fields || {};
+              function t(k) { return f[k] ? (f[k].stringValue || '') : ''; }
+              todos.push({ uid: d.name.split('/').pop(), nome: t('nome'), modelo: t('modelo'), funcao: t('funcao') });
+            });
+            return r.nextPageToken ? pagina(r.nextPageToken) : todos;
+          });
+      })('');
+    });
+  }
+
   /* Uma fotografia do grupo ainda existe? A leitura é pública, e por
      isso não precisa de sessão. */
   function fotoExiste(id) {
@@ -838,6 +880,8 @@ window.Nuvem = (function () {
     apagarFoto: apagarFoto,
     fotosDoDia: fotosDoDia,
     fotosDoGrupo: fotosDoGrupo,
+    publicarParticipante: publicarParticipante,
+    participantes: participantes,
     descarregarFoto: descarregarFoto,
     enderecoFoto: enderecoFoto,
     fotoExiste: fotoExiste

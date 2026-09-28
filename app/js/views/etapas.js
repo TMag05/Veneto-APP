@@ -558,7 +558,7 @@
         '</div>' +
         DADOS.dias.map(seccaoDia).join('') +
         '<div class="faixa" style="margin-top:32px">' +
-          UI.linhaLista({ titulo: 'Lista de participantes', nota: DADOS.carros.length + ' carros', icone: 'pessoas', href: '#/participantes' }) +
+          UI.linhaLista({ titulo: 'Lista de participantes', nota: UI.plural(Estado.participantesDoGrupo().length, 'convidado', 'convidados'), icone: 'pessoas', href: '#/participantes' }) +
         '</div>';
     }
   };
@@ -640,34 +640,62 @@
     }
   };
 
+  /* Quem vai: os convidados que já criaram o acesso, cada um com o
+     seu carro e o lugar em que viaja. Por modelo, pela ordem da lista
+     de modelos; dentro de cada um, os pilotos primeiro. A lista vai-se
+     completando à medida que se registam (28.09.2026). */
+  function porModelo(lista) {
+    const ordem = Silhuetas.MODELOS.map(function (m) { return m.id; });
+    const grupos = {};
+    lista.forEach(function (p) {
+      const id = ordem.indexOf(p.modelo) >= 0 ? p.modelo : '';
+      (grupos[id] = grupos[id] || []).push(p);
+    });
+    return ordem.concat(['']).filter(function (id) { return grupos[id]; }).map(function (id) {
+      return {
+        modelo: id,
+        pessoas: grupos[id].sort(function (a, b) {
+          const fa = a.funcao === 'copiloto' ? 1 : 0, fb = b.funcao === 'copiloto' ? 1 : 0;
+          return fa - fb || a.nome.localeCompare(b.nome, 'pt');
+        })
+      };
+    });
+  }
+
   Vistas.participantes = {
   nav: 'etapas',
   cabecalho: { voltar: '#/etapas', titulo: 'Participantes', tituloSempre: true },
+  montar: function (el, p, chegada) { if (chegada) Estado.sincronizarParticipantes(true); },
   html: function () {
+    const lista = Estado.participantesDoGrupo();
     const capa = '<div class="capa">' +
       UI.foto({ semente: 'participantes', variante: 'paisagem' }, 'foto--32 capa__imagem') +
       '<div class="capa__texto"><h1 class="titulo-editorial">Participantes</h1>';
 
-    if (!DADOS.carros.length) {
+    if (!lista.length) {
       return capa +
-        '<p class="corpo-editorial silencioso" style="margin-top:8px">A lista ainda não está fechada.</p>' +
+        '<p class="subtitulo" style="margin-top:8px">A lista vai-se fazendo à medida que os convidados entram na app.</p>' +
       '</div></div>';
     }
     return capa +
-      '<p class="corpo-editorial silencioso" style="margin-top:8px">' +
-        UI.plural(DADOS.carros.length, 'carro', 'carros') + ', ' +
-        UI.plural(DADOS.participantes.length, 'lugar', 'lugares') + '.</p>' +
+      '<p class="subtitulo" style="margin-top:8px">' + UI.plural(lista.length, 'convidado', 'convidados') + ' até agora.</p>' +
       '</div></div>' +
-      '<div class="faixa" style="margin-top:24px">' + DADOS.carros.map(function (c) {
-        return '<div class="presenca-linha">' +
-          '<div class="presenca-linha__carro">' + Silhuetas.svg(c.modelo, { rodas: false }) + '</div>' +
-          '<div style="flex:1;min-width:0">' +
-            '<div class="titulo-ui">' + UI.h(c.perfis.join(' e ')) + '</div>' +
-            '<div class="meta">' + UI.h(Silhuetas.modelo(c.modelo).nome) + '</div>' +
-          '</div>' +
+      porModelo(lista).map(function (g) {
+        return '<div class="faixa" style="margin-top:24px">' +
+          (g.modelo ? '<div class="participantes-carro">' + Silhuetas.svg(g.modelo) + '</div>' : '') +
+          '<div class="seccao-cabecalho"><h2 class="etiqueta">' + UI.h(g.modelo ? Silhuetas.modelo(g.modelo).nome : 'Sem carro indicado') + '</h2></div>' +
+          '<div class="lista">' + g.pessoas.map(function (p) {
+            const f = Silhuetas.funcao(p.funcao);
+            return '<div class="lista-linha lista-linha--estatica">' +
+              '<span class="lista-linha__corpo">' +
+                '<span class="titulo-ui" style="display:block">' + UI.h(p.nome) + '</span>' +
+                (f ? '<span class="meta" style="display:block;margin-top:2px">' + UI.h(f.nome) + '</span>' : '') +
+              '</span>' +
+            '</div>';
+          }).join('') + '</div>' +
         '</div>';
-      }).join('') + '</div>' +
-    '</div>';
+      }).join('') +
+      '<div class="faixa"><p class="meta">Cada convidado aparece aqui quando cria o acesso. O email e o telefone não se mostram.</p></div>';
   }
 };
 })();

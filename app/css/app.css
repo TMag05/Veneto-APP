@@ -1620,6 +1620,11 @@ a { color: var(--verde); text-decoration: none; }
   margin-bottom: var(--esp-2);
 }
 
+/* A lista de quem vai: o carro a traço por cima de cada grupo, e
+   linhas que não abrem nada. */
+.participantes-carro { width: 184px; margin-bottom: var(--esp-1); }
+.lista-linha--estatica { cursor: default; }
+
 /* ---------------------------------------------------------
    Destaque — o que falta fazer antes de partir
    Um cartão com a esfera do cobre: a luz por cima, a sombra por

@@ -294,6 +294,7 @@ window.Estado = (function () {
       }
     });
     publicarPendente();
+    publicarParticipante();
   }
 
   /* Lembra o modo sem repintar: é o ecrã que se abre que o diz. */
@@ -353,14 +354,59 @@ window.Estado = (function () {
   function atualizarPerfil(mudanca) {
     definir({ perfil: Object.assign({}, estado.perfil, mudanca), perfilPendente: true });
     publicarPendente();
+    publicarParticipante();
   }
+
+  /* ---------------------------------------------------------
+     Quem vai — a lista de participantes
+     Cada convidado publica o seu cartão (nome, carro, lugar no
+     carro) ao entrar, ao abrir a app e ao mudar o perfil; a lista
+     são os cartões de todos, e vai-se completando à medida que se
+     registam. Guarda-se aqui, para se ver sem rede. A organização
+     não entra: viaja em carros próprios.
+     --------------------------------------------------------- */
+
+  const CHAVE_PARTICIPANTES = 'veneto.participantes.v1';
+  let participantesGrupo = (function () {
+    try { const l = JSON.parse(localStorage.getItem(CHAVE_PARTICIPANTES)); if (Array.isArray(l)) return l; } catch (e) { /* recomeça */ }
+    return [];
+  })();
+  let aPedirParticipantes = false;
+  let ultimoPedidoParticipantes = 0;
+
+  function publicarParticipante() {
+    if (!estado.autenticado || estado.perfil.papel === 'organizacao' || !navigator.onLine) return;
+    const p = estado.perfil;
+    sessaoValida().then(function (s) {
+      return Nuvem.publicarParticipante(s, { nome: p.nome, modelo: p.modelo, funcao: p.funcao });
+    }).then(function () { sincronizarParticipantes(true); })
+      .catch(function () { /* fica para a próxima abertura */ });
+  }
+
+  function sincronizarParticipantes(forcar) {
+    if (aPedirParticipantes || !Nuvem.ligada() || !navigator.onLine) return;
+    if (!forcar && Date.now() - ultimoPedidoParticipantes < 60 * 1000) return;
+    aPedirParticipantes = true;
+    ultimoPedidoParticipantes = Date.now();
+    Nuvem.participantes().then(function (lista) {
+      aPedirParticipantes = false;
+      const nova = lista.filter(function (x) { return x.nome; });
+      if (JSON.stringify(nova) === JSON.stringify(participantesGrupo)) return;
+      participantesGrupo = nova;
+      try { localStorage.setItem(CHAVE_PARTICIPANTES, JSON.stringify(nova)); } catch (e) { /* fica em memória */ }
+      emitir();
+    }).catch(function () { aPedirParticipantes = false; });
+  }
+
+  function participantesDoGrupo() { return participantesGrupo; }
 
   /* Ao abrir e ao voltar a ter rede: confirma a sessão e envia o
      que ficou pendente. Sem rede não faz nada, e ninguém dá por isso. */
   function verificarSessao() {
     if (!estado.autenticado || !estado.sessao || !navigator.onLine) return;
     /* Renova-se sempre: é o que faz saber que a conta ainda existe. */
-    sessaoValida(true).then(publicarPendente).catch(function () { /* resolvido acima */ });
+    sessaoValida(true).then(function () { publicarPendente(); publicarParticipante(); })
+      .catch(function () { /* resolvido acima */ });
   }
 
   /* ---------------------------------------------------------
@@ -381,6 +427,7 @@ window.Estado = (function () {
     if (aSincronizar) return;
     enviarFotos();
     sincronizarGrupo();
+    sincronizarParticipantes();
     /* As fotografias seguem por Nuvem, cada uma com a sua confirmação:
        só passam a 'enviado' quando os três tamanhos subirem. Dar uma
        fotografia por enviada sem ninguém a ter recebido é o erro que
@@ -757,6 +804,8 @@ window.Estado = (function () {
     pendentes: pendentes,
     sincronizarGrupo: sincronizarGrupo,
     novasDoGrupo: novasDoGrupo,
+    participantesDoGrupo: participantesDoGrupo,
+    sincronizarParticipantes: sincronizarParticipantes,
     marcarGrupoVisto: marcarGrupoVisto,
     aoChegarFotos: aoChegarFotos,
     meuId: meuId,
