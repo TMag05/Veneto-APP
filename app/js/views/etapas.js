@@ -203,32 +203,68 @@
     const certo = caminhoPerfil(P, S, 0, corte);
     const provavel = corte < S.kmTotal ? caminhoPerfil(P, S, corte, S.kmTotal) : '';
 
-    /* Os pontos altos, pelo quilómetro. Dois perto um do outro — o
-       Rolle e o Valles ficam a treze quilómetros — afastam-se: o
-       primeiro acaba no seu ponto, o segundo começa no dele. */
-    const PERTO = 30; /* largura estimada de uma etiqueta, em % */
-    const lista = P.picos.slice().sort(function (a, b) { return a.km - b.km; }).map(function (p) {
-      const esq = S.x(p.km) / PW * 100;
+    /* Os pontos altos, pelo quilómetro. Como nos perfis das voltas,
+       um passo diz-se pelo nome curto — Rolle, San Boldo —; o nome
+       inteiro fica na leitura do perfil e no resto da app. Dois
+       passos a poucos quilómetros um do outro — o Rolle e o Valles, a
+       Forcella Aurine e o Cereda — partilham uma etiqueta, um por
+       linha: separados, não cabem na largura de um telemóvel.
+       Etiquetas vizinhas afastam-se: a primeira acaba no seu ponto, a
+       segunda começa no dela. */
+    const JUNTOS = 8;  /* distância, em %, abaixo da qual se juntam */
+    const PERTO = 30;  /* largura estimada de uma etiqueta, em % */
+    const LINHA = 22;  /* altura estimada de uma etiqueta, em % */
+    function curto(nome) { return nome.replace(/^(Passo( di)?|Forcella) /, ''); }
+    const pontos = P.picos.slice().sort(function (a, b) { return a.km - b.km; }).map(function (p) {
       /* O ponto assenta na linha — o modelo de terreno alisa os topos —
          e a etiqueta diz a altitude oficial. */
       const terreno = P.perfil[Math.round(p.km / P.passo)];
-      return { p: p, esq: esq, topo: S.y(terreno) / PH * 100, alinha: esq < 20 ? 'inicio' : (esq > 80 ? 'fim' : 'meio') };
+      return { p: p, esq: S.x(p.km) / PW * 100, topo: S.y(terreno) / PH * 100 };
+    });
+    const lista = [];
+    pontos.forEach(function (q) {
+      const ultimo = lista[lista.length - 1];
+      if (ultimo && q.esq - ultimo.membros[ultimo.membros.length - 1].esq < JUNTOS) ultimo.membros.push(q);
+      else lista.push({ membros: [q] });
+    });
+    lista.forEach(function (g) {
+      g.esq = g.membros.reduce(function (s, q) { return s + q.esq; }, 0) / g.membros.length;
+      g.topo = Math.min.apply(null, g.membros.map(function (q) { return q.topo; }));
+      g.alinha = g.esq < 20 ? 'inicio' : (g.esq > 80 ? 'fim' : 'meio');
     });
     for (let i = 1; i < lista.length; i++) {
       const a = lista[i - 1], b = lista[i];
-      /* Só chocam se também estiverem à mesma altura. */
-      if (b.esq - a.esq < PERTO && Math.abs(b.topo - a.topo) < 22) {
+      /* Só chocam se também estiverem à mesma altura; um par ocupa
+         duas linhas. */
+      const alto = LINHA * Math.max(a.membros.length, b.membros.length);
+      if (b.esq - a.esq < PERTO && Math.abs(b.topo - a.topo) <= alto) {
         if (a.esq >= 20) a.alinha = 'fim';
         b.alinha = 'inicio';
       }
     }
-    const picos = lista.map(function (q) {
-      const pos = 'left:' + q.esq.toFixed(2) + '%;top:' + q.topo.toFixed(2) + '%';
-      return '<span class="perfil-ponto" style="' + pos + '"></span>' +
-        '<span class="perfil-pico perfil-pico--' + q.alinha + '" style="' + pos + '">' +
-          '<span class="perfil-pico__nome">' + UI.h(q.p.nome) + '</span>' +
-          '<span class="perfil-pico__alt num">' + q.p.altitude + ' m</span>' +
-        '</span>';
+    const picos = pontos.map(function (q) {
+      return '<span class="perfil-ponto" style="left:' + q.esq.toFixed(2) + '%;top:' + q.topo.toFixed(2) + '%"></span>';
+    }).join('') + lista.map(function (g) {
+      /* Um par encosta ao seu primeiro ponto, se começa nele, ou ao
+         último, se acaba nele. */
+      const ancora = g.membros.length === 1 ? g.esq
+        : g.alinha === 'inicio' ? g.membros[0].esq
+        : g.alinha === 'fim' ? g.membros[g.membros.length - 1].esq : g.esq;
+      const pos = 'left:' + ancora.toFixed(2) + '%;top:' + g.topo.toFixed(2) + '%';
+      if (g.membros.length === 1) {
+        return '<span class="perfil-pico perfil-pico--' + g.alinha + '" style="' + pos + '">' +
+            '<span class="perfil-pico__nome">' + UI.h(curto(g.membros[0].p.nome)) + '</span>' +
+            '<span class="perfil-pico__alt num">' + g.membros[0].p.altitude + ' m</span>' +
+          '</span>';
+      }
+      return '<span class="perfil-pico perfil-pico--par perfil-pico--' + g.alinha + '" style="' + pos + '">' +
+        g.membros.map(function (q) {
+          return '<span class="perfil-pico__linha">' +
+            '<span class="perfil-pico__nome">' + UI.h(curto(q.p.nome)) + '</span>' +
+            '<span class="perfil-pico__alt num">' + q.p.altitude + ' m</span>' +
+          '</span>';
+        }).join('') +
+      '</span>';
     }).join('');
 
     const maisAlto = P.picos.slice().sort(function (a, b) { return b.altitude - a.altitude; })[0];

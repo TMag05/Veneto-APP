@@ -124,10 +124,8 @@ window.SEMENTE = (function () {
       imagem: { foto: 'assets/fotos/valentino-moro.jpg' } },
 
     /* Almoço do dia 3 de outubro, como no texto da direção de 27.09.2026.
-       As coordenadas são aproximadas, por confirmar no OpenStreetMap;
-       os links do Maps e do Waze procuram pelo nome («pesquisa»). */
-    { nome: 'Malga Ces', local: 'San Martino di Castrozza', tipo: 'restaurante', lat: 46.2605, lng: 11.7835,
-      pesquisa: 'Malga Ces, San Martino di Castrozza',
+       Coordenadas do OpenStreetMap. */
+    { nome: 'Malga Ces', local: 'San Martino di Castrozza', tipo: 'restaurante', lat: 46.2707, lng: 11.7732,
       subtitulo: 'Almoço com vista para as Pale di San Martino.' },
 
     /* Chegou a ser o almoço do dia 3 de outubro; a direção voltou à
