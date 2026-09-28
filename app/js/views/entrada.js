@@ -12,10 +12,45 @@
    A organização entra pela mesma forma, noutra porta —
    #/organizacao, com um botão discreto no fim desta. Sem a
    pergunta do carro: viaja em carros próprios. Só entra quem
-   tiver o email na equipa.
+   tiver o email na equipa. Antes de tudo, a porta pede a
+   palavra-passe da organização (28.09.2026).
    ========================================================= */
 
 (function () {
+
+/* ---------------------------------------------------------
+   A palavra-passe da porta da organização
+   Guarda-se só a impressão dela — o SHA-256 de um prefixo do
+   projeto com a palavra-passe —, nunca o texto. É uma barreira à
+   porta, não a segurança: essa está nas regras do Firestore, que
+   só deixam criar conta de organização a um email da equipa e não
+   deixam ninguém mudar o próprio papel. Aberta, fica aberta até se
+   fechar a app; cinco enganos seguidos fecham-na um minuto.
+   --------------------------------------------------------- */
+
+const PORTA = 'a17ac94d17ae1463663e170f39c014759c3d6fb06dd3f6df10a6f677ff3d74da';
+const CHAVE_PORTA = 'veneto.porta-organizacao';
+/* Os enganos e o fecho guardam-se na sessão: recarregar a página
+   não os apaga. */
+function lerTentativas() {
+  try { return JSON.parse(sessionStorage.getItem(CHAVE_PORTA + '.tentativas')) || { enganos: 0, ate: 0 }; }
+  catch (e) { return { enganos: 0, ate: 0 }; }
+}
+function gravarTentativas(t) {
+  try { sessionStorage.setItem(CHAVE_PORTA + '.tentativas', JSON.stringify(t)); } catch (e) { /* fica em memória */ }
+}
+
+function portaAberta() {
+  try { return sessionStorage.getItem(CHAVE_PORTA) === PORTA; } catch (e) { return false; }
+}
+
+function abrirPorta() {
+  try { sessionStorage.setItem(CHAVE_PORTA, PORTA); } catch (e) { /* sem sessão guardada: pede-se outra vez */ }
+}
+
+function confere(texto) {
+  return Fotos.impressao(new Blob(['dolomitesgt:' + texto])).then(function (h) { return h === PORTA; });
+}
 
 function fabrica(org) {
   /* 'criar' | 'entrar' | 'recuperar' | 'recuperado' */
@@ -60,10 +95,12 @@ function fabrica(org) {
   function preparar() {
     if (rascunho) return;
     const e = Estado.get();
-    rascunho = { nome: e.perfil.nome || '', email: e.perfil.email || '', senha: '', modelo: e.perfil.modelo || '', funcao: e.perfil.funcao || '', codigo: '' };
+    rascunho = { nome: e.perfil.nome || '', email: e.perfil.email || '', senha: '', modelo: e.perfil.modelo || '', funcao: e.perfil.funcao || '', codigo: '', porta: '' };
     /* A equipa é pequena e cria o acesso uma vez: quem volta a
-       esta porta quase sempre já o tem. */
-    modo = org || (instalada() && !e.aviso) ? 'entrar' : 'criar';
+       esta porta quase sempre já o tem. Mas antes, a palavra-passe
+       da porta. */
+    modo = org && !portaAberta() ? 'porta'
+      : org || (instalada() && !e.aviso) ? 'entrar' : 'criar';
     mensagem = e.aviso ? MENSAGENS[e.aviso] || '' : '';
     aEnviar = false;
   }
@@ -91,7 +128,7 @@ function fabrica(org) {
       '</div>' +
 
       '<div class="pilha-3">' + convite() +
-        ({ criar: formCriar, entrar: formEntrar, recuperar: formRecuperar, recuperado: recuperado })[modo]() +
+        ({ porta: formPorta, criar: formCriar, entrar: formEntrar, recuperar: formRecuperar, recuperado: recuperado })[modo]() +
       '</div>' +
 
       /* A outra porta, no fim e em texto: quem não é da equipa
@@ -154,8 +191,27 @@ function fabrica(org) {
   }
 
   /* ---------------------------------------------------------
-     Os quatro momentos
+     Os momentos
      --------------------------------------------------------- */
+
+  /* A porta da organização: a palavra-passe da equipa, antes de
+     entrar ou de criar o acesso. */
+  function formPorta() {
+    return '<form id="form-entrada" class="pilha-3" novalidate>' +
+      cabeca('Organização', 'Esta entrada é só para a equipa.') +
+      '<div class="campo">' +
+        '<label class="campo__rotulo" for="entrada-porta">Palavra-passe da organização</label>' +
+        '<span class="campo-senha">' +
+          '<input class="campo__entrada" id="entrada-porta" name="porta" type="' + (senhaVisivel ? 'text' : 'password') + '" ' +
+            'autocomplete="off" autocapitalize="off" spellcheck="false" required value="' + UI.h(rascunho.porta) + '">' +
+          '<button class="botao--texto campo-senha__ver" type="button" data-acao="verSenha" ' +
+            'aria-pressed="' + (senhaVisivel ? 'true' : 'false') + '">' + (senhaVisivel ? 'Esconder' : 'Mostrar') + '</button>' +
+        '</span>' +
+      '</div>' +
+      aviso() +
+      principal('Continuar', 'A verificar') +
+    '</form>';
+  }
 
   function formCriar() {
     if (org) return formCriarOrg();
@@ -270,6 +326,10 @@ function fabrica(org) {
 
   /* O que se pode dizer sem perguntar ao servidor. */
   function validar() {
+    if (modo === 'porta') {
+      if (Date.now() < lerTentativas().ate) return 'Demasiadas tentativas. Espere um minuto e tente de novo.';
+      return rascunho.porta ? '' : 'Falta a palavra-passe da organização.';
+    }
     if (modo === 'criar' && !rascunho.nome.trim()) return 'Falta o nome.';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rascunho.email.trim())) return MENSAGENS['email-invalido'];
     if (modo === 'criar' && rascunho.senha.length < 6) return MENSAGENS['senha-curta'];
@@ -287,6 +347,27 @@ function fabrica(org) {
 
     aEnviar = true;
     App.repintar();
+
+    if (modo === 'porta') {
+      confere(rascunho.porta).then(function (certa) {
+        aEnviar = false;
+        rascunho.porta = '';
+        const t = lerTentativas();
+        if (certa) {
+          gravarTentativas({ enganos: 0, ate: 0 });
+          abrirPorta();
+          modo = 'entrar';
+          mensagem = '';
+        } else {
+          t.enganos++;
+          if (t.enganos >= 5) { t.enganos = 0; t.ate = Date.now() + 60 * 1000; }
+          gravarTentativas(t);
+          mensagem = 'A palavra-passe da organização não está certa.';
+        }
+        App.repintar();
+      }, function () { falhou(); });
+      return;
+    }
 
     const email = rascunho.email.trim();
     if (modo === 'criar' && org) {
@@ -339,6 +420,7 @@ function fabrica(org) {
         Estado.definir({ tema: Estado.get().tema === 'claro' ? 'escuro' : 'claro' });
       },
       modo: function (valor) {
+        if (org && !portaAberta()) return;
         modo = valor;
         mensagem = '';
         rascunho.senha = '';
