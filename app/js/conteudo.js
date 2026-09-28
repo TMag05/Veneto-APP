@@ -65,7 +65,21 @@ window.Conteudo = (function () {
      26.09.2026: o regresso do jantar do dia 3 é às 23:30, como na
      proposta da Stappando, e não às 23:00. */
   const CORRECOES = [
-    { id: 'regresso-dia3-2330', dia: 'd-2026-10-03', titulo: 'Regresso ao hotel', campo: 'hora', de: '23:00', para: '23:30' }
+    { id: 'regresso-dia3-2330', dia: 'd-2026-10-03', titulo: 'Regresso ao hotel', campo: 'hora', de: '23:00', para: '23:30' },
+    /* A equipa entrou na semente a 28.09.2026. Junta-se a quem já
+       tinha o programa guardado, sem tocar no que a organização
+       tenha escrito; a assistência só muda de mãos se ninguém a
+       tiver ainda. */
+    { id: 'contactos-equipa', aplicar: function (o) {
+      const contactos = o.contactos || (o.contactos = []);
+      const haAssistencia = contactos.some(function (c) { return c.assistencia === 'sim'; });
+      SEMENTE.contactos.forEach(function (c) {
+        if (c.grupo !== 'equipa' || contactos.some(function (x) { return x.id === c.id; })) return;
+        const novo = clonar(c);
+        if (haAssistencia) delete novo.assistencia;
+        contactos.push(novo);
+      });
+    } }
   ];
 
   let dados = carregar();
@@ -171,6 +185,7 @@ window.Conteudo = (function () {
     let novas = 0;
     CORRECOES.forEach(function (c) {
       if (feitas.indexOf(c.id) !== -1) return;
+      if (c.aplicar) { c.aplicar(o); feitas.push(c.id); novas++; return; }
       const dia = (o.dias || []).find(function (d) { return d.id === c.dia; });
       (dia ? dia.momentos || [] : []).forEach(function (m) {
         if (m.titulo === c.titulo && m[c.campo] === c.de) m[c.campo] = c.para;
@@ -641,6 +656,10 @@ window.Conteudo = (function () {
     const c = dados.contactos.find(function (x) { return x.id === id; });
     if (!c) return;
     Object.assign(c, patch);
+    /* Os pedidos de assistência vão para um contacto só. */
+    if (patch.assistencia === 'sim') {
+      dados.contactos.forEach(function (x) { if (x !== c) delete x.assistencia; });
+    }
     guardar();
   }
 

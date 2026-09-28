@@ -186,10 +186,17 @@ window.SEMENTE = (function () {
       imagem: { foto: 'assets/fotos/sagra.jpg' } }
   ];
 
-  /* Contactos de emergência — só o que é universal. */
+  /* Contactos: o número europeu de emergência e a equipa que
+     acompanha o passeio (grupo 'equipa'). Um só contacto recebe os
+     pedidos de assistência (assistencia: 'sim') — é para ele que o
+     SOS liga e manda a localização. */
   const contactos = [
     { id: 'c-emergencia', nome: 'Emergência', papel: 'Número europeu', telefone: '112',
-      notas: 'Funciona sem rede de dados e sem cartão.', icone: 'alerta' }
+      notas: 'Funciona sem rede de dados e sem cartão.', icone: 'alerta' },
+    { id: 'c-miguel-costa', grupo: 'equipa', nome: 'Miguel Costa', papel: '', telefone: '+351 916 934 941', notas: '', icone: 'telefone' },
+    { id: 'c-bruno-oliveira', grupo: 'equipa', nome: 'Bruno Oliveira', papel: '', telefone: '+351 969 956 555', notas: '', icone: 'telefone' },
+    { id: 'c-bernardo-encarnacao-jorge', grupo: 'equipa', nome: 'Bernardo Encarnação Jorge', papel: '', telefone: '+351 965 536 661', notas: '', icone: 'telefone' },
+    { id: 'c-tiago-magalhaes', grupo: 'equipa', nome: 'Tiago Magalhães', papel: '', telefone: '+351 910 196 054', notas: '', icone: 'telefone', assistencia: 'sim' }
   ];
 
   /* ---------------------------------------------------------

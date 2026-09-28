@@ -6,11 +6,24 @@
 
 (function () {
 
+  function lista(contactos) {
+    return '<div class="lista">' + contactos.map(function (c) {
+      return UI.linhaLista({
+        titulo: c.nome,
+        nota: [c.assistencia === 'sim' ? 'Pedidos de assistência' : c.papel, c.telefone].filter(Boolean).join(' · '),
+        icone: c.icone || 'telefone',
+        href: 'tel:' + String(c.telefone || '').replace(/\s/g, '')
+      });
+    }).join('') + '</div>';
+  }
+
   Vistas.contactos = {
     nav: 'mais',
     cabecalho: { voltar: '#/mais', titulo: 'Contactos', tituloSempre: true },
     html: function () {
       const locais = DADOS.locais;
+      const equipa = DADOS.contactos.filter(function (c) { return c.grupo === 'equipa'; });
+      const gerais = DADOS.contactos.filter(function (c) { return c.grupo !== 'equipa'; });
 
       return '<div class="capa">' +
           UI.foto({ semente: 'contactos', variante: 'noite' }, 'foto--32 capa__imagem') +
@@ -20,18 +33,15 @@
         '</div>' +
 
         '<div class="faixa" style="margin-top:24px">' +
-          (DADOS.contactos.length
-            ? '<div class="lista">' +
-              DADOS.contactos.map(function (c) {
-                return UI.linhaLista({
-                  titulo: c.nome,
-                  nota: [c.papel, c.telefone].filter(Boolean).join(' · '),
-                  icone: c.icone || 'telefone',
-                  href: 'tel:' + String(c.telefone || '').replace(/\s/g, '')
-                });
-              }).join('') + '</div>'
-            : '<p class="corpo-editorial silencioso" style="margin-top:16px">A lista de contactos ainda não está publicada.</p>') +
+          (gerais.length
+            ? lista(gerais)
+            : (equipa.length ? '' : '<p class="corpo-editorial silencioso" style="margin-top:16px">A lista de contactos ainda não está publicada.</p>')) +
         '</div>' +
+
+        (equipa.length ? '<div class="faixa">' +
+          '<div class="seccao-cabecalho"><h2 class="etiqueta">Equipa Aston Martin</h2></div>' +
+          lista(equipa) +
+        '</div>' : '') +
 
         (locais.length ? '<div class="faixa">' +
           '<div class="seccao-cabecalho"><h2 class="etiqueta">Hotéis e restaurantes</h2></div>' +
@@ -81,10 +91,10 @@
   let vigia = null;
 
   function contactoAssistencia() {
-    /* A assistência é o contacto marcado como oficina; se não
-       houver, usa-se o primeiro da lista que não seja o 112. */
-    return DADOS.contactos.find(function (c) { return c.icone === 'oficina' && c.telefone; }) ||
-      DADOS.contactos.find(function (c) { return c.telefone && String(c.telefone).trim() !== '112'; }) || null;
+    /* A assistência é o contacto que a organização marcou para
+       receber os pedidos; sem nenhum marcado, o do ícone de oficina. */
+    return DADOS.contactos.find(function (c) { return c.assistencia === 'sim' && c.telefone; }) ||
+      DADOS.contactos.find(function (c) { return c.icone === 'oficina' && c.telefone; }) || null;
   }
 
   /* O WhatsApp quer o número internacional só com algarismos. Um

@@ -1,7 +1,8 @@
 /* =========================================================
    Área da organização — contactos
-   Duas listas, como no documento: emergência, e hotéis e
-   restaurantes. Ambas aparecem na app do convidado.
+   Três listas: emergência, a equipa e os hotéis e restaurantes.
+   Todas aparecem na app do convidado. Um contacto, e só um,
+   recebe os pedidos de assistência do SOS.
    ========================================================= */
 
 (function () {
@@ -26,24 +27,34 @@
     nav: 'org-contactos',
     cabecalho: OrgComum.cabecalhoOrg('Contactos'),
     html: function () {
+      const equipa = DADOS.contactos.filter(function (c) { return c.grupo === 'equipa'; });
+      const gerais = DADOS.contactos.filter(function (c) { return c.grupo !== 'equipa'; });
+      const assistencia = DADOS.contactos.find(function (c) { return c.assistencia === 'sim'; });
+
       return OrgComum.cabecalhoEvento() +
 
         '<div class="faixa" style="padding-top:24px">' +
           '<div class="seccao-cabecalho"><h2 class="etiqueta">Emergência</h2>' +
-            '<span class="meta num">' + DADOS.contactos.length + '</span></div>' +
-          '<p class="corpo-ui silencioso">Hospital, seguradora, assistência em viagem, organização.</p>' +
-          (DADOS.contactos.length
-            ? '<div class="lista" style="margin-top:16px">' + DADOS.contactos.map(function (c) {
-                return UI.linhaLista({
-                  titulo: c.nome || 'Contacto sem nome',
-                  nota: [c.papel, c.telefone].filter(Boolean).join(' · '),
-                  icone: c.icone || 'telefone',
-                  href: '#/org/contacto/' + c.id
-                });
-              }).join('') + '</div>'
+            '<span class="meta num">' + gerais.length + '</span></div>' +
+          '<p class="corpo-ui silencioso">Hospital, seguradora, assistência em viagem.</p>' +
+          (gerais.length
+            ? listaContactos(gerais)
             : '<div class="vazio"><p class="corpo-ui silencioso">Sem contactos de emergência.</p></div>') +
           '<button class="botao botao--secundario botao--largo" style="margin-top:24px" type="button" data-acao="novoContacto">' +
             Icone('juntar', 20) + 'Adicionar contacto</button>' +
+        '</div>' +
+
+        '<div class="faixa">' +
+          '<div class="seccao-cabecalho"><h2 class="etiqueta">Equipa Aston Martin</h2>' +
+            '<span class="meta num">' + equipa.length + '</span></div>' +
+          '<p class="corpo-ui silencioso">' + (assistencia
+            ? 'Os pedidos de assistência vão para ' + UI.h(assistencia.nome || 'um contacto sem nome') + '. Muda-se na ficha de cada contacto.'
+            : 'Nenhum contacto recebe os pedidos de assistência. Escolhe-se na ficha de cada contacto.') + '</p>' +
+          (equipa.length
+            ? listaContactos(equipa)
+            : '<div class="vazio"><p class="corpo-ui silencioso">Sem contactos da equipa.</p></div>') +
+          '<button class="botao botao--secundario botao--largo" style="margin-top:24px" type="button" data-acao="novoContacto" data-valor="equipa">' +
+            Icone('juntar', 20) + 'Adicionar à equipa</button>' +
         '</div>' +
 
         '<div class="faixa">' +
@@ -64,10 +75,25 @@
         '</div>';
     },
     acoes: Object.assign({}, OrgComum.acoesComuns, {
-      novoContacto: function () { App.ir('#/org/contacto/' + Conteudo.criarContacto()); },
+      novoContacto: function (v) {
+        const id = Conteudo.criarContacto();
+        if (v === 'equipa') Conteudo.atualizarContacto(id, { grupo: 'equipa' });
+        App.ir('#/org/contacto/' + id);
+      },
       novoLocal: function () { App.ir('#/org/local/' + Conteudo.criarLocal()); }
     })
   };
+
+  function listaContactos(contactos) {
+    return '<div class="lista" style="margin-top:16px">' + contactos.map(function (c) {
+      return UI.linhaLista({
+        titulo: c.nome || 'Contacto sem nome',
+        nota: [c.assistencia === 'sim' ? 'Recebe os pedidos de assistência' : c.papel, c.telefone].filter(Boolean).join(' · '),
+        icone: c.icone || 'telefone',
+        href: '#/org/contacto/' + c.id
+      });
+    }).join('') + '</div>';
+  }
 
   function rotuloTipo(t) {
     const x = TIPOS_LOCAL.find(function (o) { return o.valor === t; });
@@ -93,6 +119,10 @@
             UI.campo({ rotulo: 'Telefone', nome: 'telefone', valor: c.telefone, tipo: 'tel', placeholder: '+39 340 000 0000' }) +
             UI.campo({ rotulo: 'Notas', nome: 'notas', valor: c.notas, tipo: 'area', linhas: 3 }) +
             UI.campo({ rotulo: 'Ícone', nome: 'icone', valor: c.icone, tipo: 'lista', opcoes: ICONES }) +
+            UI.campo({ rotulo: 'Secção', nome: 'grupo', valor: c.grupo || '', tipo: 'lista',
+              opcoes: [{ valor: '', rotulo: 'Emergência' }, { valor: 'equipa', rotulo: 'Equipa Aston Martin' }] }) +
+            UI.campo({ rotulo: 'Pedidos de assistência', nome: 'assistencia', valor: c.assistencia || '', tipo: 'lista',
+              opcoes: [{ valor: '', rotulo: 'Não recebe' }, { valor: 'sim', rotulo: 'Recebe — o SOS liga e escreve para este número' }] }) +
           '</div>' +
         '</div>' +
         '<div class="faixa">' +
