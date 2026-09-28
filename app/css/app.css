@@ -1133,12 +1133,10 @@ a { color: var(--verde); text-decoration: none; }
   color: var(--ottone);
 }
 .silhueta-escolha { margin-top: var(--esp-2); }
-/* O condutor e o co-piloto: o que é vazado pinta-se com o fundo do
-   cartão, e o halo solta o volante, as mãos e o livro do corpo. */
-.lugar { max-width: 128px; margin: 0 auto; display: block; }
-.lugar__vazio { fill: var(--istria); }
-.lugar__halo { stroke: var(--istria); stroke-width: 6px; }
-.lugar__aro { fill: none; stroke-width: 20px; }
+/* O condutor e o co-piloto, em gravura: o fundo das partes é o do
+   cartão, para cada uma tapar a que está atrás nos dois temas. */
+.lugar__fundo { stroke: var(--istria); }
+.lugar__cheio { fill: var(--istria); stroke: currentColor; }
 .silhueta-opcao__nome { font-size: 15px; font-weight: 500; margin-top: var(--esp-1); }
 
 
