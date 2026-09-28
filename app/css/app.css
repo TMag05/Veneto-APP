@@ -1027,8 +1027,18 @@ a { color: var(--verde); text-decoration: none; }
 }
 .foto-ecra__vista[data-pronta="sim"] { opacity: 1; }
 
-.foto-autor { display: flex; align-items: center; gap: var(--esp-2); }
-.foto-autor__carro { width: 44px; flex: none; opacity: 0.9; }
+/* Quem tirou a fotografia: o carro a traço e o lugar no carro, lado a
+   lado e à mesma altura, e por baixo o nome. */
+.foto-autor__figuras {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--esp-2);
+  margin-bottom: var(--esp-2);
+}
+.foto-autor__carro { width: 184px; flex: none; }
+.foto-autor__lugar { width: 96px; flex: none; }
+.foto-autor p { margin: 0; }
+.foto-autor .meta { margin-top: 2px; }
 
 /* Um gesto que não se desfaz não se veste de cor de acento. */
 .botao--apagar { color: var(--inchiostro-medio); }

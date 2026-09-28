@@ -11,12 +11,17 @@
   let vigia = null;
 
   function autorDe(f) {
-    if (f.propria) return Estado.eu();
+    /* Sem carro conhecido — a organização viaja em carros próprios —,
+       não se desenha nenhum. */
+    if (f.propria) {
+      const carro = Estado.meuCarro();
+      return carro ? { nome: Estado.eu().nome, modelo: carro.modelo } : { nome: Estado.eu().nome, semCarro: true };
+    }
     /* As de abertura são do passeio, não de uma pessoa: não levam
        silhueta, porque não há carro nenhum por trás delas. */
     if (f.autor === 'organizacao') return { nome: DADOS.evento.nome || 'Do passeio', semCarro: true };
     /* Do grupo: o nome e o carro vêm com a fotografia. */
-    if (f.autor === 'grupo') return { nome: f.autorNome || 'Do grupo', modelo: f.autorModelo || 'db12' };
+    if (f.autor === 'grupo') return f.autorModelo ? { nome: f.autorNome || 'Do grupo', modelo: f.autorModelo } : { nome: f.autorNome || 'Do grupo', semCarro: true };
     const p = DADOS.participante(f.autor);
     return p ? { nome: p.nome, modelo: p.modelo } : { nome: 'Do grupo', modelo: 'db12' };
   }

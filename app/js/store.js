@@ -433,7 +433,9 @@ window.Estado = (function () {
       if (!registo) throw new Error('ficheiro perdido');
       return Nuvem.enviarFoto(registo, Object.assign({}, meta, {
         autorNome: estado.perfil.nome || '',
-        autorModelo: estado.perfil.modelo || ''
+        autorModelo: estado.perfil.modelo || '',
+        autorFuncao: estado.perfil.funcao || '',
+        autorPapel: estado.perfil.papel || ''
       }));
     }).then(function (caminhos) {
       Object.assign(meta, caminhos, { estadoEnvio: 'enviado' });

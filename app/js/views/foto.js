@@ -11,13 +11,38 @@
     return Estado.fotos().find(function (f) { return f.id === id; }) || null;
   }
 
+  /* Quem a tirou: o nome, o carro e o lugar no carro. O carro só se
+     desenha quando se sabe qual é — a organização viaja em carros
+     próprios, e não se inventa um Aston Martin a ninguém. */
   function autorDe(f) {
-    if (f.propria) return Estado.eu();
+    if (f.propria) {
+      const p = Estado.get().perfil;
+      const carro = Estado.meuCarro();
+      return { nome: Estado.eu().nome, modelo: carro ? carro.modelo : '', funcao: p.funcao || '', organizacao: p.papel === 'organizacao' };
+    }
     if (f.autor === 'organizacao') return { nome: DADOS.evento.nome || 'Do passeio', semCarro: true };
-    /* Do grupo: o nome e o carro vêm com a fotografia. */
-    if (f.autor === 'grupo') return { nome: f.autorNome || 'Do grupo', modelo: f.autorModelo || 'db12' };
+    /* Do grupo: quem a tirou vem com a fotografia. */
+    if (f.autor === 'grupo') {
+      return { nome: f.autorNome || 'Do grupo', modelo: f.autorModelo || '', funcao: f.autorFuncao || '', organizacao: f.autorPapel === 'organizacao' };
+    }
     const p = DADOS.participante(f.autor);
-    return p ? { nome: DADOS.nomeCompleto(p), modelo: p.modelo } : { nome: 'Do grupo', modelo: 'db12' };
+    return p ? { nome: DADOS.nomeCompleto(p), modelo: p.modelo, funcao: p.funcao || '' } : { nome: 'Do grupo' };
+  }
+
+  /* O carro a traço e, ao lado, o piloto ou o co-piloto; por baixo, o
+     nome, o carro e o lugar em palavras, e o dia e a hora. */
+  function autorHtml(a, linha) {
+    const funcao = Silhuetas.funcao(a.funcao);
+    const figuras = (a.modelo ? '<span class="foto-autor__carro">' + Silhuetas.svg(a.modelo) + '</span>' : '') +
+      (funcao ? '<span class="foto-autor__lugar">' + Silhuetas.lugar(a.funcao) + '</span>' : '');
+    const quem = [a.modelo ? Silhuetas.modelo(a.modelo).nome : '', funcao ? funcao.nome : '', a.organizacao ? 'Organização' : '']
+      .filter(Boolean).join(' · ');
+    return '<div class="foto-autor">' +
+      (figuras && !a.semCarro ? '<div class="foto-autor__figuras">' + figuras + '</div>' : '') +
+      '<p class="titulo-ui">' + UI.h(a.nome) + '</p>' +
+      (quem ? '<p class="meta foto-autor__quem">' + UI.h(quem) + '</p>' : '') +
+      (linha ? '<p class="meta num">' + UI.h(linha) + '</p>' : '') +
+    '</div>';
   }
 
   function deAbertura(f) { return !f.propria && f.autor === 'organizacao'; }
@@ -54,15 +79,7 @@
             'alt="Fotografia de ' + UI.h(a.nome) + (poi ? ', ' + UI.h(poi) : '') + '">' +
         '</div>' +
 
-        '<div class="faixa" style="margin-top:20px">' +
-          '<div class="foto-autor">' +
-            (a.semCarro ? '' : '<span class="foto-autor__carro">' + Silhuetas.svg(a.modelo, { rodas: false, titulo: a.nome }) + '</span>') +
-            '<div>' +
-              '<p class="titulo-ui">' + UI.h(a.nome) + '</p>' +
-              (linha ? '<p class="meta num">' + UI.h(linha) + '</p>' : '') +
-            '</div>' +
-          '</div>' +
-        '</div>' +
+        '<div class="faixa" style="margin-top:20px">' + autorHtml(a, linha) + '</div>' +
 
         '<div class="faixa" style="margin-top:24px">' +
           '<button class="botao botao--radicchio botao--largo" type="button" data-acao="descarregar" data-valor="' + UI.h(f.id) + '">' +
