@@ -10,20 +10,14 @@
   let filtro = 'todos';
   let vigia = null;
 
+  /* O nome de quem a tirou, para quem lê o ecrã. A grelha é só das
+     fotografias: o carro e o lugar estão na página de cada uma. */
   function autorDe(f) {
-    /* Sem carro conhecido — a organização viaja em carros próprios —,
-       não se desenha nenhum. */
-    if (f.propria) {
-      const carro = Estado.meuCarro();
-      return carro ? { nome: Estado.eu().nome, modelo: carro.modelo } : { nome: Estado.eu().nome, semCarro: true };
-    }
-    /* As de abertura são do passeio, não de uma pessoa: não levam
-       silhueta, porque não há carro nenhum por trás delas. */
-    if (f.autor === 'organizacao') return { nome: DADOS.evento.nome || 'Do passeio', semCarro: true };
-    /* Do grupo: o nome e o carro vêm com a fotografia. */
-    if (f.autor === 'grupo') return f.autorModelo ? { nome: f.autorNome || 'Do grupo', modelo: f.autorModelo } : { nome: f.autorNome || 'Do grupo', semCarro: true };
+    if (f.propria) return Estado.eu().nome;
+    if (f.autor === 'organizacao') return DADOS.evento.nome || 'Do passeio';
+    if (f.autor === 'grupo') return f.autorNome || 'Do grupo';
     const p = DADOS.participante(f.autor);
-    return p ? { nome: p.nome, modelo: p.modelo } : { nome: 'Do grupo', modelo: 'db12' };
+    return p ? p.nome : 'Do grupo';
   }
 
   /* A imagem vem do arquivo do telemóvel e chega depois do HTML:
@@ -42,13 +36,11 @@
   }
 
   function celula(f) {
-    const a = autorDe(f);
-    const dentro = imagemDe(f) +
-      (a.semCarro ? '' : '<span class="grelha-fotos__autor">' + Silhuetas.svg(a.modelo, { rodas: false, titulo: a.nome }) + '</span>');
+    const dentro = imagemDe(f);
     const estilo = fundoDe(f).replace(/^;/, '');
     if (!f.id) return '<div class="grelha-fotos__celula" style="' + estilo + '">' + dentro + '</div>';
     return '<a class="grelha-fotos__celula" href="#/foto/' + encodeURIComponent(f.id) + '" ' +
-      'style="' + estilo + '" aria-label="Fotografia de ' + UI.h(a.nome) + '">' + dentro + '</a>';
+      'style="' + estilo + '" aria-label="Fotografia de ' + UI.h(autorDe(f)) + '">' + dentro + '</a>';
   }
 
   function lista() {

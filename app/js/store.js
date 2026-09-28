@@ -574,8 +574,25 @@ window.Estado = (function () {
     endereco: function (id, tamanho) {
       const f = doGrupo(id);
       return f ? Nuvem.enderecoFoto(caminhoDe(f, tamanho)) : '';
+    },
+    /* A imagem de uma do grupo não carregou. Se a fotografia já não
+       existe no servidor — apagada por quem a tirou ou pela
+       organização —, sai logo daqui, sem esperar pela leitura completa
+       da hora seguinte. Se existe, foi a rede: fica. */
+    falhou: function (id) {
+      if (!doGrupo(id) || !navigator.onLine || aConfirmar[id]) return;
+      aConfirmar[id] = true;
+      Nuvem.fotoExiste(id).then(function (existe) {
+        delete aConfirmar[id];
+        if (existe) return;
+        grupo.fotos = grupo.fotos.filter(function (f) { return f.id !== id; });
+        guardarGrupo();
+        Fotos.apagar(id).catch(function () {});
+        emitir();
+      }).catch(function () { delete aConfirmar[id]; });
     }
   });
+  const aConfirmar = {};
 
   function fotosPorEnviar() {
     return estado.fotos.filter(function (f) { return f.estadoEnvio !== 'enviado'; }).length;
