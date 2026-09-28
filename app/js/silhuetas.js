@@ -5452,11 +5452,11 @@ window.Silhuetas = (function () {
 
   /* ---------------------------------------------------------
      Onde se senta: condutor ou co-piloto
-     O habitáculo visto de cima, a traço, na cor do texto: dois
-     bancos, o volante à esquerda (os carros são de volante à
-     esquerda) e a pessoa no lugar que é o seu. O co-piloto leva o
-     roadbook aberto à frente. O mesmo desenho para os dois, para a
-     diferença ser só o lugar.
+     Pictogramas cheios, na cor do texto, de frente: o piloto de
+     capacete, com as asas no capacete, as mãos no volante; o
+     co-piloto de capacete, com o roadbook nas mãos e as asas na
+     capa. O que é vazado pinta-se com o fundo do cartão
+     (.lugar__vazio), para o desenho funcionar nos dois temas.
      --------------------------------------------------------- */
 
   const FUNCOES = [
@@ -5468,31 +5468,51 @@ window.Silhuetas = (function () {
     return FUNCOES.find(function (f) { return f.id === id; }) || null;
   }
 
+  /* As asas: duas penas abertas a partir do centro, desenhadas de raiz. */
+  function asas(cx, cy, l) {
+    const k = l / 60;
+    function p(x, y) { return (cx + x * k).toFixed(1) + ' ' + (cy + y * k).toFixed(1); }
+    return '<path class="lugar__vazio" d="M' + p(0, 6) +
+      ' C' + p(-8, 0) + ' ' + p(-18, -4) + ' ' + p(-30, -5) +
+      ' C' + p(-20, 0) + ' ' + p(-12, 4) + ' ' + p(-6, 9) +
+      ' C' + p(-12, 8) + ' ' + p(-18, 6) + ' ' + p(-22, 5) +
+      ' C' + p(-14, 10) + ' ' + p(-6, 12) + ' ' + p(0, 12) +
+      ' C' + p(6, 12) + ' ' + p(14, 10) + ' ' + p(22, 5) +
+      ' C' + p(18, 6) + ' ' + p(12, 8) + ' ' + p(6, 9) +
+      ' C' + p(12, 4) + ' ' + p(20, 0) + ' ' + p(30, -5) +
+      ' C' + p(18, -4) + ' ' + p(8, 0) + ' ' + p(0, 6) + ' Z"/>';
+  }
+
+  function capacete(comAsas) {
+    return '<path d="M58 88 C58 44 142 44 142 88 L142 108 C142 122 132 128 118 128 L82 128 C68 128 58 122 58 108 Z"/>' +
+      '<rect class="lugar__vazio" x="68" y="82" width="64" height="26" rx="12"/>' +
+      (comAsas ? asas(100, 64, 56) : '');
+  }
+
+  /* O tronco, de ombros largos, como o fato de corrida. */
+  const TRONCO = '<path d="M34 204 C34 158 58 138 100 138 C142 138 166 158 166 204 Z"/>';
+
   function lugar(id) {
     const condutor = id !== 'copiloto';
-    const cx = condutor ? 76 : 124;
-    /* A pessoa, cheia, sentada no seu banco; o banco vazio fica só a traço. */
-    const pessoa =
-      '<circle cx="' + cx + '" cy="84" r="7" fill="currentColor" stroke="none"/>' +
-      '<path d="M' + (cx - 12) + ' 109 Q' + (cx - 12) + ' 95 ' + cx + ' 95 Q' + (cx + 12) + ' 95 ' + (cx + 12) + ' 109 Z" fill="currentColor" stroke="none"/>';
-    /* O co-piloto leva o roadbook aberto à frente. */
-    const roadbook = condutor ? '' :
-      '<rect x="' + (cx - 10) + '" y="54" width="20" height="13" rx="2"/>' +
-      '<path d="M' + cx + ' 54 L' + cx + ' 67"/>';
-    return '<svg class="silhueta lugar" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" role="img" ' +
-      'aria-label="' + (condutor ? 'Lugar do condutor, ao volante' : 'Lugar do co-piloto, com o roadbook') + '" ' +
-      'fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
-      /* A carroçaria, o para-brisas e o vidro de trás. */
-      '<rect x="44" y="4" width="112" height="142" rx="36"/>' +
-      '<path d="M54 40 Q100 26 146 40"/>' +
-      '<path d="M58 126 Q100 136 142 126"/>' +
-      /* Os dois bancos. */
-      '<rect x="60" y="72" width="32" height="42" rx="8"/>' +
-      '<rect x="108" y="72" width="32" height="42" rx="8"/>' +
-      /* O volante, com os raios, à frente do lugar do condutor. */
-      '<circle cx="76" cy="56" r="11"/>' +
-      '<path d="M65 56 L87 56 M76 56 L76 67"/>' +
-      pessoa + roadbook +
+    const maos = function (y) {
+      return '<rect class="lugar__halo" x="52" y="' + y + '" width="22" height="22" rx="8"/>' +
+        '<rect class="lugar__halo" x="126" y="' + y + '" width="22" height="22" rx="8"/>';
+    };
+    const frente = condutor
+      /* O volante, com o aro e os três raios soltos do corpo pelo halo. */
+      ? '<circle class="lugar__halo lugar__aro" cx="100" cy="164" r="30"/>' +
+        '<circle cx="100" cy="164" r="30" fill="none" stroke="currentColor" stroke-width="9"/>' +
+        '<path class="lugar__halo" d="M72 160 L128 160 L128 168 L72 168 Z M96 164 L104 164 L104 192 L96 192 Z"/>' +
+        '<circle class="lugar__halo" cx="100" cy="164" r="9"/>' +
+        maos(152)
+      /* O roadbook, fechado, com as asas na capa e a lombada à esquerda. */
+      : '<rect class="lugar__halo" x="64" y="146" width="72" height="54" rx="5"/>' +
+        '<rect class="lugar__vazio" x="72" y="150" width="4" height="46" rx="2"/>' +
+        asas(104, 168, 44) +
+        maos(158);
+    return '<svg class="silhueta lugar" viewBox="0 0 200 204" xmlns="http://www.w3.org/2000/svg" role="img" ' +
+      'aria-label="' + (condutor ? 'Condutor, de capacete, ao volante' : 'Co-piloto, de capacete, com o roadbook') + '" fill="currentColor">' +
+      TRONCO + capacete(condutor) + frente +
     '</svg>';
   }
 
