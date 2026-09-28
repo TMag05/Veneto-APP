@@ -71,7 +71,7 @@
           '<div class="lista">' +
             (org ? '' : UI.linhaLista({ titulo: 'O meu carro', nota: doCarro, icone: 'carro', href: '#/carro' })) +
             UI.linhaLista({ titulo: 'Perfil', nota: e.perfil.email, icone: 'pessoas', href: '#/perfil' }) +
-            UI.linhaLista({ titulo: 'O que levar', nota: UI.plural(DADOS.levar.length, 'item', 'itens'), icone: 'documento', href: '#/preparacao' }) +
+            UI.linhaLista({ titulo: 'O que levar', nota: 'Documentos e chaves', icone: 'documento', href: '#/preparacao' }) +
             UI.linhaLista({ titulo: 'Arquivo', nota: 'Álbum e roadbook', icone: 'galeria', href: '#/arquivo' }) +
           '</div>' +
         '</div>' +

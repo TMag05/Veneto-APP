@@ -30,12 +30,15 @@ window.SEMENTE = (function () {
     lugar: 'Veneto, Itália',
     hotel: 'Hotel Villa Soligo',
     /* Briefing que o convidado lê nos dias anteriores. */
+    /* O que levar: os documentos e as chaves, pela lista da
+       organização (28.09.2026). Destaca-se no Hoje até ao Dia 1. */
     levar: [
-      'Carta de condução e documento de identificação',
-      'Casaco quente — o Grappa passa dos 1700 m, e em outubro sente-se',
-      'Óculos de sol. A luz na altitude é outra',
-      'Sapato confortável para Veneza e para as paragens a pé',
-      'Adaptador de tomada tipo L ou F'
+      'Cartão de Cidadão',
+      'Carta de condução',
+      'Documentação da viatura (DUA, ou DAV na sua falta)',
+      'Seguro do Aston Martin',
+      'Inspeção (se aplicável)',
+      'Segunda chave e chave mecânica — nos modelos da plataforma VH, no DB11 e no Vantage até 2024'
     ],
     notas: [
       'Todas as manhãs, antes de partir, há um briefing: as regras da estrada e o resumo do dia.',
@@ -336,35 +339,10 @@ window.SEMENTE = (function () {
     ]
   };
 
-  /* ---------------------------------------------------------
-     Demonstração
-     Pessoas e contactos de exemplo, postos por cima do passeio
-     real para dar vida ao mapa e à lista de participantes. Não são
-     participantes reais — esses entram na área da organização.
-     --------------------------------------------------------- */
-  const exemplo = {
-    participantes: [
-      ['Tiago', 'Magalhães', 'condutor', '1', 'db12', 'AA-12-BB'],
-      ['Inês', 'Magalhães', 'acompanhante', '1'],
-      ['Rui', 'Sacramento', 'condutor', '2', 'dbx707', 'BB-24-CC'],
-      ['Marta', 'Sacramento', 'acompanhante', '2'],
-      ['Henrique', 'Vilar', 'condutor', '3', 'vantage', 'CC-36-DD'],
-      ['Duarte', 'Pinho', 'condutor', '4', 'vanquish', 'DD-48-EE'],
-      ['Sofia', 'Cardoso', 'condutor', '5', 'v12-vantage', 'EE-60-FF'],
-      ['Miguel', 'Cardoso', 'acompanhante', '5']
-    ],
-    contactos: [
-      { nome: 'Organização do passeio', papel: 'Sara Duarte', telefone: '+39 340 000 0001', icone: 'telefone' },
-      { nome: 'Assistência técnica', papel: 'Carro-oficina, 24 horas', telefone: '+39 340 000 0002', icone: 'oficina' },
-      { nome: 'Carro-vassoura', papel: 'Segue sempre o último do grupo', telefone: '+39 340 000 0003', icone: 'carro' }
-    ]
-  };
-
   return {
     evento: evento,
     contactos: contactos,
     biblioteca: biblioteca,
-    roteiro: roteiro,
-    exemplo: exemplo
+    roteiro: roteiro
   };
 })();

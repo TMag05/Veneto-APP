@@ -114,7 +114,7 @@ servidor.js             servidor estático de desenvolvimento
 
 ## Demonstração
 
-**Saiu a 20.09.2026** (commit `bc18040`), por ser condição de entrega: a secção `Demonstração`, o endereço `#/demo/n` e o campo `demoFase`. O relógio da app voltou a ser o relógio do telemóvel, e para ver o passeio a decorrer é preciso mudar a data do aparelho. **«Carregar passeio de exemplo» e «Repor tudo»** passaram para a área da organização, em Evento › Cópia de segurança — o carregador de exemplo mete pessoas falsas por cima das reais e deve sair antes de a app ir para as mãos dos convidados.
+**Saiu a 20.09.2026** (commit `bc18040`), por ser condição de entrega: a secção `Demonstração`, o endereço `#/demo/n` e o campo `demoFase`. O relógio da app é o de Itália (desde 28.09.2026), e para ver o passeio a decorrer é preciso mudar a data do aparelho. **«Repor tudo»** passou para a área da organização, em Evento › Cópia de segurança. O carregador do passeio de exemplo, que metia pessoas falsas por cima das reais, saiu no lançamento aos convidados, a 28.09.2026.
 
 **Num telemóvel, num só toque:** abrir `http://<ip-do-mac>:8123/#/demo/2` carrega o exemplo, faz a entrada como o primeiro participante e põe o relógio no dia 2 (também `#/demo/pre` e `#/demo/pos`). Cada endereço guarda os seus próprios dados — `localhost` no Mac e o IP da rede no telemóvel são dois sítios diferentes —, por isso é assim que se põem dois aparelhos no mesmo estado. O servidor de desenvolvimento regista quem abre a app e com que versão; a versão carregada também aparece no fim do Mais.
 
