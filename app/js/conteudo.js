@@ -17,8 +17,9 @@ window.Conteudo = (function () {
      para 3 a 27.09.2026, com a revisão da direção, ainda em testes:
      cada telemóvel volta a carregar a semente. Subiu para 4 no mesmo
      dia, com os títulos e os dias de logística, e para 5 quando os
-     cinco dias voltaram a ter número. */
-  const VERSAO_DADOS = 5;
+     cinco dias voltaram a ter número, e para 6 com as coordenadas da
+     Malga Ces. */
+  const VERSAO_DADOS = 6;
   const ouvintes = [];
 
   /* Revisões de linguagem da semente. O itinerário guardado num

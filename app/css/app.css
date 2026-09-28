@@ -951,6 +951,9 @@ a { color: var(--verde); text-decoration: none; }
 .perfil-pico--meio { align-items: center; transform: translate(-50%, calc(-100% - 10px)); }
 .perfil-pico--inicio { align-items: flex-start; transform: translate(-4px, calc(-100% - 10px)); }
 .perfil-pico--fim { align-items: flex-end; transform: translate(calc(-100% + 4px), calc(-100% - 10px)); }
+/* Dois passos próximos: um por linha, pela ordem da estrada, com o
+   nome e a altitude na mesma linha. */
+.perfil-pico__linha { display: flex; align-items: baseline; gap: var(--esp-1); }
 .perfil-pico__nome { font-size: 11px; color: var(--estrada-escrita-media); }
 .perfil-pico__alt { font-size: 15px; font-weight: 500; color: var(--estrada-escrita); }
 
