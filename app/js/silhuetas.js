@@ -5451,7 +5451,7 @@ window.Silhuetas = (function () {
   }
 
   /* ---------------------------------------------------------
-     Onde se senta: condutor ou co-piloto
+     Onde se senta: piloto ou co-piloto
      Uma ilustração a traço, de frente, dada pelo Tiago a 28.09.2026:
      o condutor de capacete, com a parte de cima do volante, e o
      co-piloto com o roadbook nas mãos — o mesmo corte nas duas. As
@@ -5460,7 +5460,9 @@ window.Silhuetas = (function () {
      --------------------------------------------------------- */
 
   const FUNCOES = [
-    { id: 'condutor', nome: 'Condutor' },
+    /* O id fica «condutor», que é o que está nas contas; o nome à
+       vista é «Piloto», a par de «Co-piloto» (28.09.2026). */
+    { id: 'condutor', nome: 'Piloto' },
     { id: 'copiloto', nome: 'Co-piloto' }
   ];
 
@@ -5475,7 +5477,7 @@ window.Silhuetas = (function () {
          resolve-se a partir da folha de estilo, não da página. */
       'style="-webkit-mask-image:url(assets/img/lugar-' + (condutor ? 'condutor' : 'copiloto') + '.png);' +
         'mask-image:url(assets/img/lugar-' + (condutor ? 'condutor' : 'copiloto') + '.png)" ' +
-      'aria-label="' + (condutor ? 'Condutor, de capacete, ao volante' : 'Co-piloto, de capacete, com o roadbook nas mãos') + '"></span>';
+      'aria-label="' + (condutor ? 'Piloto, de capacete, ao volante' : 'Co-piloto, de capacete, com o roadbook nas mãos') + '"></span>';
   }
 
   return { svg: svg, MODELOS: MODELOS, modelo: modelo, FORMAS: FORMAS, FUNCOES: FUNCOES, funcao: funcao, lugar: lugar };
