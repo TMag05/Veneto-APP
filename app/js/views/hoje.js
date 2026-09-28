@@ -325,13 +325,13 @@
         '</div>' +
       '</div>' +
 
-      (DADOS.dias.length || DADOS.carros.length ? '<div class="faixa" style="margin-top:24px">' +
+      /* Sem o número de carros: saiu a 28.09.2026, a pedido da organização. */
+      (DADOS.dias.length ? '<div class="faixa" style="margin-top:24px">' +
         '<div class="dados">' +
           '<div><div class="dado__valor num">' + DADOS.dias.filter(function (d) { return d.ordem; }).length + '</div><div class="dado__rotulo meta">Etapas</div></div>' +
           '<div><div class="dado__valor num">' +
             DADOS.dias.reduce(function (t, d) { return t + (d.distancia || 0); }, 0) +
             '</div><div class="dado__rotulo meta">Km</div></div>' +
-          '<div><div class="dado__valor num">' + DADOS.carros.length + '</div><div class="dado__rotulo meta">Carros</div></div>' +
         '</div>' +
       '</div>' : '') +
 
@@ -363,8 +363,7 @@
       (DADOS.carros.length
         ? '<div class="faixa">' +
             '<div class="seccao-cabecalho"><h2 class="etiqueta">Quem vai</h2></div>' +
-            '<p class="corpo-editorial">' + UI.plural(DADOS.carros.length, 'carro', 'carros') + ', ' +
-              UI.plural(DADOS.participantes.length, 'lugar', 'lugares') + '. A lista completa está no mapa.</p>' +
+            '<p class="corpo-editorial">A lista completa está nos participantes.</p>' +
             '<a class="botao botao--texto" href="#/participantes">Ver os participantes &rsaquo;</a>' +
           '</div>'
         : '');
