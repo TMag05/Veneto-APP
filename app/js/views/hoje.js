@@ -238,11 +238,12 @@
     '</div>';
   }
 
-  function capaDia(dia) {
+  /* antes: o que vai à frente da data — «Amanhã», no ecrã da noite. */
+  function capaDia(dia, antes) {
     return '<div class="capa">' +
       UI.foto(dia.imagem, 'foto--32 capa__imagem') +
       '<div class="capa__texto">' +
-        '<p class="capa__data">' + UI.h([dia.etiqueta, dia.data ? UI.dataLonga(dia.data) : ''].filter(Boolean).join(' · ')) + '</p>' +
+        '<p class="capa__data">' + UI.h([antes, dia.etiqueta, dia.data ? UI.dataLonga(dia.data) : ''].filter(Boolean).join(' · ')) + '</p>' +
         '<h1 class="capa-titulo">' + UI.h(dia.titulo || 'Etapa ' + dia.numero) + '</h1>' +
         (dia.subtitulo ? '<p class="subtitulo" style="margin-top:8px">' + UI.h(dia.subtitulo) + '</p>' : '') +
       '</div>' +
@@ -268,45 +269,67 @@
   }
 
   /* ---------------------------------------------------------
+     Um dia por revelar
+     O programa de cada dia revela-se na véspera, depois do
+     jantar; até lá, o convidado vê o número e a data, e mais
+     nada — nem o título, que já diz para onde se vai.
+     --------------------------------------------------------- */
+
+  /* «Revela-se na véspera, depois do jantar.» Para a organização,
+     que vê tudo, a hora exata. */
+  function quandoRevela(dia) {
+    const t = Estado.revelaEm(dia);
+    if (!t) return '';
+    const hora = String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0');
+    return 'Revela-se a ' + UI.dataCurta(Estado.chave(t)) + ', às ' + hora + '.';
+  }
+
+  function nomeFechado(dia) {
+    return [dia.etiqueta, dia.data ? UI.dataLonga(dia.data) : ''].filter(Boolean).join(' · ');
+  }
+
+  function seladoDia(dia) {
+    return '<div class="faixa" style="padding-top:24px">' +
+      '<div class="selado">' +
+        '<div class="selado__icone">' + Icone('selado', 24) + '</div>' +
+        '<p class="etiqueta">' + UI.h(nomeFechado(dia)) + '</p>' +
+        '<p class="corpo-editorial" style="margin-top:12px">O programa deste dia revela-se na véspera, depois do jantar.</p>' +
+      '</div>' +
+    '</div>';
+  }
+
+  /* Uma linha de lista para um dia fechado: não abre nada, e por
+     isso não leva seta. */
+  function linhaFechada(dia) {
+    return '<div class="lista-linha lista-linha--fechada">' +
+      '<span class="lista-linha__icone">' + Icone('selado', 20) + '</span>' +
+      '<span class="lista-linha__corpo">' +
+        '<span class="titulo-ui" style="display:block">' + UI.h(dia.etiqueta || '') + '</span>' +
+        '<span class="meta" style="display:block;margin-top:2px">' +
+          UI.h([dia.data ? UI.dataCurta(dia.data) : '', 'revela-se na véspera'].filter(Boolean).join(' · ')) + '</span>' +
+      '</span>' +
+    '</div>';
+  }
+
+  /* ---------------------------------------------------------
+     Amanhã — da revelação à meia-noite
+     O dia seguinte inteiro, como na página do dia: a capa, o
+     texto, o programa momento a momento e o roadbook.
+     --------------------------------------------------------- */
+
+  function amanhaHtml(dia) {
+    return capaDia(dia, 'Amanhã') +
+      (dia.resumo ? '<div class="faixa"><p class="corpo-editorial">' + UI.h(dia.resumo) + '</p></div>' : '') +
+      '<div class="faixa">' + meteo(dia) + '</div>' +
+      '<div class="faixa">' + blocos(dia, false) + '</div>' +
+      rodapeDia(dia);
+  }
+
+  /* ---------------------------------------------------------
      Antes de partir — os dias que antecedem o passeio
      A app chega ao convidado poucos dias antes. Este ecrã é o
      briefing: o que vai acontecer, o que levar, quem vai.
      --------------------------------------------------------- */
-
-  /* Uma paragem por dia, revelada. É o que faz a app abrir-se
-     todos os dias antes de partir. */
-  function revelacaoHtml() {
-    const hoje = Estado.chave(Estado.agora());
-    const visiveis = Conteudo.reveladas(hoje);
-    const nova = visiveis
-      .map(function (id) { return Object.assign({ id: id }, POIS[id]); })
-      .filter(function (p) { return p.revelacao === hoje; })[0];
-
-    if (nova) {
-      return '<div class="faixa" style="margin-top:32px">' +
-        '<a class="revelacao" href="#/poi/' + nova.id + '" ' +
-          'style="background-image:' + UI.imagemDe(nova.imagem, 1.2) + '">' +
-          '<span class="revelacao__veu"></span>' +
-          '<span class="revelacao__corpo">' +
-            '<span class="revelacao__etiqueta">Hoje revela-se</span>' +
-            '<span class="revelacao__titulo">' + UI.h(nova.nome) + '</span>' +
-            (nova.subtitulo ? '<span class="revelacao__sub">' + UI.h(nova.subtitulo) + '</span>' : '') +
-          '</span>' +
-        '</a>' +
-      '</div>';
-    }
-
-    const proxima = Conteudo.porRevelar(hoje);
-    if (!proxima) return '';
-    const dias = Math.round((new Date(proxima.revelacao + 'T00:00:00') - new Date(hoje + 'T00:00:00')) / 86400000);
-    return '<div class="faixa" style="margin-top:32px">' +
-      '<div class="selado selado--espera">' +
-        '<p class="corpo-editorial italico">Falta revelar mais uma paragem do percurso.</p>' +
-        '<p class="meta" style="margin-top:12px">' +
-          (dias <= 1 ? 'Amanhã.' : 'Daqui a ' + UI.plural(dias, 'dia', 'dias') + '.') + '</p>' +
-      '</div>' +
-    '</div>';
-  }
 
   function briefingHtml() {
     const faltam = Estado.diasAte();
@@ -335,8 +358,6 @@
         '</div>' +
       '</div>' : '') +
 
-      revelacaoHtml() +
-
       (carro ? '<div class="faixa">' +
         '<div class="seccao-cabecalho"><h2 class="etiqueta">O seu carro</h2></div>' +
         '<a href="#/carro" style="display:block;color:inherit">' +
@@ -350,9 +371,10 @@
         ? '<div class="faixa">' +
             '<div class="seccao-cabecalho"><h2 class="etiqueta">O programa</h2></div>' +
             '<div class="lista">' + DADOS.dias.map(function (d) {
+              if (!Estado.diaVisivel(d)) return linhaFechada(d);
               return UI.linhaLista({
                 titulo: [d.etiqueta, d.titulo].filter(Boolean).join(' — '),
-                nota: d.data ? UI.dataCurta(d.data) : '',
+                nota: [d.data ? UI.dataCurta(d.data) : '', Estado.ehOrganizacao() ? quandoRevela(d) : ''].filter(Boolean).join(' · '),
                 href: '#/dia/' + d.id
               });
             }).join('') + '</div>' +
@@ -419,7 +441,7 @@
     nav: 'hoje',
     /* Antes e depois do passeio o ecrã abre com uma capa, e a capa é o
        cabeçalho; durante, só o dia sobre a paisagem dispensa a barra. */
-    semCabecalho: function () { return Estado.fase() !== 'durante' || comDia(); },
+    semCabecalho: function () { return Estado.fase() !== 'durante' || !!Estado.amanha() || comDia(); },
     cabecalho: function () {
       const dia = Estado.fase() === 'durante' ? Estado.diaAtivo() : null;
       return {
@@ -431,6 +453,10 @@
       const fase = Estado.fase();
       if (fase === 'pre') return briefingHtml();
       if (fase === 'pos') return posHtml();
+
+      /* Depois do jantar, o separador é o de amanhã. */
+      const amanha = Estado.amanha();
+      if (amanha) return amanhaHtml(amanha);
 
       const dia = Estado.diaAtivo();
       if (!dia) return semItinerario('O programa de hoje ainda não está publicado.');
@@ -444,11 +470,12 @@
     nav: 'hoje',
     cabecalho: function (p) {
       const d = DADOS.dia(p.id);
-      return { voltar: '#/hoje', titulo: d ? d.titulo : 'Dia', linha: false };
+      return { voltar: '#/hoje', titulo: d ? (Estado.diaVisivel(d) ? d.titulo : d.etiqueta) : 'Dia', linha: false };
     },
     html: function (p) {
       const dia = DADOS.dia(p.id);
       if (!dia) return '<div class="faixa"><p class="corpo-editorial">Dia não encontrado.</p></div>';
+      if (!Estado.diaVisivel(dia)) return seladoDia(dia);
       const hoje = Estado.chave(Estado.agora()) === dia.data;
       return capaDia(dia) +
         (dia.resumo ? '<div class="faixa"><p class="corpo-editorial">' + UI.h(dia.resumo) + '</p></div>' : '') +
@@ -509,6 +536,7 @@
   window.Programa = {
     blocos: blocos, capaDia: capaDia, indiceAtual: indiceAtual, poiAnterior: poiAnterior,
     abertoAgora: abertoAgora,
+    seladoDia: seladoDia, quandoRevela: quandoRevela,
     corpoMomento: corpoMomento, momentoEm: momentoEm, seguinteHtml: seguinteHtml,
     imagemDoMomento: imagemDoMomento
   };

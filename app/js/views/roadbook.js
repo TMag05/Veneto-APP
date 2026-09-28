@@ -13,8 +13,23 @@
 
 (function () {
 
+  /* Um dia por revelar: o número e a data, sem fotografia nem
+     título — o título já diz para onde se vai. Não abre. */
+  function cartaoFechado(d) {
+    return '<div class="cartao-dia cartao-dia--fechado">' +
+      '<span class="cartao-dia__corpo">' +
+        '<span class="etiqueta" style="display:block">' +
+          UI.h([d.etiqueta, d.data ? UI.dataCurta(d.data) : ''].filter(Boolean).join(' · ')) + '</span>' +
+        '<span class="cartao-dia__resumo">Revela-se na véspera, depois do jantar.</span>' +
+      '</span>' +
+    '</div>';
+  }
+
   function cartaoDia(d) {
+    if (!Estado.diaVisivel(d)) return cartaoFechado(d);
     const paragens = (d.etapas || []).length;
+    /* A organização vê tudo, e a hora a que cada dia se revela. */
+    const revela = Estado.ehOrganizacao() ? Programa.quandoRevela(d) : '';
     return '<a class="cartao-dia" href="#/roadbook/' + d.id + '">' +
       UI.foto(d.imagem, 'cartao-dia__foto') +
       '<span class="cartao-dia__corpo">' +
@@ -22,7 +37,8 @@
           UI.h([d.etiqueta, d.data ? UI.dataCurta(d.data) : ''].filter(Boolean).join(' · ')) + '</span>' +
         '<span class="cartao-dia__titulo">' + UI.h(d.titulo || 'Etapa ' + d.numero) + '</span>' +
         (d.resumo ? '<span class="cartao-dia__resumo">' + UI.h(d.resumo) + '</span>' : '') +
-        (paragens ? '<span class="cartao-dia__meta">' + UI.plural(paragens, 'paragem', 'paragens') + '</span>' : '') +
+        (paragens || revela ? '<span class="cartao-dia__meta">' +
+          UI.h([paragens ? UI.plural(paragens, 'paragem', 'paragens') : '', revela].filter(Boolean).join(' · ')) + '</span>' : '') +
       '</span>' +
     '</a>';
   }
@@ -35,10 +51,10 @@
          com fotografia; sem nenhuma, a primeira fotografia do passeio;
          sem nenhuma, o desenho. */
       const temFoto = function (i) { return i && (i.foto || i.dataUrl); };
-      const estrada = Object.keys(POIS).map(function (id) { return POIS[id]; })
+      const estrada = Object.keys(POIS).filter(Estado.poiVisivel).map(function (id) { return POIS[id]; })
         .find(function (p) { return p.tipo === 'estrada' && temFoto(p.imagem); });
       const foto = estrada ? estrada.imagem
-        : DADOS.dias.map(function (d) { return d.imagem; }).find(temFoto);
+        : DADOS.dias.filter(Estado.diaVisivel).map(function (d) { return d.imagem; }).find(temFoto);
       const capa = '<div class="capa">' +
           UI.foto(foto || { semente: 'roadbook', variante: 'paisagem' }, 'foto--32 capa__imagem') +
           '<div class="capa__texto">' +
@@ -67,11 +83,13 @@
     nav: 'roadbook',
     cabecalho: function (p) {
       const d = DADOS.dia(p.id);
+      if (d && !Estado.diaVisivel(d)) return { voltar: '#/roadbook', titulo: d.etiqueta, linha: false };
       return { voltar: '#/roadbook', titulo: d ? (d.titulo || 'Etapa ' + d.numero) : 'Etapa', linha: false };
     },
     html: function (p) {
       const dia = DADOS.dia(p.id);
       if (!dia) return '<div class="faixa"><p class="corpo-editorial">Dia não encontrado.</p></div>';
+      if (!Estado.diaVisivel(dia)) return Programa.seladoDia(dia);
 
       const alojamento = dia.hotel ? DADOS.local(dia.hotel) : null;
 

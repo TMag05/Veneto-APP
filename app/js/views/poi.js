@@ -118,12 +118,24 @@
       const poi = POIS[p.id];
       return {
         voltar: '#/roadbook',
-        titulo: poi ? poi.nome : 'Ponto de interesse',
+        titulo: poi && Estado.poiVisivel(p.id) ? poi.nome : 'Paragem',
         linha: false
       };
     },
-    html: function (p) { return paginaPoi(p.id); }
+    html: function (p) {
+      if (POIS[p.id] && !Estado.poiVisivel(p.id)) return paragemFechada();
+      return paginaPoi(p.id);
+    }
   };
+
+  /* Uma paragem que só aparece em dias por revelar — pelo endereço,
+     vindo de um link — fica fechada com eles. */
+  function paragemFechada() {
+    return '<div class="faixa" style="padding-top:24px"><div class="selado">' +
+      '<div class="selado__icone">' + Icone('selado', 24) + '</div>' +
+      '<p class="corpo-editorial">Esta paragem revela-se na véspera do dia em que lá se passa, depois do jantar.</p>' +
+    '</div></div>';
+  }
 
   /* ---------------------------------------------------------
      Um momento do dia — o destino de cada bloco do Hoje
@@ -136,6 +148,7 @@
     nav: 'hoje',
     cabecalho: function (p) {
       const x = Programa.momentoEm(p.dia, p.n);
+      if (x && !Estado.diaVisivel(x.dia)) return { voltar: '#/hoje', titulo: x.dia.etiqueta, linha: false };
       const poi = x && x.m.poi ? POIS[x.m.poi] : null;
       return {
         voltar: '#/hoje',
@@ -146,6 +159,7 @@
     html: function (p) {
       const x = Programa.momentoEm(p.dia, p.n);
       if (!x) return '<div class="faixa"><p class="corpo-editorial">Momento não encontrado.</p></div>';
+      if (!Estado.diaVisivel(x.dia)) return Programa.seladoDia(x.dia);
 
       if (x.m.poi && POIS[x.m.poi]) {
         return paginaPoi(x.m.poi, {

@@ -141,7 +141,7 @@ window.Conteudo = (function () {
       const id = idUnico(nome, d.pois);
       d.pois[id] = Object.assign({
         nome: nome, local: '', tipo: 'vila', lat: 0, lng: 0, altitude: 0,
-        subtitulo: '', historia: [], nota: '', revelacao: '', chegada: chegadaVazia()
+        subtitulo: '', historia: [], nota: '', chegada: chegadaVazia()
       }, clonar(b || {}));
       d.pois[id].chegada = Object.assign(chegadaVazia(), d.pois[id].chegada || {});
       if (!d.pois[id].imagem) d.pois[id].imagem = { variante: varianteDe(d.pois[id].tipo), semente: id };
@@ -399,25 +399,6 @@ window.Conteudo = (function () {
     Fotos.apagar(id).catch(function () { /* já não existia */ });
   }
 
-  /* Paragens que já se revelaram ao convidado, por data. */
-  function reveladas(hoje) {
-    return Object.keys(dados.pois).filter(function (id) {
-      const r = dados.pois[id].revelacao;
-      return !r || r <= hoje;
-    });
-  }
-
-  /* A próxima paragem a revelar-se, e quando. */
-  function porRevelar(hoje) {
-    let melhor = null;
-    Object.keys(dados.pois).forEach(function (id) {
-      const r = dados.pois[id].revelacao;
-      if (!r || r <= hoje) return;
-      if (!melhor || r < melhor.revelacao) melhor = Object.assign({ id: id }, dados.pois[id]);
-    });
-    return melhor;
-  }
-
   /* ---------------------------------------------------------
      Etapas do itinerário
      --------------------------------------------------------- */
@@ -487,8 +468,6 @@ window.Conteudo = (function () {
       subtitulo: c.subtitulo || '',
       historia: c.historia || [],
       nota: c.nota || '',
-      /* Data em que a paragem se revela no briefing. Vazia = já visível. */
-      revelacao: c.revelacao || '',
       chegada: Object.assign(chegadaVazia(), c.chegada || {}),
       imagem: c.imagem || { variante: varianteDe(c.tipo), semente: id }
     };
@@ -768,7 +747,7 @@ window.Conteudo = (function () {
     atualizarEvento: atualizarEvento,
     apagarEm: apagarEm, diasAteApagar: diasAteApagar,
     juntarFotoInicial: juntarFotoInicial, removerFotoInicial: removerFotoInicial,
-    reveladas: reveladas, porRevelar: porRevelar, varianteDe: varianteDe,
+    varianteDe: varianteDe,
 
     criarDia: criarDia, atualizarDia: atualizarDia, removerDia: removerDia, moverDia: moverDia,
     criarPoi: criarPoi, atualizarPoi: atualizarPoi, removerPoi: removerPoi,

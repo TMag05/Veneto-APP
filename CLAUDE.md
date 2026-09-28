@@ -35,7 +35,7 @@ O documento do diretor-geral (`Estrutura-App-Passeio-Dolomitas.docx`) é a espec
 
 ## 3. Âmbito
 
-**Dentro:** o antes imediato (briefing e revelação diária), o durante (de 1 a 5 de outubro de 2026) e o depois (álbum).
+**Dentro:** o antes imediato (o briefing, com o Dia 1), o durante (de 1 a 5 de outubro de 2026) e o depois (álbum).
 
 **Fora, e não voltar a trazer:** checkup nas oficinas, transporte da viatura para Itália, inscrições em experiências, concierge (o serviço não existe; saiu a 27.09.2026 — ficam os Contactos e o SOS). Os convidados recebem acesso poucos dias antes de partir.
 
@@ -52,6 +52,7 @@ O documento do diretor-geral (`Estrutura-App-Passeio-Dolomitas.docx`) é a espec
 - **Cantos redondos, cápsulas e sombra difusa.** Capas a 26px, cartões a 20px, filtros e botões em cápsula, elevação por sombra baixa — não por linha de 1px. (Isto substituiu a regra antiga de `BRAND-GUIDELINES.md` §6.)
 - **Cada separador abre com uma capa** — cartão de fotografia inserido das margens, com o título assente no fundo dela. A capa é o cabeçalho; os separadores de topo não têm outro.
 - **Uma coisa de cada vez.** É a regra do ecrã Hoje e o princípio que governa qualquer ecrã novo. Durante o passeio, o Hoje mostra só o momento em curso — *Agora*, ou *A seguir* se o grupo estiver entre dois —, num cartão sobre a paisagem parada, com o que vem depois por baixo. Tocar abre a página desse momento (`#/momento/dia/n`): com paragem, é a página do sítio com o momento por cima (hora, o que acontece, nota, localização); sem paragem, é o momento sozinho. O dia inteiro está no roadbook, nunca no Hoje. Decisão de 13.09.2026, depois de experimentada a lista do dia.
+- **Cada dia revela-se na véspera, depois do jantar.** É o fator surpresa do passeio: o Dia 1 está à vista desde sempre, e cada um dos seguintes abre quinze minutos depois da hora do jantar da véspera — a última refeição marcada a partir das 17:00, e por isso acompanha a hora se a organização a mudar; sem jantar, à meia-noite. Até lá, o convidado vê o número e a data e mais nada, nem o título: no Roadbook, nas Etapas, na lista do programa, nos links diretos para o dia, o momento, a paragem ou a estrada, e nos restaurantes de Hotéis e restaurantes (os hotéis ficam sempre à vista). **Entre a revelação e a meia-noite, o separador Hoje chama-se Amanhã** e mostra o dia seguinte inteiro — é a única vez que o dia inteiro vive nesse separador. A organização vê tudo, com a hora a que cada dia se revela. A regra vive só em `store.js` (`revelaEm`, `diaVisivel`, `poiVisivel`, `amanha`), e `app.js` repinta sozinho quando o momento chega. Decisão de 28.09.2026, que substituiu a revelação de uma paragem por dia. Guarda a surpresa, não um segredo: o programa está no telemóvel.
 - **A navegação principal usa os cinco punções próprios** de `icones.js` (`PUNCOES`, grelha de 48, traço de 3), destacados a cobre por `currentColor`. É a única navegação que não usa o conjunto outline geral de 1.5px.
 - **Alvos de 44px, contraste AA no mínimo, AAA no texto principal.** Isto é lido de pé, ao sol, por pessoas acima dos 45 anos. Nenhuma informação passa só por cor.
 - **Movimento discreto:** 200ms. A única exceção é a revelação do álbum, a 600ms.

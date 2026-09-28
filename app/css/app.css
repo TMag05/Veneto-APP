@@ -754,7 +754,7 @@ a { color: var(--verde); text-decoration: none; }
   text-align: center;
   background: var(--intonaco);
 }
-.selado__icone { color: var(--inchiostro-chiaro); margin: 0 auto var(--esp-2); }
+.selado__icone { display: flex; justify-content: center; color: var(--inchiostro-chiaro); margin-bottom: var(--esp-2); }
 
 /* ---------------------------------------------------------
    Mapa
@@ -1404,60 +1404,11 @@ a { color: var(--verde); text-decoration: none; }
 .logo--chegada { position: relative; max-width: 200px; margin: var(--esp-1) auto auto; }
 .logo--album   { max-width: 168px; }
 
-/* ---------------------------------------------------------
-   Revelação diária, nos dias antes de partir
-   --------------------------------------------------------- */
+/* Um dia por revelar, numa lista ou no roadbook: não abre nada. */
+.lista-linha--fechada { cursor: default; color: var(--inchiostro-chiaro); }
+.lista-linha--fechada .titulo-ui { color: var(--inchiostro-medio); }
+.cartao-dia--fechado { background: transparent; border-style: dashed; }
 
-.revelacao {
-  position: relative;
-  display: block;
-  min-height: 220px;
-  border-radius: var(--raio-cartao);
-  overflow: hidden;
-  background-size: cover;
-  background-position: center;
-  color: #EDE8E0;
-}
-
-.revelacao__veu {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, rgba(12,16,22,0.12) 35%, rgba(12,16,22,0.85) 100%);
-}
-
-.revelacao__corpo {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  min-height: 220px;
-  padding: var(--esp-3);
-}
-
-.revelacao__etiqueta {
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgba(237,232,224,0.8);
-}
-
-.revelacao__titulo {
-  font-family: var(--font-editorial);
-  font-size: 30px;
-  line-height: 1.15;
-  margin-top: var(--esp-1);
-}
-
-.revelacao__sub {
-  font-family: var(--font-editorial);
-  font-style: italic;
-  font-size: 17px;
-  margin-top: 4px;
-  color: rgba(237,232,224,0.85);
-}
-
-.selado--espera { background: transparent; border-style: dashed; text-align: center; }
 /* Um aviso não é um estado vazio: lê-se de fio a pavio, alinhado à
    esquerda como o resto do texto da página. */
 .selado--aviso { text-align: left; padding: var(--esp-3); }

@@ -130,6 +130,76 @@ window.Estado = (function () {
   function ehOrganizacao() { return estado.autenticado && estado.perfil.papel === 'organizacao'; }
 
   /* ---------------------------------------------------------
+     A revelação de cada dia
+     O programa de um dia revela-se na véspera, quinze minutos
+     depois da hora do jantar; o primeiro está à vista desde
+     sempre. É o fator surpresa do passeio (28.09.2026). Entre a
+     revelação e a meia-noite, o separador Hoje chama-se Amanhã e
+     mostra o dia seguinte inteiro. A organização vê tudo. A regra
+     vive só aqui, e lê o relógio e o programa: funciona sem rede.
+     --------------------------------------------------------- */
+
+  const DEPOIS_DO_JANTAR = 15; /* minutos */
+
+  /* O jantar de um dia: a última refeição marcada a partir das
+     17:00. Se a organização o mudar de hora, a revelação vai com
+     ele. */
+  function jantar(dia) {
+    let j = null;
+    (dia.momentos || []).forEach(function (m) {
+      if (m.tipo === 'refeicao' && m.hora && m.hora >= '17:00') j = m;
+    });
+    return j;
+  }
+
+  /* O instante em que um dia se revela, ou null se está à vista
+     desde sempre. Sem jantar na véspera, abre à meia-noite. */
+  function revelaEm(dia) {
+    const i = dia ? DADOS.dias.findIndex(function (d) { return d.id === dia.id; }) : -1;
+    if (i <= 0) return null;
+    const vespera = DADOS.dias[i - 1];
+    if (!vespera.data) return null;
+    const t = new Date(vespera.data + 'T00:00:00');
+    const j = jantar(vespera);
+    if (j) t.setMinutes(UI.minutos(j.hora) + DEPOIS_DO_JANTAR);
+    else t.setDate(t.getDate() + 1);
+    return t;
+  }
+
+  function revelado(dia) {
+    const t = revelaEm(dia);
+    return !t || agora() >= t;
+  }
+
+  /* O que o convidado pode ver. A organização vê sempre tudo. */
+  function diaVisivel(dia) { return !!dia && (ehOrganizacao() || revelado(dia)); }
+
+  /* Uma paragem fica por revelar enquanto todos os dias em que
+     aparece estiverem por revelar. A que não aparece em dia
+     nenhum está à vista. */
+  function poiVisivel(id) {
+    if (ehOrganizacao()) return true;
+    let aparece = false;
+    const aberta = DADOS.dias.some(function (d) {
+      const nele = (d.etapas || []).indexOf(id) >= 0 ||
+        (d.momentos || []).some(function (m) { return m.poi === id; });
+      if (nele) aparece = true;
+      return nele && revelado(d);
+    });
+    return aberta || !aparece;
+  }
+
+  /* O dia de amanhã, entre a sua revelação e a meia-noite; fora
+     dessa janela, null. */
+  function amanha() {
+    const hoje = chave(agora());
+    return DADOS.dias.find(function (d) {
+      const t = revelaEm(d);
+      return !!t && d.data > hoje && agora() >= t;
+    }) || null;
+  }
+
+  /* ---------------------------------------------------------
      Perfil e carro
      --------------------------------------------------------- */
 
@@ -447,6 +517,10 @@ window.Estado = (function () {
     diaAtivo: diaAtivo,
     diasAte: diasAte,
     ehOrganizacao: ehOrganizacao,
+    revelaEm: revelaEm,
+    diaVisivel: diaVisivel,
+    poiVisivel: poiVisivel,
+    amanha: amanha,
     lembrarModo: lembrarModo,
     eu: eu,
     carroRegistado: carroRegistado,
