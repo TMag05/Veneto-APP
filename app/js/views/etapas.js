@@ -432,7 +432,7 @@
       '<p class="meta">' + UI.h(d.data ? UI.dataLonga(d.data) : '') + '</p>' +
       '<div class="selado" style="margin-top:16px">' +
         '<div class="selado__icone">' + Icone('selado', 24) + '</div>' +
-        '<p class="corpo-editorial">A estrada deste dia revela-se na véspera, depois do jantar.</p>' +
+        '<p class="corpo-editorial">A estrada deste dia conta-se a seu tempo.</p>' +
       '</div>' +
     '</div>';
   }
@@ -600,7 +600,7 @@
       if (estradaFechada(e)) {
         return '<div class="faixa" style="padding-top:24px"><div class="selado">' +
           '<div class="selado__icone">' + Icone('selado', 24) + '</div>' +
-          '<p class="corpo-editorial">Esta estrada revela-se na véspera do dia em que se faz, depois do jantar.</p>' +
+          '<p class="corpo-editorial">Esta estrada conta-se a seu tempo.</p>' +
         '</div></div>';
       }
 

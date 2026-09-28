@@ -133,7 +133,7 @@
   function paragemFechada() {
     return '<div class="faixa" style="padding-top:24px"><div class="selado">' +
       '<div class="selado__icone">' + Icone('selado', 24) + '</div>' +
-      '<p class="corpo-editorial">Esta paragem revela-se na véspera do dia em que lá se passa, depois do jantar.</p>' +
+      '<p class="corpo-editorial">Esta paragem conta-se a seu tempo.</p>' +
     '</div></div>';
   }
 
