@@ -274,6 +274,22 @@ window.UI = (function () {
         (escolhido ? 'Escolhido: ' + h(escolhido.nome) : 'Toque no modelo do seu carro.') + '</p>';
   }
 
+  /* Condutor ou co-piloto: o mesmo cartão da escolha do carro, com
+     o habitáculo desenhado e a pessoa no seu lugar. */
+  function escolhaFuncao(valor) {
+    const escolhida = Silhuetas.funcao(valor);
+    return '<div class="silhueta-grelha">' + Silhuetas.FUNCOES.map(function (f) {
+        const sim = f.id === valor;
+        return '<button class="silhueta-opcao" type="button" data-acao="funcao" data-valor="' + f.id + '" ' +
+          'aria-pressed="' + (sim ? 'true' : 'false') + '">' +
+          (sim ? '<span class="silhueta-opcao__marca">' + Icone('verificado', 20) + '</span>' : '') +
+          Silhuetas.lugar(f.id) +
+          '<span class="silhueta-opcao__nome">' + h(f.nome) + '</span></button>';
+      }).join('') + '</div>' +
+      '<p class="corpo-ui silhueta-escolha" aria-live="polite">' +
+        (escolhida ? 'Escolhido: ' + h(escolhida.nome) : 'Toque no seu lugar no carro.') + '</p>';
+  }
+
   /* Um nome reduzido a letras, números e hífenes. Serve de
      identificador e de nome de ficheiro. */
   function talho(t) {
@@ -447,7 +463,7 @@ window.UI = (function () {
     rotuloDia: rotuloDia, pastaDia: pastaDia, troco: troco, haversine: haversine, linkLocal: linkLocal, linkWaze: linkWaze, atalhosLocal: atalhosLocal,
     descarregar: descarregar,
     foto: foto, imagemDe: imagemDe, logo: logo, horario: horario, distintivo: distintivo, linhaLista: linhaLista,
-    campo: campo, ligarCampos: ligarCampos, coordenadas: coordenadas, escolhaCarro: escolhaCarro,
+    campo: campo, ligarCampos: ligarCampos, coordenadas: coordenadas, escolhaCarro: escolhaCarro, escolhaFuncao: escolhaFuncao,
     reduzirImagem: reduzirImagem, derivadas: derivadas, campoFoto: campoFoto, talho: talho, nomeDeFoto: nomeDeFoto,
     abrirFolha: abrirFolha, fecharFolha: fecharFolha,
     MESES: MESES

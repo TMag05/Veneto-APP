@@ -44,11 +44,12 @@ window.Nuvem = (function () {
      entrar — uma conta apagada liberta o email para outra.
 
      Uma sessão é { uid, idToken, refreshToken, expira }.
-     Um perfil é { uid, nome, email, modelo, papel, criado }.
+     Um perfil é { uid, nome, email, modelo, funcao, papel, criado }.
+     funcao é 'condutor' ou 'copiloto' — o lugar no carro.
      papel é 'convidado' ou 'organizacao'. A organização viaja
      em carros próprios: o perfil dela não tem modelo.
 
-     criarConta({ nome, email, senha, modelo })
+     criarConta({ nome, email, senha, modelo, funcao })
        → { sessao, perfil, perfilPendente }
        perfilPendente é true quando a conta ficou criada mas o
        perfil não chegou ao Firestore; volta-se a publicar
@@ -92,6 +93,7 @@ window.Nuvem = (function () {
       nome: String(d.nome || '').trim(),
       email: normalizar(d.email),
       modelo: d.papel === 'organizacao' ? '' : (d.modelo || ''),
+      funcao: d.papel === 'organizacao' ? '' : (d.funcao === 'copiloto' ? 'copiloto' : (d.funcao === 'condutor' ? 'condutor' : '')),
       papel: d.papel === 'organizacao' ? 'organizacao' : 'convidado',
       criado: criado || Date.now()
     };
@@ -190,6 +192,7 @@ window.Nuvem = (function () {
       nome: { stringValue: p.nome },
       email: { stringValue: p.email },
       modelo: { stringValue: p.modelo },
+      funcao: { stringValue: p.funcao || '' },
       papel: { stringValue: p.papel || 'convidado' },
       criado: { integerValue: String(p.criado) }
     } };
@@ -200,7 +203,7 @@ window.Nuvem = (function () {
     function t(k) { return f[k] ? (f[k].stringValue || '') : ''; }
     return {
       uid: doc.name.split('/').pop(),
-      nome: t('nome'), email: t('email'), modelo: t('modelo'),
+      nome: t('nome'), email: t('email'), modelo: t('modelo'), funcao: t('funcao'),
       papel: t('papel') === 'organizacao' ? 'organizacao' : 'convidado',
       criado: f.criado ? Number(f.criado.integerValue) : 0
     };
@@ -355,7 +358,7 @@ window.Nuvem = (function () {
   }
 
   function semSegredos(c) {
-    return { uid: c.uid, nome: c.nome, email: c.email, modelo: c.modelo,
+    return { uid: c.uid, nome: c.nome, email: c.email, modelo: c.modelo, funcao: c.funcao || '',
       papel: c.papel === 'organizacao' ? 'organizacao' : 'convidado', criado: c.criado };
   }
 
@@ -431,7 +434,7 @@ window.Nuvem = (function () {
         const s = lerSimulado();
         const c = s.contas[sessao.uid];
         if (!c) throw erro('conta-apagada');
-        Object.assign(c, { nome: perfil.nome, modelo: perfil.modelo });
+        Object.assign(c, { nome: perfil.nome, modelo: perfil.modelo, funcao: perfil.funcao || '' });
         gravarSimulado(s);
       });
     },

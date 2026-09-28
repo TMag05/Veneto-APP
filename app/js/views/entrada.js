@@ -60,7 +60,7 @@ function fabrica(org) {
   function preparar() {
     if (rascunho) return;
     const e = Estado.get();
-    rascunho = { nome: e.perfil.nome || '', email: e.perfil.email || '', senha: '', modelo: e.perfil.modelo || '', codigo: '' };
+    rascunho = { nome: e.perfil.nome || '', email: e.perfil.email || '', senha: '', modelo: e.perfil.modelo || '', funcao: e.perfil.funcao || '', codigo: '' };
     /* A equipa é pequena e cria o acesso uma vez: quem volta a
        esta porta quase sempre já o tem. */
     modo = org || (instalada() && !e.aviso) ? 'entrar' : 'criar';
@@ -171,6 +171,10 @@ function fabrica(org) {
         '<h2 class="etiqueta">Qual é o seu Aston Martin?</h2>' +
         '<div style="margin-top:24px">' + UI.escolhaCarro(rascunho.modelo) + '</div>' +
       '</div>' +
+      '<div>' +
+        '<h2 class="etiqueta">Viaja como</h2>' +
+        '<div style="margin-top:24px">' + UI.escolhaFuncao(rascunho.funcao) + '</div>' +
+      '</div>' +
       aviso() +
       principal('Criar acesso', 'A criar o acesso') +
       trocar('entrar', 'Já tenho acesso') +
@@ -271,6 +275,7 @@ function fabrica(org) {
     if (modo === 'criar' && rascunho.senha.length < 6) return MENSAGENS['senha-curta'];
     if (modo === 'entrar' && !rascunho.senha) return 'Falta a palavra-passe.';
     if (modo === 'criar' && !org && !rascunho.modelo) return 'Escolha o modelo do carro.';
+    if (modo === 'criar' && !org && !rascunho.funcao) return 'Escolha se viaja como condutor ou co-piloto.';
     if (modo === 'criar' && org && Nuvem.pedeCodigo() && !rascunho.codigo.trim()) return 'Falta o código da organização.';
     return '';
   }
@@ -294,7 +299,7 @@ function fabrica(org) {
         entrou(r);
       }).catch(falhou);
     } else if (modo === 'criar') {
-      Nuvem.criarConta({ nome: rascunho.nome.trim(), email: email, senha: rascunho.senha, modelo: rascunho.modelo })
+      Nuvem.criarConta({ nome: rascunho.nome.trim(), email: email, senha: rascunho.senha, modelo: rascunho.modelo, funcao: rascunho.funcao })
         .then(entrou, falhou);
     } else if (modo === 'entrar') {
       Nuvem.entrar(email, rascunho.senha).then(entrou, falhou);
@@ -339,7 +344,9 @@ function fabrica(org) {
         rascunho.senha = '';
         App.repintar();
       },
-      modelo: function (valor) { rascunho.modelo = valor; App.repintar(); },
+      /* Escolher o que faltava tira o aviso que o pedia. */
+      modelo: function (valor) { rascunho.modelo = valor; mensagem = ''; App.repintar(); },
+      funcao: function (valor) { rascunho.funcao = valor; mensagem = ''; App.repintar(); },
       /* Troca-se no próprio campo, sem repintar: o teclado fica aberto. */
       verSenha: function (valor, botao) {
         senhaVisivel = !senhaVisivel;
