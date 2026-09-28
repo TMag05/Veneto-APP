@@ -343,7 +343,7 @@
           '<h1 class="capa-titulo">' + UI.h(DADOS.evento.nome || 'Passeio') + '</h1>' +
           '<p class="subtitulo" style="margin-top:8px">' +
             (faltam === null ? UI.h(DADOS.evento.lugar || 'Por confirmar')
-              : (faltam > 0 ? 'Faltam ' + UI.plural(faltam, 'dia', 'dias') + '.' : 'Começa hoje.')) +
+              : (faltam > 0 ? (faltam === 1 ? 'Falta 1 dia.' : 'Faltam ' + faltam + ' dias.') : 'Começa hoje.')) +
           '</p>' +
         '</div>' +
       '</div>' +
