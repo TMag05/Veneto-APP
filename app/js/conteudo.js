@@ -19,8 +19,14 @@ window.Conteudo = (function () {
      dia, com os títulos e os dias de logística, e para 5 quando os
      cinco dias voltaram a ter número, e para 6 com as coordenadas da
      Malga Ces. Subiu para 7 no lançamento aos convidados, com a lista
-     do que levar da organização. */
+     do que levar da organização — sem apagar nada: a 6 é compatível.
+     Daqui para a frente, não se sobe: muda-se por CORRECOES. */
   const VERSAO_DADOS = 7;
+  /* Versões cujo conteúdo guardado continua a servir: sobem para a
+     atual sem recomeçar da semente. A 7 só trouxe a lista do que
+     levar, que entra por uma correção (CORRECOES) e não precisa de
+     apagar nada. */
+  const COMPATIVEIS = [6];
   const ouvintes = [];
 
   /* Revisões de linguagem da semente. O itinerário guardado num
@@ -67,6 +73,23 @@ window.Conteudo = (function () {
      26.09.2026: o regresso do jantar do dia 3 é às 23:30, como na
      proposta da Stappando, e não às 23:00. */
   const CORRECOES = [
+    /* A lista do que levar da organização, no lançamento aos
+       convidados (28.09.2026). Troca só se a guardada ainda for,
+       palavra por palavra, a da semente antiga; a que a organização
+       tenha escrito fica. */
+    { id: 'levar-lancamento', aplicar: function (o) {
+      const antiga = [
+        'Carta de condução e documento de identificação',
+        'Casaco quente — o Grappa passa dos 1700 m, e em outubro sente-se',
+        'Óculos de sol. A luz na altitude é outra',
+        'Sapato confortável para Veneza e para as paragens a pé',
+        'Adaptador de tomada tipo L ou F'
+      ];
+      if (!o.evento) return;
+      if (!o.evento.levar || !o.evento.levar.length || JSON.stringify(o.evento.levar) === JSON.stringify(antiga)) {
+        o.evento.levar = clonar(SEMENTE.evento.levar);
+      }
+    } },
     { id: 'regresso-dia3-2330', dia: 'd-2026-10-03', titulo: 'Regresso ao hotel', campo: 'hora', de: '23:00', para: '23:30' },
     /* A equipa entrou na semente a 28.09.2026. Junta-se a quem já
        tinha o programa guardado, sem tocar no que a organização
@@ -219,6 +242,9 @@ window.Conteudo = (function () {
   function carregar() {
     try {
       const g = JSON.parse(localStorage.getItem(CHAVE));
+      /* O que ficou guardado numa versão compatível sobe sem se perder:
+         os participantes e o que a organização já editou ficam. */
+      if (g && COMPATIVEIS.indexOf(g.versao) >= 0) g.versao = VERSAO_DADOS;
       if (g && g.versao === VERSAO_DADOS) {
         if (rever(g) + corrigir(g)) {
           try { localStorage.setItem(CHAVE, JSON.stringify(g)); } catch (e) { /* quota */ }
