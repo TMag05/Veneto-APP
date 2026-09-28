@@ -97,7 +97,30 @@ window.Estado = (function () {
      Relógio
      --------------------------------------------------------- */
 
-  function agora() { return new Date(); }
+  /* O relógio do programa é o de Itália, seja qual for o fuso do
+     telemóvel: as horas do itinerário são italianas, e um telemóvel
+     com a hora acertada à mão, ou ainda em Lisboa, andaria uma hora
+     atrás dos outros (28.09.2026). Devolve uma data cujos campos
+     locais — getHours, getDate — são a hora de Roma, e é por eles
+     que a app conta tudo. Sem suporte de fusos, fica a do telemóvel. */
+  const FUSO = 'Europe/Rome';
+  let relogioItalia = null;
+  try {
+    relogioItalia = new Intl.DateTimeFormat('en-GB', {
+      timeZone: FUSO, hourCycle: 'h23',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
+  } catch (e) { /* browser sem fusos: hora do telemóvel */ }
+
+  function agora() {
+    const real = new Date();
+    if (!relogioItalia) return real;
+    const p = {};
+    relogioItalia.formatToParts(real).forEach(function (x) { p[x.type] = x.value; });
+    return new Date(Number(p.year), Number(p.month) - 1, Number(p.day),
+      Number(p.hour) % 24, Number(p.minute), Number(p.second), real.getMilliseconds());
+  }
 
   function chave(d) {
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
