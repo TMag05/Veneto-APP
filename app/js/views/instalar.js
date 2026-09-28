@@ -144,16 +144,19 @@
   }
 
   /* ---------------------------------------------------------
-     O iPhone, um passo de cada vez
-     Cada passo é uma frase e o desenho do telemóvel nesse momento,
-     com o que se toca destacado a cobre. O desenho é esquemático de
-     propósito: mostra onde está o botão, não imita o browser — que
-     muda de versão para versão.
+     Os passos todos, numa página só
+     A janela de Partilhar tapa a app e, fechada, volta ao início:
+     um passo de cada vez, com «Já está» entre eles, obrigava a sair
+     e a voltar a cada toque (28.09.2026). Por isso a sequência lê-se
+     inteira antes de começar. Cada passo é uma frase e o desenho do
+     telemóvel nesse momento, com o que se toca destacado a cobre. O
+     desenho é esquemático de propósito: mostra onde está o botão, não
+     imita o browser — que muda de versão para versão.
      --------------------------------------------------------- */
 
   /* O telemóvel: 180 de largura, o ecrã útil de 50 a 210. */
   function telemovel(dentro) {
-    return '<svg class="esquema" viewBox="0 0 260 320" role="img" aria-hidden="true">' +
+    return '<svg class="esquema" viewBox="36 0 188 320" role="img" aria-hidden="true">' +
       '<rect class="esquema__corpo" x="40" y="4" width="180" height="312" rx="26"/>' +
       dentro +
     '</svg>';
@@ -196,6 +199,28 @@
         linhasDePagina(64, 11) +
         '<rect class="esquema__barra" x="46" y="270" width="168" height="40" rx="20"/>' +
         [80, 130, 180].map(function (x) { return '<circle class="esquema__ponto" cx="' + x + '" cy="290" r="4"/>'; }).join('')
+      );
+    },
+    /* A folha de Partilhar do iOS 26: os contactos, as apps e uma fila
+       de botões redondos, com «Ver mais» no fim. */
+    verMais: function () {
+      const xs = [74, 110, 146, 182];
+      return telemovel(
+        linhasDePagina(18, 1) +
+        '<rect class="esquema__folha" x="46" y="34" width="168" height="228" rx="20"/>' +
+        '<rect class="esquema__app" x="58" y="48" width="26" height="26" rx="7"/>' +
+        '<rect class="esquema__linha" x="94" y="52" width="80" height="6" rx="3"/>' +
+        '<rect class="esquema__linha" x="94" y="64" width="56" height="5" rx="2.5"/>' +
+        xs.map(function (x) { return '<circle class="esquema__ponto-grande" cx="' + x + '" cy="106" r="13"/>'; }).join('') +
+        xs.map(function (x) { return '<rect class="esquema__app" x="' + (x - 13) + '" y="134" width="26" height="26" rx="8"/>'; }).join('') +
+        xs.slice(0, 3).map(function (x) {
+          return '<circle class="esquema__ponto-grande" cx="' + x + '" cy="198" r="13"/>' +
+            '<rect class="esquema__linha" x="' + (x - 12) + '" y="220" width="24" height="5" rx="2.5"/>';
+        }).join('') +
+        alvo(182, 198, 15) +
+        '<g class="esquema__alvo-icone"><path d="M176 195.5l6 6 6-6"/></g>' +
+        '<text class="esquema__texto esquema__texto--alvo esquema__texto--lista" x="182" y="226" text-anchor="middle">Ver mais</text>' +
+        linhasDePagina(276, 2)
       );
     },
     /* A folha de Partilhar, com a linha que interessa. */
@@ -318,23 +343,26 @@
       'icone'];
   }
 
+  /* Na folha de Partilhar do iOS 26, «Adicionar ao ecrã principal»
+     só aparece depois de «Ver mais». Nos iPhones anteriores não há
+     esse botão, e a linha está mais abaixo na lista. */
+  function passosDaFolha() {
+    return [
+      ['Toque em «Ver mais»', 'É o último dos botões redondos. Se não o vir, desça na lista.', 'verMais'],
+      ['Toque em «Adicionar ao ecrã principal»', 'Na lista que se abre por baixo.', 'lista'],
+      ['Toque em «Adicionar»', 'Em cima, à direita.', 'adicionar']
+    ];
+  }
+
   /* [título, nota, desenho] — uma frase de instrução, uma de ajuda. */
   const PASSOS = {
     'ios-safari': function () {
-      return [
-        ['Toque em Partilhar ' + partilhar, 'Na barra de baixo. No iOS 26, está dentro do botão ' + reticencias + '.', 'partilharSafari'],
-        ['Toque em «Adicionar ao ecrã principal»', 'Desça na lista, se não estiver à vista.', 'lista'],
-        ['Toque em «Adicionar»', 'Em cima, à direita.', 'adicionar'],
-        ultimoPasso()
-      ];
+      return [['Toque em Partilhar ' + partilhar, 'Na barra de baixo. No iOS 26, está dentro do botão ' + reticencias + '.', 'partilharSafari']]
+        .concat(passosDaFolha(), [ultimoPasso()]);
     },
     'ios-chrome': function () {
-      return [
-        ['Toque em Partilhar ' + partilhar, 'Ao lado do endereço, em cima. Se não o vir, toque no topo do ecrã.', 'partilharChrome'],
-        ['Toque em «Adicionar ao ecrã principal»', 'Desça na lista. Se não aparecer, abra o link no Safari.', 'lista'],
-        ['Toque em «Adicionar»', 'Em cima, à direita.', 'adicionar'],
-        ultimoPasso()
-      ];
+      return [['Toque em Partilhar ' + partilhar, 'Em cima, à direita do endereço.', 'partilharChrome']]
+        .concat(passosDaFolha(), [ultimoPasso()]);
     },
     'android-chrome': function () {
       return [
@@ -354,22 +382,19 @@
     }
   };
 
-  function passoAPasso(lista) {
-    const i = Math.min(passo, lista.length - 1);
-    const p = lista[i];
-    const fim = i === lista.length - 1;
-    return '<p class="etiqueta num">Passo ' + (i + 1) + ' de ' + lista.length + '</p>' +
-      '<h1 class="instalar__titulo">' + p[0] + '</h1>' +
-      '<p class="corpo-ui silencioso" style="margin-top:8px">' + p[1] + '</p>' +
-      '<div class="instalar__desenho">' + DESENHOS[p[2]]() + '</div>' +
-      '<div class="pilha-2">' +
-        (fim
-          ? '<button class="botao botao--principal botao--largo" type="button" data-acao="fechar">Fechar</button>'
-          : '<button class="botao botao--principal botao--largo" type="button" data-acao="passo" data-valor="' + (i + 1) + '">Já está</button>') +
-        (i > 0
-          ? '<button class="botao botao--texto instalar__outro" type="button" data-acao="passo" data-valor="' + (i - 1) + '">Passo anterior</button>'
-          : '') +
-      '</div>';
+  function todosOsPassos(lista) {
+    return '<h1 class="instalar__titulo">Veja os passos antes de começar</h1>' +
+      '<p class="corpo-ui silencioso" style="margin-top:8px">A janela de Partilhar tapa este ecrã.</p>' +
+      '<ol class="passos-lista">' + lista.map(function (p, i) {
+        return '<li class="passo-linha">' +
+          '<div class="passo-linha__desenho">' + DESENHOS[p[2]]() + '</div>' +
+          '<div class="passo-linha__texto">' +
+            '<p class="etiqueta num">Passo ' + (i + 1) + '</p>' +
+            '<p class="titulo-ui">' + p[0] + '</p>' +
+            '<p class="meta">' + p[1] + '</p>' +
+          '</div>' +
+        '</li>';
+      }).join('') + '</ol>';
   }
 
   /* ---------------------------------------------------------
@@ -425,7 +450,6 @@
     '</div>';
   }
 
-  let passo = 0;
   let forcado = '';
   let escolher = false;
 
@@ -447,19 +471,16 @@
         (feito
           ? '<p class="instalar__feito corpo-ui">' + Icone('verificado', 20) + '<span>Esta app já está no ecrã principal. Os passos ficam aqui, para mostrar a quem precisar.</span></p>'
           : '') +
-        (PASSOS[o] ? passoAPasso(PASSOS[o]()) : CORPOS[o]()) +
+        (PASSOS[o] ? todosOsPassos(PASSOS[o]()) : CORPOS[o]()) +
         corrigir(o) +
       '</div>';
     },
-    /* Cada visita começa no primeiro passo. */
-    desmontar: function () { passo = 0; escolher = false; },
+    desmontar: function () { escolher = false; },
     acoes: {
       instalar: pedir,
       copiarLink: copiar,
-      passo: function (v) { passo = Math.max(0, parseInt(v, 10) || 0); App.repintar(); },
-      fechar: function () { App.voltar(Estado.get().autenticado ? '#/mais' : '#/entrar'); },
       escolher: function () { escolher = true; App.repintar(); },
-      corrigir: function (v) { forcado = v; passo = 0; escolher = false; App.repintar(); }
+      corrigir: function (v) { forcado = v; escolher = false; App.repintar(); }
     }
   };
 

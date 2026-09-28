@@ -1790,6 +1790,20 @@ a { color: var(--verde); text-decoration: none; }
   margin: 8px 0 0;
 }
 .instalar__desenho { margin: var(--esp-3) 0; }
+/* Os passos em fila: o desenho à esquerda, a frase à direita. */
+.passos-lista { list-style: none; margin: var(--esp-3) 0 0; padding: 0; }
+.passo-linha {
+  display: flex;
+  gap: var(--esp-2);
+  align-items: center;
+  padding: var(--esp-2) 0;
+}
+.passo-linha + .passo-linha { border-top: 1px solid var(--pietra); }
+.passo-linha__desenho { flex: none; width: 104px; }
+.passo-linha__desenho .esquema { max-height: none; }
+.passo-linha__texto { flex: 1; min-width: 0; }
+.passo-linha__texto .titulo-ui { margin-top: 4px; }
+.passo-linha__texto .meta { margin-top: 4px; }
 .instalar__outro {
   display: block;
   width: 100%;
