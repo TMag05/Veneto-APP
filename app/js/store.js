@@ -380,6 +380,7 @@ window.Estado = (function () {
   function sincronizar() {
     if (aSincronizar) return;
     enviarFotos();
+    sincronizarGrupo();
     /* As fotografias seguem por Nuvem, cada uma com a sua confirmação:
        só passam a 'enviado' quando os três tamanhos subirem. Dar uma
        fotografia por enviada sem ninguém a ter recebido é o erro que
@@ -430,7 +431,10 @@ window.Estado = (function () {
     aEnviarFotos = true;
     Fotos.ler(meta.id).then(function (registo) {
       if (!registo) throw new Error('ficheiro perdido');
-      return Nuvem.enviarFoto(registo, meta);
+      return Nuvem.enviarFoto(registo, Object.assign({}, meta, {
+        autorNome: estado.perfil.nome || '',
+        autorModelo: estado.perfil.modelo || ''
+      }));
     }).then(function (caminhos) {
       Object.assign(meta, caminhos, { estadoEnvio: 'enviado' });
       estado.fila = estado.fila.filter(function (i) { return !(i.tipo === 'foto' && i.ref === meta.id); });
@@ -446,6 +450,96 @@ window.Estado = (function () {
       tentarDeNovo();
     });
   }
+
+  /* ---------------------------------------------------------
+     As fotografias do grupo
+     As que os outros telemóveis enviaram. Os metadados ficam numa
+     chave própria, fora do estado — são centenas, e o estado grava-se
+     a cada toque —; as imagens ficam no arquivo (Fotos), trazidas do
+     Storage à medida que aparecem no ecrã. Sem rede, vê-se o que já
+     cá está.
+
+     Pede-se só o que chegou desde a última vez; uma vez por hora, a
+     coleção inteira, que é o que faz desaparecer as que foram
+     apagadas.
+     --------------------------------------------------------- */
+
+  const CHAVE_GRUPO = 'veneto.grupo.v1';
+  const INTERVALO = 60 * 1000;          /* nunca mais do que um pedido por minuto */
+  const COMPLETA = 60 * 60 * 1000;      /* a coleção inteira, de hora a hora */
+  const FOLGA = 10 * 60 * 1000;         /* relógios de telemóveis diferentes */
+
+  let grupo = carregarGrupo();
+  let aPedirGrupo = false;
+  let ultimoPedido = 0;
+
+  function carregarGrupo() {
+    try {
+      const g = JSON.parse(localStorage.getItem(CHAVE_GRUPO));
+      if (g && Array.isArray(g.fotos)) return g;
+    } catch (e) { /* recomeça */ }
+    return { fotos: [], cursor: 0, completa: 0 };
+  }
+
+  function guardarGrupo() {
+    try { localStorage.setItem(CHAVE_GRUPO, JSON.stringify(grupo)); } catch (e) { /* fica em memória */ }
+  }
+
+  function doGrupo(id) {
+    return grupo.fotos.find(function (f) { return f.id === id; }) || null;
+  }
+
+  function sincronizarGrupo(forcar) {
+    if (aPedirGrupo || !Nuvem.ligada() || !navigator.onLine) return;
+    const agoraMs = Date.now();
+    if (!forcar && agoraMs - ultimoPedido < INTERVALO) return;
+    aPedirGrupo = true;
+    ultimoPedido = agoraMs;
+    const completa = !grupo.completa || agoraMs - grupo.completa > COMPLETA;
+
+    Nuvem.fotosDoGrupo(completa ? 0 : Math.max(0, grupo.cursor - FOLGA)).then(function (lista) {
+      const validas = lista.filter(function (f) { return f.id && f.caminhoMini; });
+      let mudou = false;
+      if (completa) {
+        const ficam = {};
+        validas.forEach(function (f) { ficam[f.id] = true; });
+        grupo.fotos.forEach(function (f) {
+          /* Apagada no servidor: sai também do arquivo deste telemóvel. */
+          if (!ficam[f.id]) { mudou = true; Fotos.apagar(f.id).catch(function () {}); }
+        });
+        if (validas.length !== grupo.fotos.length) mudou = true;
+        grupo.fotos = validas;
+        grupo.completa = agoraMs;
+      } else {
+        validas.forEach(function (f) {
+          if (doGrupo(f.id)) return;
+          grupo.fotos.push(f);
+          mudou = true;
+        });
+      }
+      grupo.fotos.forEach(function (f) { if (f.enviado > grupo.cursor) grupo.cursor = f.enviado; });
+      guardarGrupo();
+      aPedirGrupo = false;
+      if (mudou) emitir();
+    }).catch(function () {
+      aPedirGrupo = false;
+    });
+  }
+
+  /* O Storage é a fonte das imagens do grupo que ainda não estão cá. */
+  function caminhoDe(f, tamanho) {
+    return tamanho === 'mini' ? f.caminhoMini : tamanho === 'vista' ? f.caminhoVista : f.caminhoOriginal;
+  }
+  Fotos.definirFonte({
+    descarregar: function (id, tamanho) {
+      const f = doGrupo(id);
+      return f ? Nuvem.descarregarFoto(caminhoDe(f, tamanho)) : null;
+    },
+    endereco: function (id, tamanho) {
+      const f = doGrupo(id);
+      return f ? Nuvem.enderecoFoto(caminhoDe(f, tamanho)) : '';
+    }
+  });
 
   function fotosPorEnviar() {
     return estado.fotos.filter(function (f) { return f.estadoEnvio !== 'enviado'; }).length;
@@ -524,6 +618,15 @@ window.Estado = (function () {
   }
 
   function apagarFoto(id) {
+    /* Uma do grupo só a organização apaga: sai do servidor e daqui. */
+    const doOutro = !foto(id) && doGrupo(id);
+    if (doOutro) {
+      if (Nuvem.ligada()) Nuvem.apagarFoto(doOutro).catch(function () { /* volta na próxima leitura completa */ });
+      grupo.fotos = grupo.fotos.filter(function (f) { return f.id !== id; });
+      guardarGrupo();
+      emitir();
+      return Fotos.apagar(id).catch(function () { /* já não existia */ });
+    }
     const meta = foto(id);
     if (meta && meta.estadoEnvio === 'enviado' && Nuvem.ligada()) {
       Nuvem.apagarFoto(meta).catch(function () { /* fica para a limpeza da organização */ });
@@ -536,10 +639,19 @@ window.Estado = (function () {
   }
 
   /* Todas as fotografias, as semeadas e as minhas, mais recentes primeiro. */
+  /* Todas: as minhas, as do grupo e as de abertura. As minhas e as do
+     grupo por hora, das mais recentes para as mais antigas; as de
+     abertura no fim, como sempre estiveram. Uma fotografia minha que
+     também veio do servidor conta uma vez. */
   function fotos() {
-    const minhas = estado.fotos.map(function (f) { return Object.assign({ propria: true }, f); });
-    const outras = DADOS.fotosIniciais.map(function (f) { return Object.assign({ propria: false }, f); });
-    return outras.concat(minhas).reverse();
+    const minhasIds = {};
+    const minhas = estado.fotos.map(function (f) { minhasIds[f.id] = true; return Object.assign({ propria: true }, f); });
+    const doGrupoVisiveis = grupo.fotos
+      .filter(function (f) { return !minhasIds[f.id]; })
+      .map(function (f) { return Object.assign({}, f, { propria: false, autor: 'grupo', estadoEnvio: 'enviado' }); });
+    const porHora = minhas.concat(doGrupoVisiveis).sort(function (a, b) { return (b.criado || 0) - (a.criado || 0); });
+    const outras = DADOS.fotosIniciais.map(function (f) { return Object.assign({ propria: false }, f); }).reverse();
+    return porHora.concat(outras);
   }
 
   window.addEventListener('online', sincronizar);
@@ -583,6 +695,7 @@ window.Estado = (function () {
     enfileirar: enfileirar,
     sincronizar: sincronizar,
     pendentes: pendentes,
+    sincronizarGrupo: sincronizarGrupo,
     meuId: meuId,
     juntarFoto: juntarFoto,
     apagarFoto: apagarFoto,

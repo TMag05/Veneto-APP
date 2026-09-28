@@ -646,6 +646,16 @@ window.Nuvem = (function () {
           dia: meta.dia || '',
           poi: meta.poi || '',
           autorId: autorId,
+          /* O nome e o carro de quem a tirou vão com ela: as regras só
+             deixam cada um ler o próprio perfil, e a Galeria do grupo
+             precisa de dizer de quem é cada fotografia. */
+          autorNome: meta.autorNome || '',
+          autorModelo: meta.autorModelo || '',
+          /* A hora a que chegou ao servidor, pelo relógio do telemóvel,
+             que a rede acerta. É por ela que os outros telemóveis pedem
+             só as novas — a do disparo não serve: uma fotografia tirada
+             sem rede às dez pode subir às duas. */
+          enviado: Date.now(),
           sha: meta.sha || '',
           criado: meta.criado || Date.now(),
           tipo: registo.tipo || 'image/jpeg',
@@ -721,6 +731,77 @@ window.Nuvem = (function () {
     });
   }
 
+  /* As fotografias do grupo.
+     desde: sem valor, a coleção inteira, página a página — é a leitura
+     que apanha também as que foram apagadas. Com valor, só as que
+     chegaram ao servidor depois disso, por ordem de chegada. */
+  function fotosDoGrupo(desde) {
+    if (simulada()) return Promise.reject(erro('sem-servidor'));
+    return obterSessao().then(function (sessao) {
+      const todas = [];
+      const PAGINA = 300;
+
+      if (!desde) {
+        return (function pagina(marca) {
+          return pedir(firestore('fotos?pageSize=' + PAGINA + (marca ? '&pageToken=' + encodeURIComponent(marca) : '')),
+            comSessao(sessao, 'GET')).then(function (r) {
+              (r.documents || []).forEach(function (d) { todas.push(deDocFoto(d)); });
+              return r.nextPageToken ? pagina(r.nextPageToken) : todas;
+            });
+        })('');
+      }
+
+      return (function lote(depois) {
+        const query = {
+          structuredQuery: {
+            from: [{ collectionId: 'fotos' }],
+            where: { fieldFilter: { field: { fieldPath: 'enviado' }, op: 'GREATER_THAN', value: { integerValue: String(depois) } } },
+            orderBy: [{ field: { fieldPath: 'enviado' }, direction: 'ASCENDING' }],
+            limit: PAGINA
+          }
+        };
+        return pedir('https://firestore.googleapis.com/v1/projects/' + CONFIG.projectId +
+          '/databases/(default)/documents:runQuery', comSessao(sessao, 'POST', query)).then(function (linhas) {
+            const novas = (linhas || []).filter(function (l) { return l.document; }).map(function (l) { return deDocFoto(l.document); });
+            novas.forEach(function (f) { todas.push(f); });
+            return novas.length === PAGINA ? lote(novas[novas.length - 1].enviado) : todas;
+          });
+      })(desde);
+    });
+  }
+
+  /* O endereço público de um objeto, para um <img>. As regras deixam
+     ler as fotografias sem sessão. */
+  function enderecoFoto(caminho) {
+    if (simulada() || !caminho) return '';
+    return 'https://firebasestorage.googleapis.com/v0/b/' + CONFIG.storageBucket + '/o/' +
+      encodeURIComponent(caminho) + '?alt=media';
+  }
+
+  /* Um dos três tamanhos de uma fotografia do grupo, do Storage, para
+     guardar no telemóvel. Só funciona com o CORS do bucket configurado
+     para o domínio da app (ver README); sem ele, o browser recusa a
+     resposta, e a partir daí, nesta sessão, nem se tenta — as vistas
+     mostram a imagem pelo endereço direto, que não precisa de CORS. */
+  let semCors = false;
+  function descarregarFoto(caminho) {
+    if (simulada() || !caminho) return Promise.reject(erro('sem-servidor'));
+    if (!navigator.onLine) return Promise.reject(erro('sem-rede'));
+    if (semCors) return Promise.reject(erro('sem-cors'));
+    return obterSessao().then(function (sessao) {
+      return fetch(enderecoFoto(caminho), { headers: { Authorization: 'Bearer ' + sessao.idToken } })
+        .catch(function () {
+          /* Com rede e sem resposta legível: é o CORS. */
+          if (navigator.onLine) semCors = true;
+          throw erro(navigator.onLine ? 'sem-cors' : 'sem-rede');
+        });
+    }).then(function (r) {
+      if (r.status === 404) throw erro('nao-existe');
+      if (!r.ok) throw erro('servidor');
+      return r.blob();
+    });
+  }
+
   function ligada() {
     return !simulada() && !!CONFIG.storageBucket && !!(window.Estado && window.Estado.get && window.Estado.get().sessao);
   }
@@ -744,6 +825,9 @@ window.Nuvem = (function () {
     ligada: ligada,
     enviarFoto: enviarFoto,
     apagarFoto: apagarFoto,
-    fotosDoDia: fotosDoDia
+    fotosDoDia: fotosDoDia,
+    fotosDoGrupo: fotosDoGrupo,
+    descarregarFoto: descarregarFoto,
+    enderecoFoto: enderecoFoto
   };
 })();

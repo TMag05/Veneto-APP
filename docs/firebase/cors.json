@@ -1,0 +1,11 @@
+[
+  {
+    "origin": [
+      "https://dolomitesgt.web.app",
+      "https://dolomitesgt.firebaseapp.com",
+      "http://localhost:8124"
+    ],
+    "method": ["GET"],
+    "maxAgeSeconds": 3600
+  }
+]

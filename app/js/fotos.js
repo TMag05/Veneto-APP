@@ -164,16 +164,53 @@ window.Fotos = (function () {
 
   const enderecos = {};
 
+  /* As fotografias do grupo não nasceram neste telemóvel: o tamanho
+     que falta vem de fora, por esta fonte (Estado liga-a ao Storage),
+     e fica guardado aqui para a próxima vez — e para funcionar sem
+     rede. Se não se puder guardar, mostra-se pelo endereço.
+       fonte.descarregar(id, tamanho) → Promise<Blob> | null
+       fonte.endereco(id, tamanho)    → endereço http | '' */
+  let fonte = null;
+  function definirFonte(f) { fonte = f; }
+
+  function endereco(id, tamanho) {
+    return fonte && fonte.endereco ? fonte.endereco(id, tamanho || 'mini') : '';
+  }
+
+  /* O ficheiro de um tamanho: o do arquivo, ou o que a fonte trouxer. */
+  function obter(id, tamanho) {
+    const t = tamanho || 'mini';
+    return ler(id).catch(function () { return null; }).then(function (r) {
+      if (r && r[t]) return r[t];
+      const remoto = fonte ? fonte.descarregar(id, t) : null;
+      if (!remoto) return r ? (r.original || r.vista || r.mini || null) : null;
+      return remoto.then(function (b) {
+        if (!b) return null;
+        /* O original do grupo não fica: são vários megabytes por
+           fotografia, e o álbum de um passeio inteiro enchia o
+           telemóvel. Descarrega-se quando se pede. */
+        if (t === 'original') return b;
+        return ler(id).catch(function () { return null; }).then(function (atual) {
+          const registo = Object.assign({ id: id }, atual || {});
+          registo[t] = b;
+          return guardar(registo).catch(function () { /* sem espaço: mostra-se na mesma */ }).then(function () { return b; });
+        });
+      }, function () {
+        /* Sem rede: o que houver guardado de outro tamanho serve. */
+        return r ? (r.vista || r.mini || r.original || null) : null;
+      });
+    });
+  }
+
   function url(id, tamanho) {
     const t = tamanho || 'mini';
     const chave = id + '/' + t;
     if (enderecos[chave]) return Promise.resolve(enderecos[chave]);
-    return ler(id).then(function (r) {
-      const b = r && (r[t] || r.original);
-      if (!b) return null;
-      enderecos[chave] = URL.createObjectURL(b);
+    return obter(id, t).then(function (b) {
+      if (!b) return endereco(id, t) || null;
+      if (!enderecos[chave]) enderecos[chave] = URL.createObjectURL(b);
       return enderecos[chave];
-    }).catch(function () { return null; });
+    }).catch(function () { return endereco(id, t) || null; });
   }
 
   function libertar(id) {
@@ -183,19 +220,41 @@ window.Fotos = (function () {
   }
 
   function libertarTodos() {
+    observadores.forEach(function (o) { o.disconnect(); });
+    observadores = [];
     Object.keys(enderecos).forEach(function (k) { URL.revokeObjectURL(enderecos[k]); delete enderecos[k]; });
   }
 
   /* As vistas desenham <img data-foto="id" data-tamanho="mini"> sem
      endereço — o HTML é síncrono e a base não é. Isto preenche-os
-     depois, pela ordem em que aparecem no ecrã. */
-  function pintar(raiz) {
-    const alvos = (raiz || document).querySelectorAll('img[data-foto]:not([src])');
-    Array.prototype.forEach.call(alvos, function (img) {
-      url(img.dataset.foto, img.dataset.tamanho).then(function (u) {
-        if (u && img.isConnected) img.src = u;
-      });
+     depois, à medida que chegam perto do ecrã: com as fotografias do
+     grupo, a galeria pode ter centenas, e cada uma que não está no
+     telemóvel é uma descarga. */
+  let observadores = [];
+
+  function pintarUma(img) {
+    url(img.dataset.foto, img.dataset.tamanho).then(function (u) {
+      if (u && img.isConnected) img.src = u;
     });
+  }
+
+  function pintar(raiz) {
+    /* Cada pintura é de um ecrã acabado de desenhar: as imagens que os
+       observadores anteriores vigiavam já saíram dele. */
+    observadores.forEach(function (o) { o.disconnect(); });
+    observadores = [];
+    const alvos = (raiz || document).querySelectorAll('img[data-foto]:not([src])');
+    if (!alvos.length) return;
+    if (!('IntersectionObserver' in window)) { Array.prototype.forEach.call(alvos, pintarUma); return; }
+    const o = new IntersectionObserver(function (entradas) {
+      entradas.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        o.unobserve(e.target);
+        pintarUma(e.target);
+      });
+    }, { rootMargin: '800px 0px' });
+    Array.prototype.forEach.call(alvos, function (img) { o.observe(img); });
+    observadores.push(o);
   }
 
   return {
@@ -207,6 +266,9 @@ window.Fotos = (function () {
     chaves: chaves,
     limpar: limpar,
     ocupacao: ocupacao,
+    definirFonte: definirFonte,
+    obter: obter,
+    endereco: endereco,
     url: url,
     libertar: libertar,
     libertarTodos: libertarTodos,

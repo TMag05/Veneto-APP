@@ -38,15 +38,18 @@
     const usados = {};
     return fotos.reduce(function (corrente, f) {
       return corrente.then(function (lista) {
-        return Fotos.ler(f.id).then(function (r) {
-          if (!r || !r.original) return lista;
+        /* O original: o do arquivo, ou o do servidor, para as do grupo. */
+        return Promise.all([Fotos.obter(f.id, 'original'), Fotos.ler(f.id).catch(function () { return null; })]).then(function (x) {
+          const original = x[0];
+          if (!original) return lista;
+          const tipo = (x[1] && x[1].tipo) || f.tipo || original.type || 'image/jpeg';
           const dia = DADOS.dia(f.dia);
           const pasta = porPasta && dia ? UI.pastaDia(dia) + '/' : '';
           /* Dentro da pasta do dia, o nome não repete o dia. */
-          const nome = pasta ? UI.nomeDeFoto(f, r.tipo).replace(/^dia-\d+-?/, '') : UI.nomeDeFoto(f, r.tipo);
+          const nome = pasta ? UI.nomeDeFoto(f, tipo).replace(/^dia-\d+-?/, '') : UI.nomeDeFoto(f, tipo);
           lista.push({
             nome: semRepetir(usados, pasta + nome),
-            blob: r.original,
+            blob: original,
             data: new Date(f.criado)
           });
           return lista;

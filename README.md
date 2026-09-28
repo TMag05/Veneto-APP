@@ -133,7 +133,8 @@ servidor.js             servidor estático de desenvolvimento
 | Traçados das estradas | `js/estradas.js` | Só o Passo di San Boldo está confirmado, com geometria do OpenStreetMap. A Strada Cadorna, as passagens das Dolomitas de 3 de outubro e o Cansiglio aparecem sem desenho, até a Stappando confirmar por onde se vai |
 | O que fazer à chegada | `js/conteudo.js` › `chegada` | Estacionamento, quem recebe, casas de banho e hora de voltar aos carros. Os campos estão criados e editáveis; falta a organização preenchê-los paragem a paragem |
 | Contas dos convidados | `js/nuvem.js` › `CONFIG` | Sem projeto Firebase, as contas vivem num servidor simulado em cada browser: a organização só vê as criadas no seu, e a recuperação da palavra-passe não envia email. Com o projeto, faltam as regras de `contas/{uid}` e a Cloud Function que apaga do Auth a conta que a organização apagou |
-| Envio das fotografias | `js/nuvem.js` | Ligado ao Firebase: o original, a miniatura e a vista sobem para o Storage logo a seguir a tirar a fotografia, e o registo vai para o Firestore. Sem rede, fica guardada no telemóvel e sobe sozinha quando houver. A Galeria ainda só mostra as fotografias do próprio telemóvel |
+| Envio das fotografias | `js/nuvem.js` | Ligado ao Firebase: o original, a miniatura e a vista sobem para o Storage logo a seguir a tirar a fotografia, e o registo vai para o Firestore. Sem rede, fica guardada no telemóvel e sobe sozinha quando houver. A Galeria mostra as de todo o grupo |
+| Fotografias do grupo sem rede | `docs/firebase/cors.json` | Para as guardar no telemóvel, o bucket precisa de CORS. Uma vez, na [Cloud Shell](https://console.cloud.google.com/?cloudshell=true&project=dolomitesgt): criar `cors.json` com o conteúdo desse ficheiro e correr `gcloud storage buckets update gs://dolomitesgt.firebasestorage.app --cors-file=cors.json`. Até lá, veem-se só com rede |
 
 ---
 
