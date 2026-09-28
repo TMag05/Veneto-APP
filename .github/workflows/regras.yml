@@ -28,6 +28,8 @@ jobs:
           CONTA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DOLOMITESGT }}
         run: |
           printf '%s' "$CONTA" > "$RUNNER_TEMP/conta.json"
+          # Qual é a conta de serviço — o endereço, nunca a chave.
+          echo "Conta de serviço: $(jq -r .client_email "$RUNNER_TEMP/conta.json")"
           export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/conta.json"
           npx --yes firebase-tools@13 deploy --only firestore:rules --project dolomitesgt --non-interactive
           rm -f "$RUNNER_TEMP/conta.json"
