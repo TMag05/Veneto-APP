@@ -109,7 +109,7 @@
      guardado, instala logo; nos outros casos leva aos passos. */
   function linha(nota) {
     if (instalada()) {
-      return UI.linhaLista({ titulo: 'Como pôr no ecrã principal', nota: nota, icone: 'descarregar', href: '#/instalar' });
+      return UI.linhaLista({ titulo: 'Como adicionar ao ecrã principal', nota: nota, icone: 'descarregar', href: '#/instalar' });
     }
     return UI.linhaLista(pedido
       ? { titulo: 'Instalar no ecrã principal', nota: nota, icone: 'descarregar', acao: 'instalar' }
