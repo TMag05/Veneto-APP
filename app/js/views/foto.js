@@ -14,6 +14,8 @@
   function autorDe(f) {
     if (f.propria) return Estado.eu();
     if (f.autor === 'organizacao') return { nome: DADOS.evento.nome || 'Do passeio', semCarro: true };
+    /* Do grupo: o nome e o carro vêm com a fotografia. */
+    if (f.autor === 'grupo') return { nome: f.autorNome || 'Do grupo', modelo: f.autorModelo || 'db12' };
     const p = DADOS.participante(f.autor);
     return p ? { nome: DADOS.nomeCompleto(p), modelo: p.modelo } : { nome: 'Do grupo', modelo: 'db12' };
   }
@@ -90,9 +92,20 @@
       descarregar: function (id) {
         const f = meta(id);
         if (!f) return;
-        Fotos.ler(id).then(function (r) {
-          if (!r || !r.original) return;
-          UI.descarregar(UI.nomeDeFoto(f, r.tipo), r.original, r.tipo);
+        /* O original: o do arquivo, ou, se for de outra pessoa, o do
+           servidor. */
+        Promise.all([Fotos.obter(id, 'original'), Fotos.ler(id).catch(function () { return null; })]).then(function (x) {
+          const blob = x[0];
+          const tipo = (x[1] && x[1].tipo) || f.tipo || (blob && blob.type) || 'image/jpeg';
+          if (!blob) {
+            /* Sem poder trazê-lo para aqui, abre-se o original onde está;
+               o telemóvel guarda-o a partir daí. */
+            const direto = navigator.onLine ? Fotos.endereco(id, 'original') : '';
+            if (direto) { window.open(direto, '_blank', 'noopener'); return; }
+            UI.abrirFolha('Sem ligação', '<p class="corpo-ui silencioso">O original desta fotografia está no servidor. Tente de novo com rede.</p>');
+            return;
+          }
+          UI.descarregar(UI.nomeDeFoto(f, tipo), blob, tipo);
         });
       },
 

@@ -8,12 +8,15 @@
 (function () {
 
   let filtro = 'todos';
+  let vigia = null;
 
   function autorDe(f) {
     if (f.propria) return Estado.eu();
     /* As de abertura são do passeio, não de uma pessoa: não levam
        silhueta, porque não há carro nenhum por trás delas. */
     if (f.autor === 'organizacao') return { nome: DADOS.evento.nome || 'Do passeio', semCarro: true };
+    /* Do grupo: o nome e o carro vêm com a fotografia. */
+    if (f.autor === 'grupo') return { nome: f.autorNome || 'Do grupo', modelo: f.autorModelo || 'db12' };
     const p = DADOS.participante(f.autor);
     return p ? { nome: p.nome, modelo: p.modelo } : { nome: 'Do grupo', modelo: 'db12' };
   }
@@ -96,8 +99,14 @@
         '</div>';
     },
 
-    montar: function (el) {
+    montar: function (el, p, chegada) {
       Fotos.pintar(el);
+      /* À chegada, pede as novas do grupo; aberta, volta a pedir de
+         minuto a minuto. As que chegam repintam a grelha. */
+      if (chegada) {
+        Estado.sincronizarGrupo(true);
+        if (!vigia) vigia = setInterval(function () { Estado.sincronizarGrupo(); }, 60 * 1000);
+      }
 
       ['ent-camara', 'ent-ficheiro'].forEach(function (id) {
         const ent = el.querySelector('#' + id);
@@ -130,7 +139,10 @@
     },
 
     /* Os endereços temporários das imagens devolvem-se ao sair. */
-    desmontar: function () { Fotos.libertarTodos(); },
+    desmontar: function () {
+      Fotos.libertarTodos();
+      if (vigia) { clearInterval(vigia); vigia = null; }
+    },
 
     acoes: {
       filtrar: function (id) { filtro = id; App.repintar(); },
