@@ -116,6 +116,23 @@
       : { titulo: 'Instalar no ecrã principal', nota: nota, icone: 'descarregar', href: '#/instalar' });
   }
 
+  /* Na entrada, fora do ecrã principal, instalar é a primeira coisa a
+     fazer, e por isso leva a esfera do cobre, como o que levar no
+     Hoje (28.09.2026). No Android com pedido guardado, instala logo. */
+  function destaque(etiqueta, nota) {
+    const dentro =
+      '<span class="esfera esfera--icone" aria-hidden="true">' + Icone('descarregar', 22) + '</span>' +
+      '<span class="destaque__corpo">' +
+        '<span class="etiqueta destaque__etiqueta">' + etiqueta + '</span>' +
+        '<span class="titulo-ui destaque__titulo">Instalar no ecrã principal</span>' +
+        (nota ? '<span class="meta">' + nota + '</span>' : '') +
+      '</span>' +
+      '<span class="destaque__seta">' + Icone('seta', 20) + '</span>';
+    return pedido
+      ? '<button class="destaque destaque--botao" type="button" data-acao="instalar">' + dentro + '</button>'
+      : '<a class="destaque" href="#/instalar">' + dentro + '</a>';
+  }
+
   /* ---------------------------------------------------------
      Os passos de cada browser
      --------------------------------------------------------- */
@@ -489,6 +506,7 @@
     noTelemovel: noTelemovel,
     noIphone: noIphone,
     linha: linha,
+    destaque: destaque,
     pedir: pedir
   };
 

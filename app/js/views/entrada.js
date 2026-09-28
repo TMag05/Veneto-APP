@@ -83,13 +83,11 @@ function fabrica(org) {
      do browser, e o acesso teria de ser feito duas vezes. */
   function convite() {
     if (org || !Instalar.noTelemovel() || (modo !== 'criar' && modo !== 'entrar')) return '';
-    return '<div class="lista">' +
-      Instalar.linha(Instalar.noIphone()
-        ? (modo === 'criar'
-            ? 'Antes de criar o acesso. No iPhone, é na app instalada que ele fica.'
-            : 'Antes de entrar. No iPhone, é na app instalada que a sessão fica.')
-        : '') +
-    '</div>';
+    return Instalar.destaque(
+      modo === 'criar' ? 'Antes de criar o acesso' : 'Antes de entrar',
+      Instalar.noIphone()
+        ? (modo === 'criar' ? 'No iPhone, o acesso fica na app instalada.' : 'No iPhone, a sessão fica na app instalada.')
+        : 'Abre pelo ícone, como as outras apps.');
   }
 
   function preparar() {
