@@ -60,6 +60,9 @@ window.Conteudo = (function () {
       'Todas as refeições estão asseguradas, do pequeno-almoço ao jantar.',
     'Um guia que fala inglês acompanha o grupo em todos os dias.':
       'Um guia de língua inglesa acompanha o grupo todos os dias.',
+    /* 28.09.2026: o jantar de encerramento não diz onde é. */
+    'Código de vestuário: casual todos os dias. O jantar de encerramento, no JW Marriott, é casual chic.':
+      'Código de vestuário: casual todos os dias. O jantar de encerramento é casual chic.',
     'É aqui que o passeio entra na Dolomita a sério. Do chalet, as Pale di San Martino ficam mesmo em frente.':
       'É aqui que o passeio entra verdadeiramente nas Dolomitas. Do chalet, as Pale di San Martino ficam mesmo em frente.'
   };
@@ -73,6 +76,16 @@ window.Conteudo = (function () {
      26.09.2026: o regresso do jantar do dia 3 é às 23:30, como na
      proposta da Stappando, e não às 23:00. */
   const CORRECOES = [
+    /* 28.09.2026: a nota do guia sai das notas práticas, a pedido da
+       organização. Só sai se ainda for, palavra por palavra, a da
+       semente. */
+    { id: 'notas-sem-guia', aplicar: function (o) {
+      const fora = ['Um guia de língua inglesa acompanha o grupo todos os dias.',
+        'Um guia que fala inglês acompanha o grupo em todos os dias.'];
+      if (o.evento && Array.isArray(o.evento.notas)) {
+        o.evento.notas = o.evento.notas.filter(function (n) { return fora.indexOf(n) === -1; });
+      }
+    } },
     /* A lista do que levar da organização, no lançamento aos
        convidados (28.09.2026). Troca só se a guardada ainda for,
        palavra por palavra, a da semente antiga; a que a organização
