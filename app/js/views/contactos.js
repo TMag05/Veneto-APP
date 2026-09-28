@@ -21,7 +21,6 @@
     nav: 'mais',
     cabecalho: { voltar: '#/mais', titulo: 'Contactos', tituloSempre: true },
     html: function () {
-      const locais = DADOS.locais;
       const equipa = DADOS.contactos.filter(function (c) { return c.grupo === 'equipa'; });
       const gerais = DADOS.contactos.filter(function (c) { return c.grupo !== 'equipa'; });
 
@@ -43,26 +42,65 @@
           lista(equipa) +
         '</div>' : '') +
 
-        (locais.length ? '<div class="faixa">' +
-          '<div class="seccao-cabecalho"><h2 class="etiqueta">Hotéis e restaurantes</h2></div>' +
-          locais.map(function (l) {
-            return '<div style="padding:16px 0;border-bottom:1px solid var(--pietra)">' +
-              '<div class="par par--espalhado">' +
-                '<span class="titulo-ui">' + UI.h(l.nome) + '</span>' +
-                UI.distintivo(l.tipo === 'restaurante' ? 'Restaurante' : (l.tipo === 'hotel' ? 'Hotel' : 'Local')) +
-              '</div>' +
-              (l.morada ? '<p class="corpo-ui silencioso" style="margin-top:6px">' + UI.h(l.morada) + '</p>' : '') +
-              (l.notas ? '<p class="meta" style="margin-top:4px">' + UI.h(l.notas) + '</p>' : '') +
-              '<div style="display:flex;gap:16px;margin-top:8px">' +
-                (l.telefone ? '<a class="botao botao--texto" href="tel:' + l.telefone.replace(/\s/g, '') + '">' +
-                  Icone('telefone', 20) + ' ' + UI.h(l.telefone) + '</a>' : '') +
-                (l.morada ? '<a class="botao botao--texto" href="https://www.google.com/maps/search/?api=1&query=' +
-                  encodeURIComponent(l.nome + ' ' + l.morada) + '" target="_blank" rel="noopener">' +
-                  Icone('externo', 20) + ' Mapa</a>' : '') +
-              '</div>' +
-            '</div>';
-          }).join('') +
+        (DADOS.locais.length ? '<div class="faixa">' +
+          '<div class="lista">' +
+            UI.linhaLista({ titulo: 'Hotéis e restaurantes', nota: 'Telefones e moradas', icone: 'utensilios', href: '#/hoteis' }) +
+          '</div>' +
         '</div>' : '') +
+
+        '<div class="faixa">' +
+          '<p class="meta">Guardados no telemóvel. Funcionam sem rede de dados.</p>' +
+        '</div>';
+    }
+  };
+
+  /* ---------------------------------------------------------
+     Hotéis e restaurantes
+     Um ecrã só para eles, fora dos Contactos (28.09.2026): o
+     telefone da receção e a morada, que é o que se procura à
+     chegada ou à noite, longe do grupo.
+     --------------------------------------------------------- */
+
+  function cartaoLocal(l) {
+    return '<div style="padding:16px 0;border-bottom:1px solid var(--pietra)">' +
+      '<span class="titulo-ui">' + UI.h(l.nome) + '</span>' +
+      (l.notas ? '<p class="meta" style="margin-top:4px">' + UI.h(l.notas) + '</p>' : '') +
+      (l.morada ? '<p class="corpo-ui silencioso" style="margin-top:6px">' + UI.h(l.morada) + '</p>' : '') +
+      '<div style="display:flex;flex-wrap:wrap;gap:0 16px;margin-top:8px">' +
+        (l.telefone ? '<a class="botao botao--texto" href="tel:' + l.telefone.replace(/\s/g, '') + '">' +
+          Icone('telefone', 20) + ' <span class="num">' + UI.h(l.telefone) + '</span></a>' : '') +
+        (l.morada ? '<a class="botao botao--texto" href="https://www.google.com/maps/search/?api=1&query=' +
+          encodeURIComponent(l.nome + ' ' + l.morada) + '" target="_blank" rel="noopener">' +
+          Icone('externo', 20) + ' Mapa</a>' : '') +
+      '</div>' +
+    '</div>';
+  }
+
+  Vistas.hoteis = {
+    nav: 'mais',
+    cabecalho: { voltar: '#/mais', titulo: 'Hotéis e restaurantes', tituloSempre: true },
+    html: function () {
+      const grupos = [
+        { titulo: 'Hotéis', locais: DADOS.locais.filter(function (l) { return l.tipo === 'hotel'; }) },
+        { titulo: 'Restaurantes', locais: DADOS.locais.filter(function (l) { return l.tipo === 'restaurante'; }) },
+        { titulo: 'Outros', locais: DADOS.locais.filter(function (l) { return l.tipo !== 'hotel' && l.tipo !== 'restaurante'; }) }
+      ].filter(function (g) { return g.locais.length; });
+
+      return '<div class="capa">' +
+          UI.foto({ foto: 'assets/fotos/hotel-villa-soligo.jpg' }, 'foto--32 capa__imagem') +
+          '<div class="capa__texto">' +
+            '<h1 class="titulo-editorial">Hotéis e restaurantes</h1>' +
+          '</div>' +
+        '</div>' +
+
+        (grupos.length
+          ? grupos.map(function (g, i) {
+              return '<div class="faixa"' + (i ? '' : ' style="margin-top:24px"') + '>' +
+                '<div class="seccao-cabecalho"><h2 class="etiqueta">' + g.titulo + '</h2></div>' +
+                g.locais.map(cartaoLocal).join('') +
+              '</div>';
+            }).join('')
+          : '<div class="faixa" style="margin-top:24px"><p class="corpo-editorial silencioso">A lista de hotéis e restaurantes ainda não está publicada.</p></div>') +
 
         '<div class="faixa">' +
           '<p class="meta">Guardados no telemóvel. Funcionam sem rede de dados.</p>' +

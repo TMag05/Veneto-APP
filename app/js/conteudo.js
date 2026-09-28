@@ -80,6 +80,24 @@ window.Conteudo = (function () {
         if (haAssistencia) delete novo.assistencia;
         contactos.push(novo);
       });
+    } },
+    /* Os telefones e as moradas dos hotéis, e os restaurantes, entraram
+       a 28.09.2026. Preenche só o que está vazio ou ainda é, palavra
+       por palavra, a morada antiga da semente; o que a organização
+       criou fica no fim, pela ordem em que estava. */
+    { id: 'locais-contactos', aplicar: function (o) {
+      const antigas = { 'Via Guglielmo Marconi 2, Soligo': true };
+      const guardados = o.locais || [];
+      const semente = (SEMENTE.roteiro.locais || []).map(function (l) {
+        const id = 'l-' + talho(l.nome);
+        const g = guardados.find(function (x) { return x.id === id; });
+        if (!g) return Object.assign({ id: id, telefone: '', morada: '', notas: '' }, clonar(l));
+        if (!g.telefone) g.telefone = l.telefone || '';
+        if (!g.morada || antigas[g.morada]) g.morada = l.morada || '';
+        if (!g.notas) g.notas = l.notas || '';
+        return g;
+      });
+      o.locais = semente.concat(guardados.filter(function (x) { return semente.indexOf(x) === -1; }));
     } }
   ];
 

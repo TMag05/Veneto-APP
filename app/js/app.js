@@ -35,6 +35,7 @@
     /* O concierge saiu; um link antigo abre os contactos. */
     ['concierge', 'contactos'],
     ['contactos', 'contactos'],
+    ['hoteis', 'hoteis'],
     ['sos', 'sos'],
     ['carro', 'carro'],
     ['perfil', 'perfil'],

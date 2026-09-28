@@ -60,7 +60,8 @@
         '<div class="faixa" style="margin-top:32px">' +
           '<div class="seccao-cabecalho"><h2 class="etiqueta">Durante o passeio</h2></div>' +
           '<div class="lista">' +
-            UI.linhaLista({ titulo: 'Contactos', nota: 'Organização, assistência, hotel', icone: 'telefone', href: '#/contactos' }) +
+            UI.linhaLista({ titulo: 'Contactos', nota: 'Equipa, assistência, emergência', icone: 'telefone', href: '#/contactos' }) +
+            UI.linhaLista({ titulo: 'Hotéis e restaurantes', nota: 'Telefones e moradas', icone: 'utensilios', href: '#/hoteis' }) +
             UI.linhaLista({ titulo: 'Participantes', nota: DADOS.carros.length + ' carros', icone: 'pessoas', href: '#/participantes' }) +
           '</div>' +
         '</div>' +

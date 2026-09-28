@@ -207,9 +207,28 @@ window.SEMENTE = (function () {
      hotel e a do jantar, e mais nenhuma (27.09.2026).
      --------------------------------------------------------- */
   const roteiro = {
+    /* Hotéis e restaurantes, com o telefone e a morada dos sites
+       oficiais (28.09.2026). O Sagra não tem linha própria: é a
+       do JW Marriott. */
     locais: [
-      { tipo: 'hotel', nome: 'Hotel Villa Soligo', morada: 'Via Guglielmo Marconi 2, Soligo' },
-      { tipo: 'hotel', nome: 'JW Marriott Venice', morada: 'Isola delle Rose, Veneza' },
+      { tipo: 'hotel', nome: 'Hotel Villa Soligo', telefone: '+39 0438 173 6929',
+        morada: 'Via Guglielmo Marconi 2, Farra di Soligo', notas: 'Noites de 1, 2 e 3 de outubro' },
+      { tipo: 'hotel', nome: 'JW Marriott Venice', telefone: '+39 041 852 1300',
+        morada: 'Isola delle Rose, Veneza', notas: 'Noite de 4 de outubro' },
+      { tipo: 'restaurante', nome: 'Rifugio Bassano', telefone: '+39 0423 53101',
+        morada: 'Via Madonna del Covolo 161, Crespano del Grappa', notas: 'Almoço, 2 de outubro' },
+      { tipo: 'restaurante', nome: 'Ristorante Da Gigetto', telefone: '+39 0438 960 020',
+        morada: 'Via Alcide De Gasperi 5, Miane', notas: 'Jantar, 2 de outubro' },
+      { tipo: 'restaurante', nome: 'Malga Ces', telefone: '+39 0439 68223',
+        morada: 'Località Ces, San Martino di Castrozza', notas: 'Almoço, 3 de outubro' },
+      { tipo: 'restaurante', nome: 'La Candola', telefone: '+39 0438 900006',
+        morada: 'Via San Gallo 43, Farra di Soligo', notas: 'Jantar, 3 de outubro' },
+      { tipo: 'restaurante', nome: 'La Casera', telefone: '+39 0437 908180',
+        morada: 'Via Faverghera 751, Nevegal, Belluno', notas: 'Paragem da manhã, 4 de outubro' },
+      { tipo: 'restaurante', nome: 'Rifugio Città di Vittorio Veneto', telefone: '+39 0438 145 1035',
+        morada: 'Via Monte Pizzoc 35, Fregona', notas: 'Almoço volante, 4 de outubro. Telemóvel: +39 349 368 0586' },
+      { tipo: 'restaurante', nome: 'Sagra', telefone: '+39 041 852 1300',
+        morada: 'JW Marriott Venice, Isola delle Rose, Veneza', notas: 'Jantar de encerramento, 4 de outubro' },
       { tipo: 'outro', nome: 'LO.VE. events&travels', morada: 'Via dei Colli 3, Follina' }
     ],
     dias: [
