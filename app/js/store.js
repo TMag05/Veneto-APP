@@ -20,7 +20,7 @@ window.Estado = (function () {
        ser por escolha de quem a tinha. */
     aviso: '',
     /* papel vem da conta: 'convidado' ou 'organizacao'. */
-    perfil: { nome: '', email: '', telefone: '', modelo: '', papel: 'convidado' },
+    perfil: { nome: '', email: '', telefone: '', modelo: '', funcao: '', papel: 'convidado' },
     /* A ficha da organização com o mesmo email, se existir. Dá a
        matrícula e quem partilha o carro; não é condição de entrada. */
     participanteId: '',
@@ -196,6 +196,7 @@ window.Estado = (function () {
         email: r.perfil.email,
         telefone: estado.perfil.telefone || (ficha ? ficha.telefone || '' : ''),
         modelo: r.perfil.modelo || '',
+        funcao: r.perfil.funcao || '',
         papel: r.perfil.papel === 'organizacao' ? 'organizacao' : 'convidado'
       }
     });
@@ -241,7 +242,7 @@ window.Estado = (function () {
 
   function perfilPublico() {
     const p = estado.perfil;
-    return { nome: p.nome, email: p.email, modelo: p.modelo, papel: p.papel, criado: Date.now() };
+    return { nome: p.nome, email: p.email, modelo: p.modelo, funcao: p.funcao || '', papel: p.papel, criado: Date.now() };
   }
 
   /* O perfil que ficou por gravar no servidor, ou que mudou desde. */

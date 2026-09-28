@@ -115,12 +115,21 @@
               '<input class="campo__entrada" name="telefone" type="tel" value="' + UI.h(p.telefone) + '" autocomplete="tel" placeholder="+351"></label>' +
             '<button class="botao botao--principal botao--largo" type="submit">Guardar</button>' +
           '</form>' +
+          /* O lugar no carro escolhe-se ao criar o acesso e muda-se
+             aqui. A organização viaja em carros próprios. */
+          (Estado.ehOrganizacao() ? '' : '<div class="faixa">' +
+            '<div class="seccao-cabecalho"><h2 class="etiqueta">Viaja como</h2></div>' +
+            UI.escolhaFuncao(p.funcao) +
+          '</div>') +
           '<div class="faixa">' +
           (ficha
             ? '<p class="meta">Ficha da organização: ' + UI.h(DADOS.nomeCompleto(ficha)) +
                 ', carro ' + UI.h(ficha.equipa || '—') + '.</p>'
             : '') +
           '</div>';
+    },
+    acoes: {
+      funcao: function (id) { Estado.atualizarPerfil({ funcao: id }); }
     },
     montar: function (el) {
       const f = el.querySelector('#form-perfil');

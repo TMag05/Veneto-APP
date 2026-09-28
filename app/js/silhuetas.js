@@ -5450,5 +5450,51 @@ window.Silhuetas = (function () {
     return String(t).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
   }
 
-  return { svg: svg, MODELOS: MODELOS, modelo: modelo, FORMAS: FORMAS };
+  /* ---------------------------------------------------------
+     Onde se senta: condutor ou co-piloto
+     O habitáculo visto de cima, a traço, na cor do texto: dois
+     bancos, o volante à esquerda (os carros são de volante à
+     esquerda) e a pessoa no lugar que é o seu. O co-piloto leva o
+     roadbook aberto à frente. O mesmo desenho para os dois, para a
+     diferença ser só o lugar.
+     --------------------------------------------------------- */
+
+  const FUNCOES = [
+    { id: 'condutor', nome: 'Condutor' },
+    { id: 'copiloto', nome: 'Co-piloto' }
+  ];
+
+  function funcao(id) {
+    return FUNCOES.find(function (f) { return f.id === id; }) || null;
+  }
+
+  function lugar(id) {
+    const condutor = id !== 'copiloto';
+    const cx = condutor ? 76 : 124;
+    /* A pessoa, cheia, sentada no seu banco; o banco vazio fica só a traço. */
+    const pessoa =
+      '<circle cx="' + cx + '" cy="84" r="7" fill="currentColor" stroke="none"/>' +
+      '<path d="M' + (cx - 12) + ' 109 Q' + (cx - 12) + ' 95 ' + cx + ' 95 Q' + (cx + 12) + ' 95 ' + (cx + 12) + ' 109 Z" fill="currentColor" stroke="none"/>';
+    /* O co-piloto leva o roadbook aberto à frente. */
+    const roadbook = condutor ? '' :
+      '<rect x="' + (cx - 10) + '" y="54" width="20" height="13" rx="2"/>' +
+      '<path d="M' + cx + ' 54 L' + cx + ' 67"/>';
+    return '<svg class="silhueta lugar" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" role="img" ' +
+      'aria-label="' + (condutor ? 'Lugar do condutor, ao volante' : 'Lugar do co-piloto, com o roadbook') + '" ' +
+      'fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
+      /* A carroçaria, o para-brisas e o vidro de trás. */
+      '<rect x="44" y="4" width="112" height="142" rx="36"/>' +
+      '<path d="M54 40 Q100 26 146 40"/>' +
+      '<path d="M58 126 Q100 136 142 126"/>' +
+      /* Os dois bancos. */
+      '<rect x="60" y="72" width="32" height="42" rx="8"/>' +
+      '<rect x="108" y="72" width="32" height="42" rx="8"/>' +
+      /* O volante, com os raios, à frente do lugar do condutor. */
+      '<circle cx="76" cy="56" r="11"/>' +
+      '<path d="M65 56 L87 56 M76 56 L76 67"/>' +
+      pessoa + roadbook +
+    '</svg>';
+  }
+
+  return { svg: svg, MODELOS: MODELOS, modelo: modelo, FORMAS: FORMAS, FUNCOES: FUNCOES, funcao: funcao, lugar: lugar };
 })();

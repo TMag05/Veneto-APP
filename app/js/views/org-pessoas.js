@@ -216,7 +216,8 @@
     const proprio = c.uid === Estado.get().uid;
     const carro = c.papel === 'organizacao'
       ? 'Organização'
-      : (c.modelo ? Silhuetas.modelo(c.modelo).nome : 'Carro por escolher');
+      : [c.modelo ? Silhuetas.modelo(c.modelo).nome : 'Carro por escolher',
+         Silhuetas.funcao(c.funcao) ? Silhuetas.funcao(c.funcao).nome : ''].filter(Boolean).join(' · ');
     return '<div class="linha-org">' +
       '<div class="linha-org__corpo">' +
         '<span class="titulo-ui" style="display:block">' + UI.h(c.nome || 'Sem nome') + '</span>' +
