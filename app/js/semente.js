@@ -43,8 +43,7 @@ window.SEMENTE = (function () {
     notas: [
       'Todas as manhãs, antes de partir, há um briefing: as regras da estrada e o resumo do dia.',
       'Todas as refeições estão asseguradas, do pequeno-almoço ao jantar.',
-      'Um guia de língua inglesa acompanha o grupo todos os dias.',
-      'Código de vestuário: casual todos os dias. O jantar de encerramento, no JW Marriott, é casual chic.'
+      'Código de vestuário: casual todos os dias. O jantar de encerramento é casual chic.'
     ]
   };
 
