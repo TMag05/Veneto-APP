@@ -76,13 +76,22 @@
     '</div>';
   }
 
+  /* Um restaurante diz por onde passa o dia: aparece quando o dia
+     em que lá se come se revela, na véspera, depois do jantar. Os
+     hotéis estão sempre à vista — são logística, e o contacto que
+     se deixa à família. O restaurante liga-se à paragem pelo nome. */
+  function restauranteVisivel(l) {
+    const id = Object.keys(POIS).find(function (k) { return POIS[k].nome === l.nome; });
+    return !id || Estado.poiVisivel(id);
+  }
+
   Vistas.hoteis = {
     nav: 'mais',
     cabecalho: { voltar: '#/mais', titulo: 'Hotéis e restaurantes', tituloSempre: true },
     html: function () {
       const grupos = [
         { titulo: 'Hotéis', locais: DADOS.locais.filter(function (l) { return l.tipo === 'hotel'; }) },
-        { titulo: 'Restaurantes', locais: DADOS.locais.filter(function (l) { return l.tipo === 'restaurante'; }) },
+        { titulo: 'Restaurantes', locais: DADOS.locais.filter(function (l) { return l.tipo === 'restaurante' && restauranteVisivel(l); }) },
         { titulo: 'Outros', locais: DADOS.locais.filter(function (l) { return l.tipo !== 'hotel' && l.tipo !== 'restaurante'; }) }
       ].filter(function (g) { return g.locais.length; });
 

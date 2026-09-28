@@ -17,9 +17,12 @@
          erraria o género a metade dos convidados. */
       const primeiro = String(e.perfil.nome || '').split(' ')[0];
 
-      /* A primeira fotografia real do passeio, se existir. Se não,
-         o poente — que é a hora em que a dolomia se acende. */
-      const dia = DADOS.dias.find(function (d) { return d.imagem && (d.imagem.dataUrl || d.imagem.foto); });
+      /* A primeira fotografia real do passeio, de um dia já revelado,
+         se existir. Se não, o poente — que é a hora em que a dolomia
+         se acende. */
+      const dia = DADOS.dias.find(function (d) {
+        return Estado.diaVisivel(d) && d.imagem && (d.imagem.dataUrl || d.imagem.foto);
+      });
       const capa = dia
         ? dia.imagem
         : { variante: 'poente', semente: (DADOS.evento.nome || 'chegada') + '-capa' };

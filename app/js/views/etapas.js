@@ -422,7 +422,23 @@
 
   /* Um dia: o desenho do percurso, e por baixo as paragens pela
      ordem do programa com as estradas no sítio onde se fazem. */
+  /* Um dia por revelar: o número e a data, sem desenho nem
+     paragens — revela-se na véspera, depois do jantar. */
+  function seccaoFechada(d) {
+    return '<div class="faixa" style="margin-top:32px">' +
+      '<div class="seccao-cabecalho">' +
+        '<h2 class="titulo-editorial">' + UI.h(UI.rotuloDia(d)) + '</h2>' +
+      '</div>' +
+      '<p class="meta">' + UI.h(d.data ? UI.dataLonga(d.data) : '') + '</p>' +
+      '<div class="selado" style="margin-top:16px">' +
+        '<div class="selado__icone">' + Icone('selado', 24) + '</div>' +
+        '<p class="corpo-editorial">A estrada deste dia revela-se na véspera, depois do jantar.</p>' +
+      '</div>' +
+    '</div>';
+  }
+
   function seccaoDia(d) {
+    if (!Estado.diaVisivel(d)) return seccaoFechada(d);
     const E = enquadrar(d);
     const linhas = [];
 
@@ -471,9 +487,11 @@
     return DADOS.dias.filter(function (d) { return d.distancia > 0; });
   }
 
+  /* Só entre os dias revelados: o nome do ponto mais alto diria
+     por onde passa um dia que ainda é surpresa. */
   function pontoMaisAlto() {
     let alto = null;
-    aoVolante().forEach(function (d) {
+    aoVolante().filter(Estado.diaVisivel).forEach(function (d) {
       const P = PERCURSOS.para(d);
       (P ? P.picos : []).forEach(function (p) { if (!alto || p.altitude > alto.altitude) alto = p; });
     });
@@ -551,13 +569,22 @@
     '</div>';
   }
 
+  /* Uma estrada que só se faz em dias por revelar fica fechada
+     com eles. */
+  function estradaFechada(e) {
+    const seus = e.dias.map(function (n) {
+      return DADOS.dias.find(function (d) { return d.numero === n; });
+    }).filter(Boolean);
+    return seus.length > 0 && !seus.some(Estado.diaVisivel);
+  }
+
   Vistas.estrada = {
     nav: 'etapas',
     cabecalho: function (p) {
       const e = ESTRADAS.por(p.id);
       return {
         voltar: '#/etapas',
-        titulo: e ? e.nome : 'Estrada',
+        titulo: e && !estradaFechada(e) ? e.nome : 'Estrada',
         linha: false
       };
     },
@@ -568,6 +595,13 @@
           '<p class="corpo-editorial">Estrada não encontrada.</p>' +
           '<a class="botao botao--secundario botao--largo" style="margin-top:24px" href="#/etapas">Voltar às etapas</a>' +
         '</div>';
+      }
+
+      if (estradaFechada(e)) {
+        return '<div class="faixa" style="padding-top:24px"><div class="selado">' +
+          '<div class="selado__icone">' + Icone('selado', 24) + '</div>' +
+          '<p class="corpo-editorial">Esta estrada revela-se na véspera do dia em que se faz, depois do jantar.</p>' +
+        '</div></div>';
       }
 
       const x = e.dados || {};

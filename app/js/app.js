@@ -297,11 +297,14 @@
     elNav.hidden = false;
     const organizacao = vista.area === 'organizacao';
     const abas = organizacao ? ABAS_ORGANIZACAO : ABAS_CONVIDADO;
+    /* Entre o jantar e a meia-noite, o Hoje é o dia de amanhã. */
+    const amanha = !organizacao && Estado.amanha();
     elNav.innerHTML = abas.map(function (a) {
       const ativo = a.nav === vista.nav;
+      const rotulo = a.nav === 'hoje' && amanha ? 'Amanhã' : a.rotulo;
       return '<a class="nav-item" href="' + a.rota + '"' + (ativo ? ' aria-current="page"' : '') + '>' +
         (organizacao ? Icone(a.icone, 24) : IconePuncao(a.icone, ativo)) +
-        '<span class="nav-item__rotulo">' + a.rotulo + '</span>' +
+        '<span class="nav-item__rotulo">' + rotulo + '</span>' +
         '</a>';
     }).join('');
   }
@@ -392,10 +395,30 @@
     if (meta && cor) meta.setAttribute('content', cor);
   }
 
+  /* O relógio do programa: um dia revela-se depois do jantar da
+     véspera, e o Hoje passa a Amanhã até à meia-noite. Com a app
+     aberta, repinta-se quando isso muda — não a cada minuto. */
+  function momentoDoPrograma() {
+    const amanha = Estado.amanha();
+    return (amanha ? amanha.id : '') + '|' + DADOS.dias.filter(Estado.diaVisivel).length + '|' + Estado.chave(Estado.agora());
+  }
+  let ultimoMomento = null;
+  function verificarRelogio() {
+    const agora = momentoDoPrograma();
+    if (ultimoMomento !== null && agora !== ultimoMomento && vistaAtual) {
+      /* Enquanto se escreve num campo não se repinta: perder-se-ia o cursor. */
+      const foco = document.activeElement;
+      if (foco && foco.dataset && foco.dataset.campo !== undefined) return;
+      desenhar();
+    }
+    ultimoMomento = agora;
+  }
+  setInterval(verificarRelogio, 30000);
+
   window.addEventListener('scroll', atualizarTituloCabecalho, { passive: true });
   window.addEventListener('hashchange', navegar);
   document.addEventListener('visibilitychange', function () {
-    if (document.visibilityState === 'visible') verificarVersao();
+    if (document.visibilityState === 'visible') { verificarVersao(); verificarRelogio(); }
   });
   window.addEventListener('pageshow', function (e) { if (e.persisted) verificarVersao(); });
   window.addEventListener('online', desenharRede);
@@ -444,6 +467,7 @@
 
   aplicarTema();
   navegar();
+  verificarRelogio();
   Estado.sincronizar();
   Estado.verificarSessao();
 

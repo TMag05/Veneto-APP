@@ -33,7 +33,9 @@ A app existe para o passeio e só para o passeio. Os convidados recebem acesso p
 
 **A primeira abertura** — uma chegada, uma vez por instalação: fotografia a ecrã inteiro, o nome do convidado em Garamond, as datas e o carro dele em tamanho de objeto. É o equivalente digital de abrir a caixa.
 
-**Nos dias anteriores** — o briefing: o programa, o que levar e as notas práticas, com o código de vestuário. E uma **revelação por dia**: uma paragem do percurso que se abre, com fotografia e três linhas. É o que faz a app abrir-se todos os dias antes de partir.
+**Nos dias anteriores** — o briefing: o programa, o que levar e as notas práticas, com o código de vestuário. Do programa, só o Dia 1 está à vista.
+
+**Cada dia revela-se na véspera, depois do jantar** — quinze minutos depois da hora do jantar do dia anterior. Até lá, o convidado vê o número e a data do dia, e mais nada. Entre a revelação e a meia-noite, o separador Hoje chama-se **Amanhã** e mostra o dia seguinte inteiro. É o que faz a app abrir-se todas as noites do passeio.
 
 **Durante** — o ecrã "Hoje" é **só o momento em curso**: sobre a paisagem, que fica parada atrás, a data e o título da etapa em Garamond de 44 px; por baixo, um cartão com o que está a acontecer — *Agora*, ou *A seguir* se o grupo estiver na estrada entre dois momentos —, com a hora, quando é das que se mostram, o título e o local; e, mais pequeno, o que vem depois. **Tocar no cartão abre a página desse momento** (`#/momento/dia/n`): quando há paragem, é a página do sítio — fotografia, subtítulo, a história como promessa, a nota prática — com o momento por cima, num cartão com a hora, o tipo, a nota e as alterações; quando não há (a partida, o jantar livre), é o momento sozinho. No fim de cada página, o que vem a seguir, para seguir o dia sem voltar ao Hoje. O dia inteiro está no roadbook. O roadbook fica para ler o dia de uma vez — o interlúdio do dia, cada momento com a sua secção, o cartão da paragem e a localização no Google Maps e no Waze; a história de cada paragem apresentada como **promessa** — um excerto sobre a fotografia do sítio — que se abre à hora a que o programa lá chega; no alto da paragem, **o que fazer à chegada**: onde estacionar, quem recebe, a que horas se volta aos carros; o separador **Etapas** com a estrada real de cada dia vista de cima e de lado — o perfil de altitude, com os pontos altos (Cima Grappa, 1776 m; Passo Valles, 2032 m; o Pizzoc, 1547 m) —, o traçado real de cada estrada e o desenho do percurso de cada dia; galeria com câmara nativa; contactos e SOS.
 
@@ -63,7 +65,7 @@ Três separadores, como no documento, mais os dados do evento. Mesma identidade 
 
 **Fotografias** — cada etapa e cada paragem aceitam uma fotografia, carregada do telemóvel e reduzida automaticamente. Sem fotografia, fica o desenho gerado. É o campo com mais efeito de toda a área.
 
-**Revelação** — cada paragem pode ter uma data em que se revela ao convidado, nos dias antes de partir. Uma por dia é o ritmo certo.
+**Revelação** — não se edita: cada dia abre-se sozinho, depois do jantar da véspera. Mudar a hora do jantar muda a hora da revelação. A organização vê sempre o programa inteiro, com a hora a que cada dia se revela.
 
 **Contactos** — emergência (nome, telefone, notas) e hotéis/restaurantes (tipo, nome, telefone, morada). Cada etapa pode apontar para o hotel do fim do dia.
 
@@ -137,7 +139,7 @@ servidor.js             servidor estático de desenvolvimento
 
 ## O que veio da pesquisa
 
-Sete dos oito movimentos de [O Luxo é Atmosfera](PESQUISA-LUXO.html) estão implementados: fotografia a toda a largura com carregamento pela organização, a primeira abertura, um momento de cada vez, a revelação diária, a história como recompensa e o álbum como certidão. O oitavo — a manchete do grupo — saiu com a marcação de chegada: numa caravana que chega junta, não há notícia nenhuma em dizer que os carros chegaram. O que continua a faltar é a fotografia real — nenhum desenho gerado substitui uma sessão no percurso.
+Sete dos oito movimentos de [O Luxo é Atmosfera](PESQUISA-LUXO.html) estão implementados: fotografia a toda a largura com carregamento pela organização, a primeira abertura, um momento de cada vez, a revelação de cada dia na véspera, a história como recompensa e o álbum como certidão. O oitavo — a manchete do grupo — saiu com a marcação de chegada: numa caravana que chega junta, não há notícia nenhuma em dizer que os carros chegaram. O que continua a faltar é a fotografia real — nenhum desenho gerado substitui uma sessão no percurso.
 
 ---
 

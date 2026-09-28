@@ -357,8 +357,6 @@
               nota: 'Abre ao convidado à hora a que o programa chega a esta paragem.' }) +
             UI.campo({ rotulo: 'Nota prática', nome: 'nota', valor: poi.nota,
               placeholder: 'Estacionamento, horários, o que levar' }) +
-            UI.campo({ rotulo: 'Revelar em', nome: 'revelacao', valor: poi.revelacao, tipo: 'data',
-              nota: 'Nos dias antes de partir, uma paragem por dia. Em branco, fica visível desde já.' }) +
           '</div>' +
         '</div>' +
 
