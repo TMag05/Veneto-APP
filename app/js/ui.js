@@ -274,7 +274,7 @@ window.UI = (function () {
         (escolhido ? 'Escolhido: ' + h(escolhido.nome) : 'Toque no modelo do seu carro.') + '</p>';
   }
 
-  /* Condutor ou co-piloto: o mesmo cartão da escolha do carro, com
+  /* Piloto ou co-piloto: o mesmo cartão da escolha do carro, com
      o habitáculo desenhado e a pessoa no seu lugar. */
   function escolhaFuncao(valor) {
     const escolhida = Silhuetas.funcao(valor);

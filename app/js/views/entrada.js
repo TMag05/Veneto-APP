@@ -275,7 +275,7 @@ function fabrica(org) {
     if (modo === 'criar' && rascunho.senha.length < 6) return MENSAGENS['senha-curta'];
     if (modo === 'entrar' && !rascunho.senha) return 'Falta a palavra-passe.';
     if (modo === 'criar' && !org && !rascunho.modelo) return 'Escolha o modelo do carro.';
-    if (modo === 'criar' && !org && !rascunho.funcao) return 'Escolha se viaja como condutor ou co-piloto.';
+    if (modo === 'criar' && !org && !rascunho.funcao) return 'Escolha se viaja como piloto ou co-piloto.';
     if (modo === 'criar' && org && Nuvem.pedeCodigo() && !rascunho.codigo.trim()) return 'Falta o código da organização.';
     return '';
   }
