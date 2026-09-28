@@ -405,10 +405,26 @@ window.Estado = (function () {
   }
 
   /* Sobe as que faltam, uma de cada vez para não afogar a ligação.
-     Sem servidor não faz nada e ninguém dá por isso. */
+     Sai logo a seguir a tirar a fotografia. Se falhar — um vale sem
+     rede, uma ligação que cai a meio —, volta a tentar sozinha, cada
+     vez mais espaçado, e também sempre que a app volta a ficar à
+     vista ou o telemóvel volta a ter rede. Sem servidor não faz nada
+     e ninguém dá por isso. */
   let aEnviarFotos = false;
+  let repetir = null;
+  let espera = 0;
+  const ESPERAS = [30, 60, 120, 300]; /* segundos; depois, de cinco em cinco minutos */
+
+  function tentarDeNovo() {
+    if (repetir) return;
+    const s = ESPERAS[Math.min(espera, ESPERAS.length - 1)];
+    espera++;
+    repetir = setTimeout(function () { repetir = null; enviarFotos(); }, s * 1000);
+  }
+
   function enviarFotos() {
-    if (aEnviarFotos || !Nuvem.ligada() || !navigator.onLine) return;
+    if (aEnviarFotos || !Nuvem.ligada()) return;
+    if (!navigator.onLine) { if (fotosPorEnviar()) tentarDeNovo(); return; }
     const meta = estado.fotos.find(function (f) { return f.estadoEnvio !== 'enviado'; });
     if (!meta) return;
     aEnviarFotos = true;
@@ -419,13 +435,15 @@ window.Estado = (function () {
       Object.assign(meta, caminhos, { estadoEnvio: 'enviado' });
       estado.fila = estado.fila.filter(function (i) { return !(i.tipo === 'foto' && i.ref === meta.id); });
       aEnviarFotos = false;
+      espera = 0;
       guardar();
       emitir();
       enviarFotos();
     }).catch(function () {
-      /* Fica pendente. A próxima ligação volta a tentar — e o caminho
-         é o mesmo, por ser o do ficheiro, por isso repetir não duplica. */
+      /* Fica pendente e volta a tentar — e o caminho é o mesmo, por ser
+         o do ficheiro, por isso repetir não duplica. */
       aEnviarFotos = false;
+      tentarDeNovo();
     });
   }
 
@@ -525,6 +543,13 @@ window.Estado = (function () {
   }
 
   window.addEventListener('online', sincronizar);
+  /* De volta à app, o que ficou por enviar tenta logo, sem esperar pela
+     próxima tentativa marcada. */
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState !== 'visible') return;
+    if (repetir) { clearTimeout(repetir); repetir = null; }
+    sincronizar();
+  });
   window.addEventListener('online', verificarSessao);
   window.addEventListener('offline', emitir);
 

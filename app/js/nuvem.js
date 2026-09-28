@@ -5,8 +5,7 @@
    que sabe que há um do outro lado.
 
    Tem duas metades: as contas, dos convidados e da organização,
-   que já funcionam, e as fotografias, que esperam pelo
-   Storage. Nada fora deste ficheiro conhece o Firestore, o Storage ou o Auth.
+   e as fotografias, no Storage. Nada fora deste ficheiro conhece o Firestore, o Storage ou o Auth.
    ========================================================= */
 
 window.Nuvem = (function () {
@@ -602,11 +601,14 @@ window.Nuvem = (function () {
       '/o?uploadType=media&name=' + encodeURIComponent(caminho);
   }
 
+  /* Só os cabeçalhos que o Storage aceita de um browser: Content-Type
+     e Authorization. Um Cache-Control aqui fazia o browser bloquear o
+     pedido antes de sair (CORS), e nenhuma fotografia subia
+     (28.09.2026). */
   function subirObjeto(caminho, blob, tipo, sessao) {
     if (!blob) return Promise.reject(erro('sem-ficheiro'));
     const headers = {
-      'Content-Type': tipo || blob.type || 'image/jpeg',
-      'Cache-Control': 'public, max-age=31536000, immutable'
+      'Content-Type': tipo || blob.type || 'image/jpeg'
     };
     if (sessao && sessao.idToken) headers['Authorization'] = 'Bearer ' + sessao.idToken;
     return pedir(storageUrl(caminho), {
@@ -654,6 +656,15 @@ window.Nuvem = (function () {
           caminhoOriginal: cOrig
         };
         return pedir(firestore('fotos/' + meta.id), comSessao(sessao, 'PATCH', paraDocFoto(dadosFoto)))
+          .catch(function (e) {
+            /* O registo só se cria, nunca se reescreve. Se uma tentativa
+               anterior o gravou e a resposta se perdeu, a repetição é
+               recusada — e a fotografia ficaria pendente para sempre.
+               Se ele já lá está, com este ficheiro, está enviada. */
+            return pedir(firestore('fotos/' + meta.id), comSessao(sessao, 'GET')).then(function (doc) {
+              if (deDocFoto(doc).sha !== dadosFoto.sha) throw e;
+            }, function () { throw e; });
+          })
           .then(function () {
             return {
               caminhoMini: cMini,
