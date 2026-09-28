@@ -106,6 +106,8 @@
 
     montar: function (el, p, chegada) {
       Fotos.pintar(el);
+      /* O que está na grelha já foi visto: o número do separador apaga-se. */
+      Estado.marcarGrupoVisto();
       /* À chegada, pede as novas do grupo; aberta, volta a pedir de
          cinco em cinco segundos — a fotografia de um é de todos no
          momento em que é tirada. As que chegam repintam a grelha. */

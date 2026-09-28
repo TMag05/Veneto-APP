@@ -299,15 +299,60 @@
     const abas = organizacao ? ABAS_ORGANIZACAO : ABAS_CONVIDADO;
     /* Entre o jantar e a meia-noite, o Hoje é o dia de amanhã. */
     const amanha = !organizacao && Estado.amanha();
+    /* As fotografias do grupo que ainda não se viram, no separador da
+       Galeria — fora dela. */
+    const novas = organizacao || vista.nav === 'galeria' ? 0 : Estado.novasDoGrupo();
     elNav.innerHTML = abas.map(function (a) {
       const ativo = a.nav === vista.nav;
       const rotulo = a.nav === 'hoje' && amanha ? 'Amanhã' : a.rotulo;
-      return '<a class="nav-item" href="' + a.rota + '"' + (ativo ? ' aria-current="page"' : '') + '>' +
-        (organizacao ? Icone(a.icone, 24) : IconePuncao(a.icone, ativo)) +
+      const marca = a.nav === 'galeria' && novas
+        ? '<span class="nav-item__novas num" aria-hidden="true">' + (novas > 99 ? '99+' : novas) + '</span>' : '';
+      return '<a class="nav-item" href="' + a.rota + '"' + (ativo ? ' aria-current="page"' : '') +
+        (marca ? ' aria-label="' + rotulo + ', ' + UI.plural(novas, 'fotografia nova', 'fotografias novas') + '"' : '') + '>' +
+        (organizacao ? Icone(a.icone, 24) : IconePuncao(a.icone, ativo)) + marca +
         '<span class="nav-item__rotulo">' + rotulo + '</span>' +
         '</a>';
     }).join('');
   }
+
+  /* ---------------------------------------------------------
+     Fotografias novas do grupo — um aviso, não um alarme
+     Quando chegam fotografias de outros e o convidado está noutro
+     ecrã, uma linha no fundo diz quem as juntou; tocar abre a
+     Galeria. Some sozinha. Na Galeria não aparece — a grelha já as
+     mostra —, nem na área da organização.
+     --------------------------------------------------------- */
+
+  let avisoFotos = null;
+  let fecharAviso = null;
+
+  function quemJuntou(fotos) {
+    const nomes = [];
+    fotos.forEach(function (f) { if (f.autorNome && nomes.indexOf(f.autorNome) < 0) nomes.push(f.autorNome); });
+    const quantas = UI.plural(fotos.length, 'fotografia', 'fotografias');
+    if (!nomes.length) return (fotos.length === 1 ? 'Uma fotografia nova' : quantas + ' novas') + ' na galeria.';
+    const n = fotos.length === 1 ? 'uma fotografia' : quantas;
+    if (nomes.length === 1) return nomes[0] + ' juntou ' + n + '.';
+    if (nomes.length === 2) return nomes[0] + ' e ' + nomes[1] + ' juntaram ' + n + '.';
+    return nomes[0] + ' e mais ' + (nomes.length - 1) + ' juntaram ' + n + '.';
+  }
+
+  Estado.aoChegarFotos(function (fotos) {
+    const vista = window.Vistas[vistaAtual] || {};
+    if (!vistaAtual || vista.nav === 'galeria' || vista.area === 'organizacao' || ehVerdadeiro(vista.semNav)) return;
+    if (!avisoFotos) {
+      avisoFotos = document.createElement('a');
+      avisoFotos.className = 'aviso-fotos';
+      avisoFotos.href = '#/galeria';
+      avisoFotos.setAttribute('aria-live', 'polite');
+      avisoFotos.addEventListener('click', function () { avisoFotos.hidden = true; });
+      document.body.appendChild(avisoFotos);
+    }
+    avisoFotos.innerHTML = Icone('galeria', 20) + '<span>' + UI.h(quemJuntou(fotos)) + '</span>' + Icone('seta', 16);
+    avisoFotos.hidden = false;
+    clearTimeout(fecharAviso);
+    fecharAviso = setTimeout(function () { avisoFotos.hidden = true; }, 7000);
+  });
 
   /* ---------------------------------------------------------
      Estado de rede — discreto, nunca um erro

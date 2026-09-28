@@ -475,13 +475,38 @@ window.Estado = (function () {
   let aPedirGrupo = false;
   let ultimoPedido = 0;
 
+  /* vistoAte: até onde este telemóvel já viu a Galeria, pela hora de
+     chegada ao servidor. O que chegou depois é novo. */
   function carregarGrupo() {
     try {
       const g = JSON.parse(localStorage.getItem(CHAVE_GRUPO));
-      if (g && Array.isArray(g.fotos)) return g;
+      if (g && Array.isArray(g.fotos)) return Object.assign({ vistoAte: 0 }, g);
     } catch (e) { /* recomeça */ }
-    return { fotos: [], cursor: 0, completa: 0 };
+    return { fotos: [], cursor: 0, completa: 0, vistoAte: 0 };
   }
+
+  /* Fotografias minhas, deste telemóvel ou enviadas por mim de outro:
+     nunca são novidade para mim. */
+  function ehMinha(f) {
+    return f.autorId === estado.uid || estado.fotos.some(function (m) { return m.id === f.id; });
+  }
+
+  /* As novas desde a última vez que se abriu a Galeria. */
+  function novasDoGrupo() {
+    if (!grupo.vistoAte) return 0;
+    return grupo.fotos.filter(function (f) { return f.enviado > grupo.vistoAte && !ehMinha(f); }).length;
+  }
+
+  function marcarGrupoVisto() {
+    if (grupo.vistoAte >= grupo.cursor) return;
+    grupo.vistoAte = grupo.cursor;
+    guardarGrupo();
+  }
+
+  /* Quem quer saber quando chegam fotografias novas de outros —
+     a app, para o aviso no fundo do ecrã. */
+  const aoChegar = [];
+  function aoChegarFotos(fn) { aoChegar.push(fn); }
 
   function guardarGrupo() {
     try { localStorage.setItem(CHAVE_GRUPO, JSON.stringify(grupo)); } catch (e) { /* fica em memória */ }
@@ -502,6 +527,9 @@ window.Estado = (function () {
     Nuvem.fotosDoGrupo(completa ? 0 : Math.max(0, grupo.cursor - FOLGA)).then(function (lista) {
       const validas = lista.filter(function (f) { return f.id && f.caminhoMini; });
       let mudou = false;
+      /* As que ainda não estavam cá, e que não são minhas: é disto que
+         se avisa. */
+      const chegadas = validas.filter(function (f) { return !doGrupo(f.id) && !ehMinha(f); });
       if (completa) {
         const ficam = {};
         validas.forEach(function (f) { ficam[f.id] = true; });
@@ -520,9 +548,15 @@ window.Estado = (function () {
         });
       }
       grupo.fotos.forEach(function (f) { if (f.enviado > grupo.cursor) grupo.cursor = f.enviado; });
+      /* Na primeira leitura, o que já lá estava não é novidade: um
+         convidado que instala a app a meio do passeio não abre com
+         cento e vinte fotografias por ver. */
+      const primeira = !grupo.vistoAte;
+      if (primeira) grupo.vistoAte = grupo.cursor || 1;
       guardarGrupo();
       aPedirGrupo = false;
       if (mudou) emitir();
+      if (!primeira && chegadas.length) aoChegar.forEach(function (fn) { fn(chegadas); });
     }).catch(function () {
       aPedirGrupo = false;
     });
@@ -656,6 +690,13 @@ window.Estado = (function () {
     return porHora.concat(outras);
   }
 
+  /* Com a app à vista, em qualquer ecrã, pergunta-se pelas novas do
+     grupo de quinze em quinze segundos: é o que acende o aviso. A
+     Galeria aberta pergunta mais vezes. */
+  setInterval(function () {
+    if (document.visibilityState === 'visible') sincronizarGrupo();
+  }, 15 * 1000);
+
   window.addEventListener('online', sincronizar);
   /* De volta à app, o que ficou por enviar tenta logo, sem esperar pela
      próxima tentativa marcada. */
@@ -698,6 +739,9 @@ window.Estado = (function () {
     sincronizar: sincronizar,
     pendentes: pendentes,
     sincronizarGrupo: sincronizarGrupo,
+    novasDoGrupo: novasDoGrupo,
+    marcarGrupoVisto: marcarGrupoVisto,
+    aoChegarFotos: aoChegarFotos,
     meuId: meuId,
     juntarFoto: juntarFoto,
     apagarFoto: apagarFoto,
