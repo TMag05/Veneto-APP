@@ -1133,10 +1133,20 @@ a { color: var(--verde); text-decoration: none; }
   color: var(--ottone);
 }
 .silhueta-escolha { margin-top: var(--esp-2); }
-/* O condutor e o co-piloto, em gravura: o fundo das partes é o do
-   cartão, para cada uma tapar a que está atrás nos dois temas. */
-.lugar__fundo { stroke: var(--istria); }
-.lugar__cheio { fill: var(--istria); stroke: currentColor; }
+/* O condutor e o co-piloto: a ilustração é uma máscara, e a cor é
+   a do texto — muda com o tema, como a das silhuetas. */
+.lugar {
+  display: block;
+  width: 100%;
+  aspect-ratio: 432 / 288;
+  background-color: currentColor;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
 .silhueta-opcao__nome { font-size: 15px; font-weight: 500; margin-top: var(--esp-1); }
 
 
