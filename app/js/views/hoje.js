@@ -403,10 +403,10 @@
           '</div>'
         : semItinerario('O itinerário está a ser preparado.')) +
 
-      (DADOS.carros.length
+      (Estado.participantesDoGrupo().length
         ? '<div class="faixa">' +
             '<div class="seccao-cabecalho"><h2 class="etiqueta">Quem vai</h2></div>' +
-            '<p class="corpo-editorial">A lista completa está nos participantes.</p>' +
+            '<p class="corpo-editorial">' + UI.plural(Estado.participantesDoGrupo().length, 'convidado já entrou', 'convidados já entraram') + ' na app.</p>' +
             '<a class="botao botao--texto" href="#/participantes">Ver os participantes &rsaquo;</a>' +
           '</div>'
         : '');
