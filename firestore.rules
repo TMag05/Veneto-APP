@@ -10,29 +10,37 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == uid;
     }
     
-    function isOrganizacao() {
-      return isAuthenticated() && (
-        get(/databases/$(database)/documents/contas/$(request.auth.uid)).data.papel == 'organizacao'
-      );
+    function naEquipa() {
+      return isAuthenticated()
+        && exists(/databases/$(database)/documents/equipa/$(request.auth.token.email));
     }
 
-    // O papel com que a conta se cria: convidado, ou organização só
+    // Organização é quem tem o papel no perfil e o email na equipa,
+    // as duas coisas: retirar o email da equipa tira logo os poderes,
+    // mesmo que o perfil fique para trás (29.09.2026).
+    function isOrganizacao() {
+      return isAuthenticated()
+        && get(/databases/$(database)/documents/contas/$(request.auth.uid)).data.papel == 'organizacao'
+        && naEquipa();
+    }
+
+    // O papel que uma conta pode ter: convidado, ou organização só
     // se o email da sessão estiver na equipa.
     function papelValido(papel) {
-      return papel == 'convidado'
-        || (papel == 'organizacao'
-            && exists(/databases/$(database)/documents/equipa/$(request.auth.token.email)));
+      return papel == 'convidado' || (papel == 'organizacao' && naEquipa());
     }
 
     // Contas de utilizadores e perfis. Quem é dono muda o nome, o
-    // carro e o lugar — nunca o papel: um convidado não se promove a
-    // organização (28.09.2026).
+    // carro e o lugar; o papel só passa a organização com o email na
+    // equipa — quem foi convidado antes de entrar para a equipa, ou
+    // saiu e voltou, entra pela porta da organização (29.09.2026).
     match /contas/{uid} {
       allow read: if isOwner(uid) || isOrganizacao();
       allow create: if isOwner(uid)
         && papelValido(request.resource.data.get('papel', 'convidado'));
       allow update: if isOwner(uid)
-        && request.resource.data.get('papel', 'convidado') == resource.data.get('papel', 'convidado');
+        && (request.resource.data.get('papel', 'convidado') == resource.data.get('papel', 'convidado')
+            || papelValido(request.resource.data.get('papel', 'convidado')));
       allow delete: if isOrganizacao();
     }
 
@@ -47,10 +55,12 @@ service cloud.firestore {
       allow delete: if isOwner(uid) || isOrganizacao();
     }
 
-    // Lista de emails que podem registar-se como organização
+    // Os emails que podem ter acesso de organização. Pergunta-se por
+    // um de cada vez sem sessão — a porta precisa de o saber antes de
+    // criar a conta —; a lista inteira, só a equipa a lê.
     match /equipa/{email} {
-      allow read: if true;
-      allow write: if isOrganizacao();
+      allow get: if true;
+      allow list, write: if isOrganizacao();
     }
 
     // Conteúdo / Edições do evento

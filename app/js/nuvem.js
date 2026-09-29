@@ -58,6 +58,14 @@ window.Nuvem = (function () {
        → { sessao, perfil, perfilPendente }
        Só para emails da equipa. O código só é pedido, e só
        serve, enquanto a equipa estiver vazia (pedeCodigo()).
+       Se o email já tiver conta e a palavra-passe for a dela,
+       entra como entrarOrganizacao.
+     entrarOrganizacao(email, senha, nome) → { sessao, perfil }
+       A porta da organização. Com o email na equipa, o perfil
+       passa a organização se não o era — criado antes como
+       convidado, ou apagado quando a pessoa saiu da equipa e
+       voltou. nome serve só se o servidor não tiver nenhum.
+     naEquipa(email)             → true se o email está na equipa
      recuperar(email)            → resolve sempre, exista a conta ou não
      renovar(sessao)             → sessão nova
      publicarPerfil(sessao, p)   → grava o perfil
@@ -112,15 +120,18 @@ window.Nuvem = (function () {
          escreve a sua; a organização lê e apaga todas. Quem é
          da organização diz-se por equipa/{email}: um perfil só
          pode ter papel 'organizacao' se existir esse documento
-         para o email do token.
+         para o email do token, e só vale enquanto existir.
        · Regras para equipa/{email}: get aberto a todos — a
          entrada precisa de saber se o email é da equipa antes
          de criar a conta —; list e escrita só para a equipa. A
          primeira entrada escreve-se à mão, na consola.
        · Uma Cloud Function em contas/{uid} onDelete que apaga
          o utilizador do Auth. O telemóvel não pode apagar a
-         conta de outra pessoa, e sem isto o email ficaria
-         preso a uma conta sem perfil.
+         conta de outra pessoa, e sem isto o email fica preso a
+         uma conta sem perfil. Na porta da organização não faz
+         falta — quem volta à equipa entra com a palavra-passe
+         antiga e o perfil refaz-se (entrarOrganizacao) —, mas
+         um convidado apagado continua a poder entrar.
      --------------------------------------------------------- */
 
   const AUTH = 'https://identitytoolkit.googleapis.com/v1/accounts:';
@@ -223,11 +234,10 @@ window.Nuvem = (function () {
     /* Pergunta-se primeiro se o email é da equipa: criar a conta
        e só depois descobrir que não é deixaria uma conta órfã. */
     criarContaOrganizacao: function (d) {
-      return pedir(firestore('equipa/' + encodeURIComponent(normalizar(d.email))), { method: 'GET' })
-        .catch(function (e) { throw e.codigo === 'nao-existe' ? erro('fora-da-equipa') : e; })
-        .then(function () {
-          return firebase.criarConta(Object.assign({}, d, { papel: 'organizacao' }));
-        });
+      return firebase.naEquipa(normalizar(d.email)).then(function (sim) {
+        if (!sim) throw erro('fora-da-equipa');
+        return firebase.criarConta(Object.assign({}, d, { papel: 'organizacao' }));
+      });
     },
 
     entrar: function (email, senha) {
@@ -307,6 +317,24 @@ window.Nuvem = (function () {
           const c = lista.find(function (x) { return x.email === email; });
           if (c) return firebase.apagarConta(sessao, c.uid);
         });
+    },
+
+    /* Um email de cada vez, sem sessão: a lista inteira só a
+       equipa a lê. */
+    naEquipa: function (email) {
+      return pedir(firestore('equipa/' + encodeURIComponent(email)) + '?key=' + CONFIG.apiKey, { method: 'GET' })
+        .then(function () { return true; })
+        .catch(function (e) { if (e.codigo === 'nao-existe') return false; throw e; });
+    },
+
+    /* As regras só deixam escrever o papel com o email na equipa. Um
+       convidado que passa a organização sai da lista de quem vai: a
+       organização viaja em carros próprios. */
+    tornarOrganizacao: function (sessao, perfil) {
+      return firebase.publicarPerfil(sessao, perfil).then(function () {
+        return pedir(firestore('participantes/' + sessao.uid), comSessao(sessao, 'DELETE'))
+          .catch(function () { /* não tinha cartão */ });
+      });
     }
   };
 
@@ -484,6 +512,21 @@ window.Nuvem = (function () {
         const c = porEmail(s, email);
         if (c) return simulado.apagarConta(sessao, c.uid);
       });
+    },
+
+    naEquipa: function (email) {
+      return demora().then(function () { return !!lerSimulado().equipa[email]; });
+    },
+
+    tornarOrganizacao: function (sessao, perfil) {
+      return demora().then(function () {
+        const s = lerSimulado();
+        const c = s.contas[sessao.uid];
+        if (!c) throw erro('conta-apagada');
+        if (!s.equipa[c.email]) throw erro('fora-da-equipa');
+        Object.assign(c, { nome: perfil.nome, modelo: '', funcao: '', papel: 'organizacao' });
+        gravarSimulado(s);
+      });
     }
   };
 
@@ -502,10 +545,37 @@ window.Nuvem = (function () {
     return servidor().entrar(email, senha);
   }
 
+  /* Um email da equipa que já tem conta é de um acesso de convidado,
+     ou de quem saiu da equipa e voltou. Com a palavra-passe dessa
+     conta é a mesma pessoa, e entra; com outra, o ecrã pede que
+     entre. */
   function criarContaOrganizacao(d) {
     if (!emailValido(normalizar(d.email))) return Promise.reject(erro('email-invalido'));
     if (String(d.senha || '').length < 6) return Promise.reject(erro('senha-curta'));
-    return servidor().criarContaOrganizacao(d);
+    return servidor().criarContaOrganizacao(d).catch(function (e) {
+      if (e.codigo !== 'email-usado') throw e;
+      return entrarOrganizacao(d.email, d.senha, d.nome).catch(function (e2) {
+        throw e2.codigo === 'credenciais' ? erro('email-usado') : e2;
+      });
+    });
+  }
+
+  /* A porta da organização pergunta sempre à equipa: é a equipa que
+     diz quem entra, não o perfil — que pode ter ficado para trás, ou
+     nunca ter sido de organização. */
+  function entrarOrganizacao(email, senha, nome) {
+    const e = normalizar(email);
+    return entrar(e, senha).then(function (r) {
+      return servidor().naEquipa(e).then(function (sim) {
+        if (!sim) throw erro('fora-da-equipa');
+        if (r.perfil.papel === 'organizacao') return r;
+        const perfil = perfilDe(r.sessao.uid,
+          { nome: r.perfil.nome || nome, email: e, papel: 'organizacao' }, r.perfil.criado);
+        return servidor().tornarOrganizacao(r.sessao, perfil).then(function () {
+          return { sessao: r.sessao, perfil: perfil };
+        });
+      });
+    });
   }
 
   function emailDaEquipa(sessao, email) {
@@ -866,6 +936,8 @@ window.Nuvem = (function () {
     criarContaOrganizacao: criarContaOrganizacao,
     pedeCodigo: function () { return servidor().pedeCodigo(); },
     entrar: entrar,
+    entrarOrganizacao: entrarOrganizacao,
+    naEquipa: function (email) { return servidor().naEquipa(normalizar(email)); },
     recuperar: recuperar,
     renovar: function (sessao) { return servidor().renovar(sessao); },
     publicarPerfil: function (sessao, perfil) { return servidor().publicarPerfil(sessao, perfil); },
