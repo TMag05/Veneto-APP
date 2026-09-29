@@ -353,8 +353,10 @@
     });
   }
 
+  /* O perfil de organização só se grava com o email confirmado: sem
+     ele, a pessoa ainda não tem acesso, mesmo que tenha começado. */
   function linhaEquipa(m) {
-    const conta = contasEquipa.find(function (c) { return c.email === m.email; });
+    const conta = contasEquipa.find(function (c) { return c.email === m.email && c.papel === 'organizacao'; });
     const propria = m.email === Estado.get().perfil.email;
     return '<div class="linha-org">' +
       '<div class="linha-org__corpo">' +
@@ -399,11 +401,11 @@
 
         '<div class="faixa">' +
           '<h2 class="etiqueta">Acrescentar à equipa</h2>' +
-          '<p class="corpo-ui silencioso" style="margin-top:8px">Com o email acrescentado, a pessoa cria o seu acesso na porta da organização, no fim da entrada.</p>' +
+          '<p class="corpo-ui silencioso" style="margin-top:8px">O email da empresa de cada pessoa. Ela cria o seu acesso na porta da organização e confirma-o com o link que lá recebe.</p>' +
           '<form id="form-equipa" class="pilha-2" style="margin-top:16px" novalidate>' +
             '<label class="campo">' +
               '<span class="campo__rotulo">Email</span>' +
-              '<input class="campo__entrada" name="email" type="email" inputmode="email" autocapitalize="off" spellcheck="false" placeholder="nome@exemplo.pt">' +
+              '<input class="campo__entrada" name="email" type="email" inputmode="email" autocapitalize="off" spellcheck="false" placeholder="nome@empresa.pt">' +
             '</label>' +
             '<button class="botao botao--secundario botao--largo" type="submit">' + Icone('juntar', 20) + 'Acrescentar</button>' +
             '<p class="meta" id="msg-equipa" role="alert"></p>' +
