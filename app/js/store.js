@@ -405,8 +405,18 @@ window.Estado = (function () {
   function verificarSessao() {
     if (!estado.autenticado || !estado.sessao || !navigator.onLine) return;
     /* Renova-se sempre: é o que faz saber que a conta ainda existe. */
-    sessaoValida(true).then(function () { publicarPendente(); publicarParticipante(); })
+    sessaoValida(true).then(function (s) { publicarPendente(); publicarParticipante(); confirmarEquipa(s); })
       .catch(function () { /* resolvido acima */ });
+  }
+
+  /* Quem sai da equipa perde a área da organização na próxima
+     ligação. As regras já lhe fecham a escrita; aqui fecha-se a
+     sessão, que o Auth, sozinho, deixaria aberta. */
+  function confirmarEquipa(s) {
+    if (estado.perfil.papel !== 'organizacao') return;
+    Nuvem.naEquipa(estado.perfil.email).then(function (continua) {
+      if (!continua && estado.sessao && estado.sessao.uid === s.uid) terminarSessao('fora-da-equipa');
+    }).catch(function () { /* fica para a próxima ligação */ });
   }
 
   /* ---------------------------------------------------------

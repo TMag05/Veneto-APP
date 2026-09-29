@@ -373,11 +373,10 @@ function fabrica(org) {
       Nuvem.criarContaOrganizacao({ nome: rascunho.nome.trim(), email: email, senha: rascunho.senha, codigo: rascunho.codigo })
         .then(entrou, falhou);
     } else if (modo === 'entrar' && org) {
-      /* Um acesso de convidado não abre esta porta. */
-      Nuvem.entrar(email, rascunho.senha).then(function (r) {
-        if (r.perfil.papel !== 'organizacao') throw Object.assign(new Error('fora-da-equipa'), { codigo: 'fora-da-equipa' });
-        entrou(r);
-      }).catch(falhou);
+      /* Quem abre esta porta é a equipa, não o acesso: um email fora
+         dela não passa, e um da equipa passa mesmo que o acesso tenha
+         sido de convidado. */
+      Nuvem.entrarOrganizacao(email, rascunho.senha, rascunho.nome.trim()).then(entrou, falhou);
     } else if (modo === 'criar') {
       Nuvem.criarConta({ nome: rascunho.nome.trim(), email: email, senha: rascunho.senha, modelo: rascunho.modelo, funcao: rascunho.funcao })
         .then(entrou, falhou);
