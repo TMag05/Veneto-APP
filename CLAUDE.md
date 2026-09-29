@@ -161,6 +161,8 @@ Enquanto não houver servidor, tudo isto está no `localStorage` do telemóvel d
 
 O código da organização (`2026`, `CODIGO_EQUIPA` em `js/nuvem.js`) só existe no servidor simulado e só serve enquanto a equipa estiver vazia: é o que deixa entrar a primeira pessoa. Com o Firebase, a primeira entrada de `equipa/{email}` escreve-se à mão na consola, e são as regras que decidem quem tem papel de organização.
 
+**A equipa tem um master** (29.09.2026): o email profissional do Tiago, com `master: true` no seu documento de `equipa`. Só o master acrescenta e retira pessoas da equipa; os outros veem a lista e o nome de quem a gere. O campo escreve-se na consola, nunca pela app — as regras não deixam ninguém fazer-se master nem retirar o master. O email não se escreve no repositório, que é público: vive só no Firestore. O Gmail do Tiago saiu da equipa no mesmo dia; o perfil antigo ficou, sem poderes, e apaga-se em Pessoas › Acessos.
+
 ---
 
 ## 9. O que é provisório

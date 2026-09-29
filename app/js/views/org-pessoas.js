@@ -331,6 +331,8 @@
      acesso na porta da organização, no fim da entrada; quem não
      está não passa. Retirar um email apaga o acesso que houver
      com ele, e a sessão desse telemóvel acaba na próxima ligação.
+     Acrescenta e retira só o master, que gere a equipa; os outros
+     veem a lista e sabem a quem pedir (29.09.2026).
      --------------------------------------------------------- */
 
   let equipa = null;
@@ -355,19 +357,56 @@
 
   /* O perfil de organização só se grava com o email confirmado: sem
      ele, a pessoa ainda não tem acesso, mesmo que tenha começado. */
+  function contaDe(m) {
+    return contasEquipa.find(function (c) { return c.email === m.email && c.papel === 'organizacao'; });
+  }
+
+  function souMaster() {
+    const eu = (equipa || []).find(function (m) { return m.email === Estado.get().perfil.email; });
+    return !!(eu && eu.master);
+  }
+
   function linhaEquipa(m) {
-    const conta = contasEquipa.find(function (c) { return c.email === m.email && c.papel === 'organizacao'; });
+    const conta = contaDe(m);
     const propria = m.email === Estado.get().perfil.email;
     return '<div class="linha-org">' +
       '<div class="linha-org__corpo">' +
         '<span class="titulo-ui" style="display:block">' + UI.h(conta && conta.nome ? conta.nome : m.email) + '</span>' +
         (conta && conta.nome ? '<span class="meta" style="display:block;margin-top:2px">' + UI.h(m.email) + '</span>' : '') +
         '<span class="meta" style="display:block;margin-top:2px">' +
-          (conta ? 'Acesso criado' : 'Ainda sem acesso') + (propria ? ' · este telemóvel' : '') + '</span>' +
+          (conta ? 'Acesso criado' : 'Ainda sem acesso') + (m.master ? ' · gere a equipa' : '') +
+          (propria ? ' · este telemóvel' : '') + '</span>' +
       '</div>' +
-      (propria ? '' :
+      (propria || m.master || !souMaster() ? '' :
         '<button class="botao-icone" type="button" data-acao="retirar" data-valor="' + UI.h(m.email) + '" ' +
           'aria-label="Retirar ' + UI.h(m.email) + ' da equipa">' + Icone('apagar', 20) + '</button>') +
+    '</div>';
+  }
+
+  /* Quem não gere a equipa sabe a quem pedir. */
+  function acrescentar() {
+    if (!equipa) return '';
+    if (!souMaster()) {
+      const master = equipa.find(function (m) { return m.master; });
+      const conta = master && contaDe(master);
+      return '<div class="faixa">' +
+        '<h2 class="etiqueta">Acrescentar à equipa</h2>' +
+        '<p class="corpo-ui silencioso" style="margin-top:8px">' +
+          (master ? 'Quem acrescenta e retira pessoas da equipa é ' + UI.h(conta && conta.nome ? conta.nome : master.email) + '.'
+                  : 'Quem acrescenta e retira pessoas da equipa é quem a gere.') + '</p>' +
+      '</div>';
+    }
+    return '<div class="faixa">' +
+      '<h2 class="etiqueta">Acrescentar à equipa</h2>' +
+      '<p class="corpo-ui silencioso" style="margin-top:8px">O email da empresa de cada pessoa. Ela cria o seu acesso na porta da organização e confirma-o com o link que lá recebe.</p>' +
+      '<form id="form-equipa" class="pilha-2" style="margin-top:16px" novalidate>' +
+        '<label class="campo">' +
+          '<span class="campo__rotulo">Email</span>' +
+          '<input class="campo__entrada" name="email" type="email" inputmode="email" autocapitalize="off" spellcheck="false" placeholder="nome@empresa.pt">' +
+        '</label>' +
+        '<button class="botao botao--secundario botao--largo" type="submit">' + Icone('juntar', 20) + 'Acrescentar</button>' +
+        '<p class="meta" id="msg-equipa" role="alert"></p>' +
+      '</form>' +
     '</div>';
   }
 
@@ -399,18 +438,7 @@
           lista +
         '</div>' +
 
-        '<div class="faixa">' +
-          '<h2 class="etiqueta">Acrescentar à equipa</h2>' +
-          '<p class="corpo-ui silencioso" style="margin-top:8px">O email da empresa de cada pessoa. Ela cria o seu acesso na porta da organização e confirma-o com o link que lá recebe.</p>' +
-          '<form id="form-equipa" class="pilha-2" style="margin-top:16px" novalidate>' +
-            '<label class="campo">' +
-              '<span class="campo__rotulo">Email</span>' +
-              '<input class="campo__entrada" name="email" type="email" inputmode="email" autocapitalize="off" spellcheck="false" placeholder="nome@empresa.pt">' +
-            '</label>' +
-            '<button class="botao botao--secundario botao--largo" type="submit">' + Icone('juntar', 20) + 'Acrescentar</button>' +
-            '<p class="meta" id="msg-equipa" role="alert"></p>' +
-          '</form>' +
-        '</div>' +
+        acrescentar() +
 
         '<div class="faixa">' +
           '<h2 class="etiqueta">A porta da organização</h2>' +
@@ -422,7 +450,9 @@
     },
     montar: function (el, p, chegada) {
       if (chegada) carregarEquipa();
+      /* Só o master tem o formulário. */
       const f = el.querySelector('#form-equipa');
+      if (!f) return;
       f.addEventListener('submit', function (e) {
         e.preventDefault();
         const campo = f.querySelector('[name="email"]');
