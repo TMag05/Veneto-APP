@@ -83,10 +83,13 @@ window.Nuvem = (function () {
      apagarConta(sessao, uid)    → apaga o perfil e a conta
 
      A equipa — os emails que podem ter acesso de organização:
-     equipa(sessao)              → [{ email, criado }]
+     equipa(sessao)              → [{ email, criado, master }]
      juntarEquipa(sessao, email) → acrescenta o email
      retirarEquipa(sessao, email)→ tira o email e apaga o acesso
                                    que houver com ele
+     Acrescentar e retirar é só do master, que gere a equipa. O
+     master marca-se na consola (master: true no documento da
+     equipa), nunca pela app, e não se retira por ela.
 
      Os erros rejeitam com um Error cujo .codigo é um de:
        email-usado, email-invalido, senha-curta, credenciais,
@@ -340,7 +343,8 @@ window.Nuvem = (function () {
           const f = doc.fields || {};
           return {
             email: f.email ? f.email.stringValue : decodeURIComponent(doc.name.split('/').pop()),
-            criado: f.criado ? Number(f.criado.integerValue) : 0
+            criado: f.criado ? Number(f.criado.integerValue) : 0,
+            master: !!(f.master && f.master.booleanValue)
           };
         });
       });
@@ -438,6 +442,12 @@ window.Nuvem = (function () {
       papel: c.papel === 'organizacao' ? 'organizacao' : 'convidado', criado: c.criado };
   }
 
+  /* Como as regras: só o master acrescenta e retira. */
+  function masterSimulado(s, sessao) {
+    const c = s.contas[sessao.uid];
+    return !!(c && s.equipa[c.email] && s.equipa[c.email].master);
+  }
+
   function porEmail(s, email) {
     const alvo = normalizar(email);
     return Object.keys(s.contas).map(function (k) { return s.contas[k]; })
@@ -461,18 +471,19 @@ window.Nuvem = (function () {
       });
     },
 
-    /* A primeira pessoa da equipa entra com o código; as outras
-       têm de lá estar antes, acrescentadas por quem já entrou. */
+    /* A primeira pessoa da equipa entra com o código e fica master;
+       as outras têm de lá estar antes, acrescentadas por ela. */
     criarContaOrganizacao: function (d) {
       const email = normalizar(d.email);
       const s = lerSimulado();
+      const primeira = !Object.keys(s.equipa).length;
       if (!s.equipa[email]) {
-        if (Object.keys(s.equipa).length) return demora().then(function () { throw erro('fora-da-equipa'); });
+        if (!primeira) return demora().then(function () { throw erro('fora-da-equipa'); });
         if (String(d.codigo || '').trim() !== CODIGO_EQUIPA) return demora().then(function () { throw erro('codigo-errado'); });
       }
       return simulado.criarConta(Object.assign({}, d, { papel: 'organizacao' })).then(function (r) {
         const t = lerSimulado();
-        t.equipa[email] = t.equipa[email] || { email: email, criado: Date.now() };
+        t.equipa[email] = t.equipa[email] || { email: email, criado: Date.now(), master: primeira };
         gravarSimulado(t);
         return r;
       });
@@ -543,7 +554,8 @@ window.Nuvem = (function () {
     juntarEquipa: function (sessao, email) {
       return demora().then(function () {
         const s = lerSimulado();
-        s.equipa[email] = s.equipa[email] || { email: email, criado: Date.now() };
+        if (!masterSimulado(s, sessao)) throw erro('outro');
+        s.equipa[email] = s.equipa[email] || { email: email, criado: Date.now(), master: false };
         gravarSimulado(s);
       });
     },
@@ -551,6 +563,7 @@ window.Nuvem = (function () {
     retirarEquipa: function (sessao, email) {
       return demora().then(function () {
         const s = lerSimulado();
+        if (!masterSimulado(s, sessao) || (s.equipa[email] && s.equipa[email].master)) throw erro('outro');
         delete s.equipa[email];
         gravarSimulado(s);
         const c = porEmail(s, email);

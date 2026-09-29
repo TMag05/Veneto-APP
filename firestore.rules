@@ -59,12 +59,23 @@ service cloud.firestore {
       allow delete: if isOwner(uid) || isOrganizacao();
     }
 
+    // Quem gere a equipa: o email com master no seu documento da
+    // equipa. O campo escreve-se na consola, nunca pela app (29.09.2026).
+    function ehMaster() {
+      return isOrganizacao()
+        && get(/databases/$(database)/documents/equipa/$(request.auth.token.email)).data.get('master', false) == true;
+    }
+
     // Os emails que podem ter acesso de organização. Pergunta-se por
     // um de cada vez sem sessão — a porta precisa de o saber antes de
-    // criar a conta —; a lista inteira, só a equipa a lê.
+    // criar a conta —; a lista inteira, só a equipa a lê. Acrescenta e
+    // retira pessoas só o master: ninguém se faz master pela app, e o
+    // master não se retira por ela.
     match /equipa/{email} {
       allow get: if true;
-      allow list, write: if isOrganizacao();
+      allow list: if isOrganizacao();
+      allow create: if ehMaster() && !request.resource.data.keys().hasAny(['master']);
+      allow delete: if ehMaster() && resource.data.get('master', false) != true;
     }
 
     // Conteúdo / Edições do evento
