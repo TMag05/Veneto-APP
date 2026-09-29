@@ -411,9 +411,12 @@ window.Estado = (function () {
 
   /* Quem sai da equipa perde a área da organização na próxima
      ligação. As regras já lhe fecham a escrita; aqui fecha-se a
-     sessão, que o Auth, sozinho, deixaria aberta. */
+     sessão, que o Auth, sozinho, deixaria aberta. O mesmo a quem
+     entrou antes de o email se confirmar (29.09.2026): volta à porta
+     da organização, que lhe manda o link. */
   function confirmarEquipa(s) {
     if (estado.perfil.papel !== 'organizacao') return;
+    if (!Nuvem.confirmado(s)) { terminarSessao('por-confirmar'); return; }
     Nuvem.naEquipa(estado.perfil.email).then(function (continua) {
       if (!continua && estado.sessao && estado.sessao.uid === s.uid) terminarSessao('fora-da-equipa');
     }).catch(function () { /* fica para a próxima ligação */ });

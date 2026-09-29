@@ -10,8 +10,12 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == uid;
     }
     
+    // O email da sessão está na equipa, e a pessoa provou que é dela:
+    // tocou no link que o Firebase lhe mandou. Sem isto, quem soubesse
+    // um email da equipa ainda sem acesso podia criá-lo (29.09.2026).
     function naEquipa() {
       return isAuthenticated()
+        && request.auth.token.email_verified == true
         && exists(/databases/$(database)/documents/equipa/$(request.auth.token.email));
     }
 

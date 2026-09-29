@@ -53,9 +53,12 @@ function confere(texto) {
 }
 
 function fabrica(org) {
-  /* 'criar' | 'entrar' | 'recuperar' | 'recuperado' */
+  /* 'porta' | 'criar' | 'entrar' | 'confirmar' | 'recuperar' | 'recuperado' */
   let modo = null;
   let rascunho = null;
+  /* A sessão de quem ainda não tocou no link do email: fica aqui,
+     e não no telemóvel, até o email estar confirmado. */
+  let pendente = null;
   let aEnviar = false;
   let mensagem = '';
   let senhaVisivel = false;
@@ -70,6 +73,7 @@ function fabrica(org) {
     'conta-apagada': 'Este acesso deixou de existir. Crie outro para continuar.',
     'fora-da-equipa': 'Este email não está na equipa da organização. Peça a quem já entrou que o acrescente.',
     'codigo-errado': 'O código da organização não está certo.',
+    'por-confirmar': 'Confirme o seu email para voltar à área da organização.',
     'outro': 'Não foi possível agora. Tente de novo dentro de momentos.'
   };
 
@@ -127,7 +131,7 @@ function fabrica(org) {
       '</div>' +
 
       '<div class="pilha-3">' + convite() +
-        ({ porta: formPorta, criar: formCriar, entrar: formEntrar, recuperar: formRecuperar, recuperado: recuperado })[modo]() +
+        ({ porta: formPorta, criar: formCriar, entrar: formEntrar, confirmar: formConfirmar, recuperar: formRecuperar, recuperado: recuperado })[modo]() +
       '</div>' +
 
       /* A outra porta, no fim e em texto: quem não é da equipa
@@ -241,7 +245,7 @@ function fabrica(org) {
     return '<form id="form-entrada" class="pilha-3" novalidate>' +
       cabeca('Criar acesso da organização', codigo
         ? 'É a primeira conta da equipa. As seguintes acrescentam-se lá dentro, em Pessoas.'
-        : 'O email tem de estar na equipa.') +
+        : 'Com o seu email da empresa, que tem de estar na equipa.') +
       '<label class="campo">' +
         '<span class="campo__rotulo">Nome</span>' +
         '<input class="campo__entrada" name="nome" autocomplete="name" required value="' + UI.h(rascunho.nome) + '" placeholder="Nome próprio e apelido">' +
@@ -263,7 +267,7 @@ function fabrica(org) {
   function formEntrar() {
     return '<form id="form-entrada" class="pilha-3" novalidate>' +
       (org
-        ? cabeca('Organização', 'Com o email e a palavra-passe da equipa.')
+        ? cabeca('Organização', 'Com o seu email da empresa e a sua palavra-passe.')
         : cabeca('Entrar', 'Com o email e a palavra-passe do seu acesso.')) +
       campoEmail() +
       campoSenha(false) +
@@ -271,6 +275,20 @@ function fabrica(org) {
       principal('Entrar', 'A entrar') +
       trocar('recuperar', 'Esqueci-me da palavra-passe') +
       trocar('criar', 'Primeira vez? Criar acesso') +
+    '</form>';
+  }
+
+  /* Cada pessoa da organização prova que o email é seu com o link
+     que o Firebase lhe manda. Só depois a área abre: até lá, as
+     regras não lhe dão nada. */
+  function formConfirmar() {
+    return '<form id="form-entrada" class="pilha-3" novalidate>' +
+      cabeca('Confirme o seu email',
+        'Enviámos um link para ' + UI.h(pendente.perfil.email) + '. Toque nele e volte aqui.') +
+      aviso() +
+      principal('Já confirmei', 'A verificar') +
+      '<button class="botao botao--texto" type="button" data-acao="reenviar" style="width:100%">Enviar outra vez</button>' +
+      trocar('entrar', 'Entrar com outro email') +
     '</form>';
   }
 
@@ -319,8 +337,21 @@ function fabrica(org) {
   /* A sessão fica no telemóvel; a app sai sozinha da entrada. */
   function entrou(r) {
     rascunho = null;
+    pendente = null;
     mensagem = '';
     Estado.iniciarSessao(r);
+  }
+
+  /* Da porta da organização vem-se já com o email confirmado, ou
+     com o link acabado de sair para o confirmar. */
+  function chegouOrg(r) {
+    if (!r.porConfirmar) { entrou(r); return; }
+    pendente = r;
+    modo = 'confirmar';
+    aEnviar = false;
+    mensagem = '';
+    rascunho.senha = '';
+    App.repintar();
   }
 
   /* O que se pode dizer sem perguntar ao servidor. */
@@ -329,6 +360,7 @@ function fabrica(org) {
       if (Date.now() < lerTentativas().ate) return 'Demasiadas tentativas. Espere um minuto e tente de novo.';
       return rascunho.porta ? '' : 'Falta a palavra-passe da organização.';
     }
+    if (modo === 'confirmar') return '';
     if (modo === 'criar' && !rascunho.nome.trim()) return 'Falta o nome.';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rascunho.email.trim())) return MENSAGENS['email-invalido'];
     if (modo === 'criar' && rascunho.senha.length < 6) return MENSAGENS['senha-curta'];
@@ -368,15 +400,26 @@ function fabrica(org) {
       return;
     }
 
+    if (modo === 'confirmar') {
+      Nuvem.jaConfirmou(pendente).then(function (r) {
+        if (!r.porConfirmar) { entrou(r); return; }
+        pendente = r;
+        aEnviar = false;
+        mensagem = 'O email ainda não está confirmado. Toque no link e tente de novo.';
+        App.repintar();
+      }, falhou);
+      return;
+    }
+
     const email = rascunho.email.trim();
     if (modo === 'criar' && org) {
       Nuvem.criarContaOrganizacao({ nome: rascunho.nome.trim(), email: email, senha: rascunho.senha, codigo: rascunho.codigo })
-        .then(entrou, falhou);
+        .then(chegouOrg, falhou);
     } else if (modo === 'entrar' && org) {
       /* Quem abre esta porta é a equipa, não o acesso: um email fora
          dela não passa, e um da equipa passa mesmo que o acesso tenha
          sido de convidado. */
-      Nuvem.entrarOrganizacao(email, rascunho.senha, rascunho.nome.trim()).then(entrou, falhou);
+      Nuvem.entrarOrganizacao(email, rascunho.senha, rascunho.nome.trim()).then(chegouOrg, falhou);
     } else if (modo === 'criar') {
       Nuvem.criarConta({ nome: rascunho.nome.trim(), email: email, senha: rascunho.senha, modelo: rascunho.modelo, funcao: rascunho.funcao })
         .then(entrou, falhou);
@@ -422,7 +465,22 @@ function fabrica(org) {
         modo = valor;
         mensagem = '';
         rascunho.senha = '';
+        pendente = null;
         App.repintar();
+      },
+      /* Uma hora depois o token já não serve para pedir o link: o
+         pedido leva o token renovado. */
+      reenviar: function () {
+        if (!pendente || aEnviar) return;
+        mensagem = '';
+        Nuvem.reenviarConfirmacao(pendente).then(function (sessao) {
+          pendente.sessao = sessao;
+          mensagem = 'Enviámos outro link. Se não chegar, veja o lixo eletrónico.';
+          App.repintar();
+        }, function (e) {
+          mensagem = MENSAGENS[e && e.codigo] || MENSAGENS.outro;
+          App.repintar();
+        });
       },
       /* Escolher o que faltava tira o aviso que o pedia. */
       modelo: function (valor) { rascunho.modelo = valor; mensagem = ''; App.repintar(); },

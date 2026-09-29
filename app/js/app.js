@@ -491,9 +491,10 @@
     /* A sessão acabou — a conta foi apagada, ou saiu-se: volta-se à entrada. */
     if (!semSessao(vistaAtual) && !Estado.get().autenticado) {
       UI.fecharFolha();
-      /* Quem saiu da área da organização volta à porta dela. */
+      /* Quem saiu da área da organização volta à porta dela, e quem
+         tem o email por confirmar também: é lá que se confirma. */
       const v = window.Vistas[vistaAtual];
-      irSubstituindo(v && v.area === 'organizacao' ? '#/organizacao' : '#/entrar');
+      irSubstituindo((v && v.area === 'organizacao') || Estado.get().aviso === 'por-confirmar' ? '#/organizacao' : '#/entrar');
       return;
     }
     desenhar();

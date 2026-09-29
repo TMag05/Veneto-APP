@@ -21,7 +21,7 @@ Depois: `http://localhost:8124`. Não há dependências, não há passo de build
 
 **Instalar no telemóvel:** abrir o endereço no Safari ou no Chrome e escolher *Adicionar ao ecrã principal*.
 
-**Entrar na área da organização:** o botão «Organização», no fim da entrada dos convidados, abre `#/organizacao` — email e palavra-passe, sem a pergunta do carro. Só cria acesso quem tiver o email na equipa (Pessoas › Equipa da organização); um acesso de convidado com um email da equipa passa a organização ao entrar por esta porta, e quem sai da equipa perde os poderes logo e a sessão na ligação seguinte. A primeira pessoa, com a equipa vazia, entra com o código `2026` (`CODIGO_EQUIPA` em `js/nuvem.js`); só existe no servidor simulado.
+**Entrar na área da organização:** o botão «Organização», no fim da entrada dos convidados, abre `#/organizacao` — a palavra-passe comum da porta e, depois, o email da empresa e a palavra-passe de cada pessoa, sem a pergunta do carro. A área só abre com o email confirmado pelo link que o Firebase manda. Só cria acesso quem tiver o email na equipa (Pessoas › Equipa da organização); um acesso de convidado com um email da equipa passa a organização ao entrar por esta porta, e quem sai da equipa perde os poderes logo e a sessão na ligação seguinte. A primeira pessoa, com a equipa vazia, entra com o código `2026` (`CODIGO_EQUIPA` em `js/nuvem.js`); só existe no servidor simulado.
 
 ---
 

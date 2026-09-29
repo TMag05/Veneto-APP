@@ -55,16 +55,26 @@ window.Nuvem = (function () {
        depois, com publicarPerfil.
      entrar(email, senha)        → { sessao, perfil }
      criarContaOrganizacao({ nome, email, senha, codigo })
-       → { sessao, perfil, perfilPendente }
+       → { sessao, perfil } ou { sessao, perfil, porConfirmar }
        Só para emails da equipa. O código só é pedido, e só
        serve, enquanto a equipa estiver vazia (pedeCodigo()).
        Se o email já tiver conta e a palavra-passe for a dela,
        entra como entrarOrganizacao.
-     entrarOrganizacao(email, senha, nome) → { sessao, perfil }
-       A porta da organização. Com o email na equipa, o perfil
-       passa a organização se não o era — criado antes como
-       convidado, ou apagado quando a pessoa saiu da equipa e
-       voltou. nome serve só se o servidor não tiver nenhum.
+     entrarOrganizacao(email, senha, nome)
+       → { sessao, perfil } ou { sessao, perfil, porConfirmar }
+       A porta da organização. Cada pessoa entra com o seu email
+       e a sua palavra-passe, e só passa com o email na equipa e
+       confirmado: tocou no link que o Firebase lhe mandou. Com
+       porConfirmar, o email do link acabou de sair e a sessão
+       ainda não serve — não se inicia. O perfil passa a
+       organização se não o era — criado antes como convidado,
+       ou apagado quando a pessoa saiu da equipa e voltou. nome
+       serve só se o servidor não tiver nenhum.
+     jaConfirmou(pendente)       → o mesmo, depois do link
+     reenviarConfirmacao(pendente)→ manda o link outra vez; resolve
+                                   com a sessão renovada
+     confirmado(sessao)          → true se o email da sessão está
+                                   confirmado
      naEquipa(email)             → true se o email está na equipa
      recuperar(email)            → resolve sempre, exista a conta ou não
      renovar(sessao)             → sessão nova
@@ -114,8 +124,10 @@ window.Nuvem = (function () {
      regras.
 
      Do lado do Firebase, falta configurar:
-       · Auth › Email/palavra-passe ligado, e o modelo do email
-         de recuperação em português.
+       · Auth › Email/palavra-passe ligado. Os emails de
+         recuperação e de confirmação do endereço pedem-se em
+         português de Portugal (X-Firebase-Locale); os modelos
+         veem-se em Auth › Modelos.
        · Regras do Firestore para contas/{uid}: cada pessoa lê e
          escreve a sua; a organização lê e apaga todas. Quem é
          da organização diz-se por equipa/{email}: um perfil só
@@ -168,12 +180,23 @@ window.Nuvem = (function () {
     });
   }
 
+  /* X-Firebase-Locale escolhe a língua dos emails que o Auth manda.
+     O Auth aceita-o de um browser; ao Storage não se manda. */
   function auth(acao, corpo) {
     return pedir(AUTH + acao + '?key=' + CONFIG.apiKey, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-Firebase-Locale': 'pt-PT' },
       body: JSON.stringify(corpo)
     });
+  }
+
+  /* O que o Auth diz da sessão vem no próprio token: é aí que as
+     regras o leem, e um token renovado traz o estado de agora. */
+  function reivindicacoes(sessao) {
+    try {
+      const b = sessao.idToken.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+      return JSON.parse(atob(b));
+    } catch (e) { return {}; }
   }
 
   function comSessao(sessao, metodo, corpo) {
@@ -220,8 +243,10 @@ window.Nuvem = (function () {
   }
 
   const firebase = {
+    /* O nome fica também no Auth: é de onde volta, se o perfil se
+       perder. */
     criarConta: function (d) {
-      return auth('signUp', { email: normalizar(d.email), password: d.senha, returnSecureToken: true })
+      return auth('signUp', { email: normalizar(d.email), password: d.senha, displayName: String(d.nome || '').trim(), returnSecureToken: true })
         .then(function (r) {
           const sessao = sessaoDe(r);
           const perfil = perfilDe(sessao.uid, d);
@@ -232,11 +257,16 @@ window.Nuvem = (function () {
     },
 
     /* Pergunta-se primeiro se o email é da equipa: criar a conta
-       e só depois descobrir que não é deixaria uma conta órfã. */
+       e só depois descobrir que não é deixaria uma conta órfã. O
+       perfil não se grava aqui: as regras só o deixam gravar
+       depois de o email estar confirmado. */
     criarContaOrganizacao: function (d) {
       return firebase.naEquipa(normalizar(d.email)).then(function (sim) {
         if (!sim) throw erro('fora-da-equipa');
-        return firebase.criarConta(Object.assign({}, d, { papel: 'organizacao' }));
+        return auth('signUp', { email: normalizar(d.email), password: d.senha, displayName: String(d.nome || '').trim(), returnSecureToken: true });
+      }).then(function (r) {
+        const sessao = sessaoDe(r);
+        return { sessao: sessao, perfil: perfilDe(sessao.uid, Object.assign({}, d, { papel: 'organizacao' })) };
       });
     },
 
@@ -246,9 +276,23 @@ window.Nuvem = (function () {
           const sessao = sessaoDe(r);
           return pedir(firestore('contas/' + sessao.uid), comSessao(sessao, 'GET'))
             .then(deDocumento)
-            .catch(function () { return perfilDe(sessao.uid, { email: email }); })
+            .catch(function () { return perfilDe(sessao.uid, { email: email, nome: r.displayName }); })
             .then(function (perfil) { return { sessao: sessao, perfil: perfil }; });
         });
+    },
+
+    /* O perfil guardado, ou null se não houver. */
+    perfil: function (sessao) {
+      return pedir(firestore('contas/' + sessao.uid), comSessao(sessao, 'GET'))
+        .then(deDocumento)
+        .catch(function (e) { if (e.codigo === 'nao-existe') return null; throw e; });
+    },
+
+    confirmado: function (sessao) { return reivindicacoes(sessao).email_verified === true; },
+
+    /* O Firebase manda ao endereço da conta um link que o confirma. */
+    pedirConfirmacao: function (sessao) {
+      return auth('sendOobCode', { requestType: 'VERIFY_EMAIL', idToken: sessao.idToken });
     },
 
     recuperar: function (email) {
@@ -518,6 +562,18 @@ window.Nuvem = (function () {
       return demora().then(function () { return !!lerSimulado().equipa[email]; });
     },
 
+    perfil: function (sessao) {
+      return demora().then(function () {
+        const c = lerSimulado().contas[sessao.uid];
+        return c ? semSegredos(c) : null;
+      });
+    },
+
+    /* Sem servidor não sai email nenhum: o endereço dá-se por
+       confirmado. */
+    confirmado: function () { return true; },
+    pedirConfirmacao: function () { return demora(); },
+
     tornarOrganizacao: function (sessao, perfil) {
       return demora().then(function () {
         const s = lerSimulado();
@@ -550,31 +606,58 @@ window.Nuvem = (function () {
      conta é a mesma pessoa, e entra; com outra, o ecrã pede que
      entre. */
   function criarContaOrganizacao(d) {
-    if (!emailValido(normalizar(d.email))) return Promise.reject(erro('email-invalido'));
+    const e = normalizar(d.email);
+    if (!emailValido(e)) return Promise.reject(erro('email-invalido'));
     if (String(d.senha || '').length < 6) return Promise.reject(erro('senha-curta'));
-    return servidor().criarContaOrganizacao(d).catch(function (e) {
-      if (e.codigo !== 'email-usado') throw e;
-      return entrarOrganizacao(d.email, d.senha, d.nome).catch(function (e2) {
-        throw e2.codigo === 'credenciais' ? erro('email-usado') : e2;
+    return servidor().criarContaOrganizacao(d).then(function (r) {
+      return abrirOrganizacao(r.sessao, e, d.nome).then(pedirSeFaltar);
+    }, function (x) {
+      if (x.codigo !== 'email-usado') throw x;
+      return entrarOrganizacao(e, d.senha, d.nome).catch(function (x2) {
+        throw x2.codigo === 'credenciais' ? erro('email-usado') : x2;
       });
     });
   }
 
-  /* A porta da organização pergunta sempre à equipa: é a equipa que
-     diz quem entra, não o perfil — que pode ter ficado para trás, ou
-     nunca ter sido de organização. */
   function entrarOrganizacao(email, senha, nome) {
     const e = normalizar(email);
     return entrar(e, senha).then(function (r) {
-      return servidor().naEquipa(e).then(function (sim) {
-        if (!sim) throw erro('fora-da-equipa');
-        if (r.perfil.papel === 'organizacao') return r;
-        const perfil = perfilDe(r.sessao.uid,
-          { nome: r.perfil.nome || nome, email: e, papel: 'organizacao' }, r.perfil.criado);
-        return servidor().tornarOrganizacao(r.sessao, perfil).then(function () {
-          return { sessao: r.sessao, perfil: perfil };
+      return abrirOrganizacao(r.sessao, e, r.perfil.nome || nome);
+    }).then(pedirSeFaltar);
+  }
+
+  /* A porta da organização pergunta sempre à equipa: é a equipa que
+     diz quem entra, não o perfil — que pode ter ficado para trás, ou
+     nunca ter sido de organização. E cada pessoa prova que o email é
+     seu antes de passar: as regras não lhe dão nada até lá. */
+  function abrirOrganizacao(sessao, email, nome) {
+    return servidor().naEquipa(email).then(function (sim) {
+      if (!sim) throw erro('fora-da-equipa');
+      const provisorio = perfilDe(sessao.uid, { nome: nome, email: email, papel: 'organizacao' });
+      if (!servidor().confirmado(sessao)) return { sessao: sessao, perfil: provisorio, porConfirmar: true };
+      return servidor().perfil(sessao).then(function (p) {
+        if (p && p.papel === 'organizacao') return { sessao: sessao, perfil: p };
+        const perfil = perfilDe(sessao.uid,
+          { nome: (p && p.nome) || nome, email: email, papel: 'organizacao' }, p && p.criado);
+        return servidor().tornarOrganizacao(sessao, perfil).then(function () {
+          return { sessao: sessao, perfil: perfil };
         });
       });
+    });
+  }
+
+  /* O link sai ao criar e ao entrar, nunca ao perguntar se já foi
+     tocado. Se não sair, o ecrã tem «Enviar outra vez». */
+  function pedirSeFaltar(r) {
+    if (!r.porConfirmar) return r;
+    return servidor().pedirConfirmacao(r.sessao).then(function () { return r; }, function () { return r; });
+  }
+
+  /* Depois do link: o token renova-se, e o novo já diz que o email
+     está confirmado. */
+  function jaConfirmou(pendente) {
+    return servidor().renovar(pendente.sessao).then(function (sessao) {
+      return abrirOrganizacao(sessao, pendente.perfil.email, pendente.perfil.nome);
     });
   }
 
@@ -937,6 +1020,13 @@ window.Nuvem = (function () {
     pedeCodigo: function () { return servidor().pedeCodigo(); },
     entrar: entrar,
     entrarOrganizacao: entrarOrganizacao,
+    jaConfirmou: jaConfirmou,
+    reenviarConfirmacao: function (pendente) {
+      return servidor().renovar(pendente.sessao).then(function (sessao) {
+        return servidor().pedirConfirmacao(sessao).then(function () { return sessao; });
+      });
+    },
+    confirmado: function (sessao) { return servidor().confirmado(sessao); },
     naEquipa: function (email) { return servidor().naEquipa(normalizar(email)); },
     recuperar: recuperar,
     renovar: function (sessao) { return servidor().renovar(sessao); },
