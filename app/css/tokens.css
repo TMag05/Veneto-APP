@@ -84,6 +84,10 @@
   --estrada-escrita-media: rgba(251, 248, 242, 0.66);
   --estrada-grelha: rgba(251, 248, 242, 0.10);
 
+  /* O visor das fotografias, com as barras escondidas: negro nos dois
+     temas, como na galeria do telemóvel. */
+  --visor-negro: #000000;
+
   /* Espessura do traço de uma estrada. Não escala com o desenho —
      vector-effect segura-a em pixels — para o mesmo traçado se ler
      grande numa capa e pequeno numa lista. */
