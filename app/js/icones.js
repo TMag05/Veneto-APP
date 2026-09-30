@@ -10,6 +10,7 @@ window.Icone = (function () {
     mapa: '<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/>',
     galeria: '<path d="M3 7h4l1.5-2h7L17 7h4v13H3z"/><path d="M12 17a4 4 0 100-8 4 4 0 000 8z"/>',
     mais: '<path d="M4 7h16M4 12h16M4 17h10"/>',
+    info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
     seta: '<path d="M9 5l7 7-7 7"/>',
     voltar: '<path d="M15 5l-7 7 7 7"/>',
     externo: '<path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v6H4V6h6"/>',

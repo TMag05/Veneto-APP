@@ -9,6 +9,8 @@
 
   let filtro = 'todos';
   let vigia = null;
+  /* A última fotografia vista no visor: a grelha volta a ela. */
+  let focar = '';
 
   /* O nome de quem a tirou, para quem lê o ecrã. A grelha é só das
      fotografias: o carro e o lugar estão na página de cada uma. */
@@ -98,6 +100,12 @@
 
     montar: function (el, p, chegada) {
       Fotos.pintar(el);
+      /* De volta do visor, a grelha abre onde está a última que se viu. */
+      if (chegada && focar) {
+        const alvo = el.querySelector('[href="#/foto/' + encodeURIComponent(focar) + '"]');
+        if (alvo) alvo.scrollIntoView({ block: 'center' });
+        focar = '';
+      }
       /* O que está na grelha já foi visto: o número do separador apaga-se. */
       Estado.marcarGrupoVisto();
       /* À chegada, pede as novas do grupo; aberta, volta a pedir de
@@ -143,6 +151,11 @@
       Fotos.libertarTodos();
       if (vigia) { clearInterval(vigia); vigia = null; }
     },
+
+    /* O visor desliza pela mesma lista que a grelha mostra, com o
+       mesmo filtro, e diz-lhe a que fotografia voltar. */
+    lista: lista,
+    focar: function (id) { focar = id; },
 
     acoes: {
       filtrar: function (id) { filtro = id; App.repintar(); },

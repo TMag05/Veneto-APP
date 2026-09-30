@@ -255,6 +255,9 @@
   function desenhar(chegada) {
     const vista = window.Vistas[vistaAtual];
     if (!vista) return;
+    /* Uma vista viva — o visor das fotografias, a meio de um gesto —
+       pode dispensar a repintura que o estado pede. */
+    if (chegada !== true && vista.repintar && vista.repintar(elEcra, paramsAtuais) === false) return;
 
     elApp.hidden = false;
     elEcra.innerHTML = vista.html(paramsAtuais) || '';

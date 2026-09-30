@@ -1010,31 +1010,95 @@ a { color: var(--verde); text-decoration: none; }
    a saltar para dentro de um buraco cinzento.
    --------------------------------------------------------- */
 
-.foto-ecra {
-  position: relative;
-  margin: var(--esp-1) var(--margem) 0;
-  border-radius: var(--raio-cartao);
+/* O visor: a fotografia a ecrã inteiro, como na galeria do iPhone.
+   Com as barras à vista, o fundo é o do tema; escondidas, é negro. */
+.visor {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
   overflow: hidden;
-  background: var(--intonaco);
-  min-height: 200px;
+  touch-action: none;
+  overscroll-behavior: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  --visor-fecho: 1;
 }
-.foto-ecra__base {
+.visor__fundo {
+  position: absolute;
+  inset: 0;
+  background: var(--calce);
+  opacity: var(--visor-fecho);
+  transition: background-color var(--transicao);
+}
+.visor[data-interface="nao"] .visor__fundo { background: var(--visor-negro); }
+.visor__palco, .visor__trilho { position: absolute; inset: 0; }
+.visor__folha { position: absolute; inset: 0; overflow: hidden; will-change: transform; }
+.visor__zoom { position: absolute; inset: 0; transform-origin: 50% 50%; will-change: transform; }
+.visor__img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: contain;
+  pointer-events: none;
 }
-.foto-ecra__vista {
-  position: relative;
-  display: block;
-  width: 100%;
-  max-height: 68dvh;
-  object-fit: contain;
-  opacity: 0;
+.visor__img--vista { opacity: 0; transition: opacity var(--transicao); }
+.visor__img--vista[data-pronta="sim"] { opacity: 1; }
+
+.visor__topo, .visor__base {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  background: var(--chapa);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  color: var(--inchiostro);
   transition: opacity var(--transicao);
 }
-.foto-ecra__vista[data-pronta="sim"] { opacity: 1; }
+.visor__topo {
+  top: 0;
+  gap: var(--esp-1);
+  padding: calc(env(safe-area-inset-top) + 4px) var(--esp-1) 6px;
+}
+.visor__base {
+  bottom: 0;
+  justify-content: space-around;
+  padding: 6px var(--esp-1) calc(env(safe-area-inset-bottom) + 6px);
+}
+.visor__titulo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.visor__titulo span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.visor__contador { min-width: 44px; text-align: right; padding-right: var(--esp-1); }
+.visor__base [hidden], .visor__seta[hidden] { display: none; }
+
+/* No computador, as setas ao lado; no telemóvel, desliza-se. */
+.visor__seta {
+  position: absolute;
+  top: 50%;
+  margin-top: -22px;
+  display: none;
+  background: var(--chapa);
+  color: var(--inchiostro);
+  border-radius: var(--raio-pill);
+  transition: opacity var(--transicao);
+}
+.visor__seta--anterior { left: var(--esp-2); }
+.visor__seta--seguinte { right: var(--esp-2); }
+@media (hover: hover) and (pointer: fine) {
+  .visor__seta:not([hidden]) { display: grid; }
+}
+.visor[data-interface="nao"] .visor__topo,
+.visor[data-interface="nao"] .visor__base,
+.visor[data-interface="nao"] .visor__seta { opacity: 0; pointer-events: none; }
 
 /* Quem tirou a fotografia: o carro a traço e o lugar no carro, lado a
    lado e à mesma altura, e por baixo o nome. */
