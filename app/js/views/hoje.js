@@ -202,10 +202,13 @@
     const m = i >= 0 ? dia.momentos[i] : null;
     const s = i >= 0 ? dia.momentos[i + 1] : null;
 
+    const tempo = Previsao.cartao();
+
     return '<div class="hoje-dia">' +
       '<div class="hoje-dia__fundo" style="background-image:' + UI.imagemDe(imagemDoMomento(dia, i), 0.46) + '"></div>' +
 
-      '<div class="hoje-dia__abertura">' +
+      '<div class="hoje-dia__abertura' + (tempo ? ' hoje-dia__abertura--tempo' : '') + '">' +
+        tempo +
         '<p class="hoje-dia__data">' + UI.h([dia.etiqueta, dia.data ? UI.dataCurta(dia.data) : ''].filter(Boolean).join(' · ')) + '</p>' +
         '<h1 class="hoje-dia__titulo">' + UI.h(dia.titulo || 'Etapa ' + dia.numero) + '</h1>' +
       '</div>' +
@@ -238,10 +241,12 @@
     '</div>';
   }
 
-  /* antes: o que vai à frente da data — «Amanhã», no ecrã da noite. */
-  function capaDia(dia, antes) {
+  /* antes: o que vai à frente da data — «Amanhã», no ecrã da noite.
+     topo: o que assenta no canto de cima — o tempo, no Hoje. */
+  function capaDia(dia, antes, topo) {
     return '<div class="capa">' +
       UI.foto(dia.imagem, 'foto--32 capa__imagem') +
+      (topo || '') +
       '<div class="capa__texto">' +
         '<p class="capa__data">' + UI.h([antes, dia.etiqueta, dia.data ? UI.dataLonga(dia.data) : ''].filter(Boolean).join(' · ')) + '</p>' +
         '<h1 class="capa-titulo">' + UI.h(dia.titulo || 'Etapa ' + dia.numero) + '</h1>' +
@@ -318,7 +323,7 @@
      --------------------------------------------------------- */
 
   function amanhaHtml(dia) {
-    return capaDia(dia, 'Amanhã') +
+    return capaDia(dia, 'Amanhã', Previsao.cartao()) +
       (dia.resumo ? '<div class="faixa"><p class="corpo-editorial">' + UI.h(dia.resumo) + '</p></div>' : '') +
       '<div class="faixa">' + meteo(dia) + '</div>' +
       '<div class="faixa">' + blocos(dia, false) + '</div>' +
@@ -357,6 +362,8 @@
     return '' +
       '<div class="capa">' +
         UI.foto({ variante: 'manha', semente: 'abertura' }, 'foto--32 capa__imagem') +
+        /* Na véspera, a partir das 19:00: o tempo do primeiro dia. */
+        Previsao.cartao() +
         '<div class="capa__texto">' +
           '<p class="capa__data">' + UI.intervaloEvento() + '</p>' +
           '<h1 class="capa-titulo">' + UI.h(DADOS.evento.nome || 'Passeio') + '</h1>' +
