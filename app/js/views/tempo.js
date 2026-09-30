@@ -2,10 +2,10 @@
    O tempo — o cartão do Hoje e a página de detalhe
    No canto superior direito do Hoje, sobre a fotografia, o
    resumo: o céu, a máxima, a mínima e a chuva prevista, uma
-   linha por zona quando as zonas diferem. Tocar abre #/tempo,
-   com o vento, a sensação térmica e a humidade de cada uma.
-   Até às 19:00 é só hoje; daí para a frente, hoje e amanhã
-   (30.09.2026). A chuva diz-se em milímetros: o MET Norway, que
+   linha por zona quando as zonas diferem. Até às 19:00 é só
+   hoje; daí para a frente, hoje e amanhã. Tocar abre #/tempo:
+   todos os dias que faltam, por local, com o vento, a sensação
+   térmica e a humidade de cada um (30.09.2026). A chuva diz-se em milímetros: o MET Norway, que
    é a fonte, não dá a probabilidade fora dos países nórdicos.
    ========================================================= */
 
@@ -39,10 +39,6 @@
     return !numero(n) || n < 0.1 ? 'Sem chuva prevista' : mm(n) + ' previstos';
   }
 
-  function vento(v) {
-    if (!numero(v.vento)) return '—';
-    return v.vento + ' km/h' + (RUMOS[v.rumo] ? ', de ' + RUMOS[v.rumo] : '');
-  }
 
   function sensacao(v) {
     if (!numero(v.sensMin) || !numero(v.sensMax)) return '—';
@@ -112,6 +108,8 @@
      O detalhe — #/tempo
      --------------------------------------------------------- */
 
+  /* Um local: o céu, a máxima e a mínima; por baixo, numa fila, a
+     chuva, o vento, a sensação térmica e a humidade. */
   function zona(l) {
     const v = l.valores;
     return '<div class="tempo-zona">' +
@@ -127,19 +125,26 @@
         '</span>' +
       '</div>' +
       '<dl class="tempo-zona__dados num">' +
-        '<div><dt>Chuva</dt><dd>' + chuvaPorExtenso(v.chuva) + '</dd></div>' +
-        '<div><dt>Vento</dt><dd>' + vento(v) + '</dd></div>' +
-        '<div><dt>Sensação térmica</dt><dd>' + sensacao(v) + '</dd></div>' +
+        '<div><dt>Chuva</dt><dd>' + mm(v.chuva) + '</dd></div>' +
+        '<div><dt>Vento</dt><dd>' + (numero(v.vento) ? v.vento + ' km/h' : '—') +
+          (RUMOS[v.rumo] ? '<span class="tempo-zona__rumo">de ' + RUMOS[v.rumo] + '</span>' : '') + '</dd></div>' +
+        '<div><dt>Sensação</dt><dd>' + sensacao(v) + '</dd></div>' +
         '<div><dt>Humidade</dt><dd>' + (numero(v.humidade) ? v.humidade + '%' : '—') + '</dd></div>' +
       '</dl>' +
     '</div>';
+  }
+
+  /* «Hoje · Dia 2 · 2 de outubro». O número e a data de um dia estão
+     sempre à vista, mesmo por revelar. */
+  function cabecalhoDia(d) {
+    return [d.rotulo, d.dia && d.dia.etiqueta, UI.dataCurta(d.data)].filter(Boolean).join(' · ');
   }
 
   Vistas.tempo = {
     nav: 'hoje',
     cabecalho: { voltar: '#/hoje', titulo: 'O tempo' },
     html: function () {
-      const dias = Tempo.dias();
+      const dias = Tempo.todos();
       const feito = Tempo.atualizado();
       return '<div class="faixa" style="padding-top:24px">' +
           '<h1 class="titulo-editorial">O tempo</h1>' +
@@ -147,12 +152,12 @@
         (dias.length
           ? dias.map(function (d) {
               return '<div class="faixa">' +
-                '<div class="seccao-cabecalho"><h2 class="etiqueta">' + d.rotulo + ' · ' + UI.dataCurta(d.data) + '</h2></div>' +
+                '<div class="seccao-cabecalho"><h2 class="etiqueta">' + UI.h(cabecalhoDia(d)) + '</h2></div>' +
                 '<div class="pilha-2">' + d.linhas.map(zona).join('') + '</div>' +
               '</div>';
             }).join('') +
             '<div class="faixa">' +
-              '<p class="meta">Vento e humidade das 08:00 às 20:00. ' +
+              '<p class="meta">Sensação térmica do dia inteiro; vento e humidade das 08:00 às 20:00. ' +
                 'Previsão do MET Norway' + (feito ? ', atualizada ' + quando(feito) : '') + '.</p>' +
             '</div>'
           : '<div class="faixa">' +
