@@ -1528,9 +1528,9 @@ a { color: var(--verde); text-decoration: none; }
 .capa > .tempo { align-self: flex-end; margin: -8px -8px auto 0; }
 .capa > .tempo + .capa__texto { margin-top: var(--esp-3); }
 
-/* O detalhe — uma zona por cartão. */
+/* O detalhe — todos os dias, um local por cartão. */
 .tempo-zona {
-  padding: var(--esp-3);
+  padding: var(--esp-2) 20px 20px;
   border-radius: var(--raio-cartao);
   background: var(--istria);
   box-shadow: var(--sombra-cartao);
@@ -1543,12 +1543,13 @@ a { color: var(--verde); text-decoration: none; }
 .tempo-zona__min { font-size: 19px; line-height: 1; color: var(--inchiostro-medio); }
 .tempo-zona__dados {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--esp-2);
-  margin: var(--esp-3) 0 0;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--esp-1);
+  margin: var(--esp-2) 0 0;
 }
 .tempo-zona__dados dt { font-size: 12px; line-height: 1.4; color: var(--inchiostro-chiaro); }
-.tempo-zona__dados dd { margin: 2px 0 0; font-size: 16px; line-height: 1.4; }
+.tempo-zona__dados dd { margin: 2px 0 0; font-size: 15px; line-height: 1.35; }
+.tempo-zona__rumo { display: block; font-size: 12px; color: var(--inchiostro-chiaro); }
 
 
 /* ---------------------------------------------------------

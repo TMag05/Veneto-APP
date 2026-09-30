@@ -1,7 +1,8 @@
 /* =========================================================
    O tempo
-   A previsão de hoje e, a partir das 19:00, a de amanhã, por
-   zonas (30.09.2026). Vem do MET Norway pela publicação, que a
+   No Hoje, a previsão de hoje e, a partir das 19:00, a de
+   amanhã, por zonas; no detalhe, a de todos os dias que faltam,
+   por local (30.09.2026). Vem do MET Norway pela publicação, que a
    grava em tempo.json de hora a hora (ferramentas/tempo.js): o
    telemóvel pede-a ao sítio de onde vem a própria app e a mais
    ninguém. Guarda-se aqui, para se ver sem rede.
@@ -94,18 +95,21 @@ window.Tempo = (function () {
 
   function numero(x) { return typeof x === 'number' && isFinite(x); }
 
-  /* As linhas de um dia: { nome, curto, altitude, valores }. Uma só
-     linha, se as zonas não diferem — e então sem nome, porque é o
-     dia inteiro. Por revelar, as zonas juntam-se primeiro pela
+  /* As linhas de um dia: { nome, curto, altitude, valores }. No
+     resumo, uma só linha se as zonas não diferem — e então sem nome,
+     porque é o dia inteiro. No detalhe (porLocal), uma linha por
+     zona, sempre com nome. Por revelar, as zonas juntam-se pela
      altitude, e o nome é o da altitude. */
-  function linhas(data) {
+  function linhas(data, porLocal) {
     if (!dados || !dados.dias[data]) return [];
     const lista = dados.dias[data].filter(function (r) { return dados.zonas[r.zona]; });
     const dia = DADOS.dias.find(function (d) { return d.data === data; });
     const aberto = !dia || Estado.diaVisivel(dia);
 
     let grupos = [];
-    if (aberto) {
+    if (aberto && porLocal) {
+      grupos = lista.map(function (r) { return [r]; });
+    } else if (aberto) {
       lista.forEach(function (r) {
         const g = grupos.find(function (x) { return x.every(function (m) { return !diferentes(m, r); }); });
         if (g) g.push(r); else grupos.push([r]);
@@ -114,10 +118,10 @@ window.Tempo = (function () {
       const altos = lista.filter(function (r) { return banda(r) === 'alto'; });
       const baixos = lista.filter(function (r) { return banda(r) === 'baixo'; });
       grupos = [baixos, altos].filter(function (g) { return g.length; });
-      if (grupos.length === 2 && !diferentes(juntar(grupos[0]), juntar(grupos[1]))) grupos = [lista];
+      if (!porLocal && grupos.length === 2 && !diferentes(juntar(grupos[0]), juntar(grupos[1]))) grupos = [lista];
     }
 
-    const sozinho = grupos.length === 1;
+    const sozinho = !porLocal && grupos.length === 1;
     return grupos.map(function (g) {
       const zonas = g.map(function (r) { return dados.zonas[r.zona]; });
       let nome = '';
@@ -140,19 +144,37 @@ window.Tempo = (function () {
     });
   }
 
-  /* Os dias a mostrar agora: hoje, se for dia do passeio, e amanhã a
-     partir das 19:00. Cada um com as suas linhas. */
-  function dias() {
-    if (!dados) return [];
+  function hojeEAmanha() {
     const agora = Estado.agora();
-    const hoje = Estado.chave(agora);
     const d = new Date(agora);
     d.setDate(d.getDate() + 1);
-    const amanha = Estado.chave(d);
-    const lista = [{ data: hoje, rotulo: 'Hoje' }];
-    if (agora.getHours() >= HORA_AMANHA) lista.push({ data: amanha, rotulo: 'Amanhã' });
+    return { agora: agora, hoje: Estado.chave(agora), amanha: Estado.chave(d) };
+  }
+
+  /* Os dias do resumo, no Hoje: hoje, se for dia do passeio, e amanhã
+     a partir das 19:00. Cada um com as suas linhas. */
+  function dias() {
+    if (!dados) return [];
+    const h = hojeEAmanha();
+    const lista = [{ data: h.hoje, rotulo: 'Hoje' }];
+    if (h.agora.getHours() >= HORA_AMANHA) lista.push({ data: h.amanha, rotulo: 'Amanhã' });
     return lista.map(function (x) {
       return Object.assign(x, { linhas: linhas(x.data) });
+    }).filter(function (x) { return x.linhas.length; });
+  }
+
+  /* Os dias do detalhe: todos os que ainda faltam do passeio, cada um
+     com uma linha por local (30.09.2026). */
+  function todos() {
+    if (!dados) return [];
+    const h = hojeEAmanha();
+    return Object.keys(dados.dias).filter(function (data) { return data >= h.hoje; }).sort().map(function (data) {
+      return {
+        data: data,
+        rotulo: data === h.hoje ? 'Hoje' : data === h.amanha ? 'Amanhã' : '',
+        dia: DADOS.dias.find(function (d) { return d.data === data; }) || null,
+        linhas: linhas(data, true)
+      };
     }).filter(function (x) { return x.linhas.length; });
   }
 
@@ -176,6 +198,7 @@ window.Tempo = (function () {
   return {
     atualizar: atualizar,
     dias: dias,
+    todos: todos,
     momento: momento,
     atualizado: atualizado,
     fonte: function () { return dados ? dados.fonte || '' : ''; }
