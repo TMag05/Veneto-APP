@@ -3,7 +3,8 @@
    No canto superior direito do Hoje, sobre a fotografia, o
    resumo: o céu, a máxima, a mínima e a chuva prevista, uma
    linha por zona quando as zonas diferem. Até às 19:00 é só
-   hoje; daí para a frente, hoje e amanhã. Tocar abre #/tempo:
+   hoje; daí para a frente, hoje e amanhã. Por baixo, a linha dos
+   dias, com a máxima e a mínima de cada um. Tocar abre #/tempo:
    todos os dias que faltam, por local, com o vento, a sensação
    térmica e a humidade de cada um (30.09.2026). A chuva diz-se em milímetros: o MET Norway, que
    é a fonte, não dá a probabilidade fora dos países nórdicos.
@@ -77,7 +78,42 @@
         return (l.nome ? l.nome + ', ' : '') + (CEU[v.simbolo] || '').toLowerCase() +
           ', máxima ' + grau(v.max) + ', mínima ' + grau(v.min) + ', ' + chuvaPorExtenso(v.chuva).toLowerCase();
       }).join('; ');
-    }).join('. ') + '. Abre o detalhe.';
+    }).join('. ') + '. Abre a previsão de todos os dias.';
+  }
+
+  /* A linha dos dias: duas linhas finas, a máxima por cima e a
+     mínima por baixo, com um ponto por dia que falta e o de hoje
+     aceso. Diz, sem uma palavra, que há mais dias por trás do cartão
+     — e a forma deles: o dia frio da montanha vê-se de relance. É o
+     desenho do perfil das Etapas, com a temperatura no lugar da
+     altitude (01.10.2026). Com um dia só, não há linha. */
+  const CURVA = { alto: 32, margem: 5, lado: 4 };
+
+  function linhaDosDias() {
+    const dias = Tempo.curva();
+    if (dias.length < 2) return '';
+    const alta = Math.max.apply(null, dias.map(function (d) { return d.max; }));
+    const baixa = Math.min.apply(null, dias.map(function (d) { return d.min; }));
+    const amplitude = Math.max(1, alta - baixa);
+    function x(i) { return CURVA.lado + i * (100 - 2 * CURVA.lado) / (dias.length - 1); }
+    function y(t) { return CURVA.margem + (alta - t) / amplitude * (CURVA.alto - 2 * CURVA.margem); }
+    function arred(n) { return Math.round(n * 10) / 10; }
+    function traco(k) {
+      return dias.map(function (d, i) { return arred(x(i)) + ',' + arred(y(d[k])); }).join(' ');
+    }
+    function pontos(k) {
+      return dias.map(function (d, i) {
+        return '<i class="tempo__ponto tempo__ponto--' + k + (d.aceso ? ' tempo__ponto--aceso' : '') +
+          '" style="left:' + arred(x(i)) + '%;top:' + arred(y(d[k])) + 'px"></i>';
+      }).join('');
+    }
+    return '<span class="tempo__curva" aria-hidden="true">' +
+      '<svg viewBox="0 0 100 ' + CURVA.alto + '" preserveAspectRatio="none" focusable="false">' +
+        '<polyline class="tempo__curva-max" points="' + traco('max') + '"/>' +
+        '<polyline class="tempo__curva-min" points="' + traco('min') + '"/>' +
+      '</svg>' +
+      pontos('max') + pontos('min') +
+    '</span>';
   }
 
   /* O resumo, ou nada se não houver previsão para mostrar. Os dias
@@ -101,6 +137,7 @@
             '</span>';
           }).join('');
       }).join('') +
+      linhaDosDias() +
     '</a>';
   }
 

@@ -178,6 +178,21 @@ window.Tempo = (function () {
     }).filter(function (x) { return x.linhas.length; });
   }
 
+  /* A linha dos dias, no cartão do Hoje: a máxima e a mínima de cada
+     dia que falta — a do sítio mais quente e a do mais frio, que é o
+     que o dia vai de uma ponta à outra. Vai acesa a de hoje, ou, na
+     véspera, a do primeiro dia (01.10.2026). */
+  function curva() {
+    if (!dados) return [];
+    const hoje = hojeEAmanha().hoje;
+    const lista = Object.keys(dados.dias).filter(function (data) { return data >= hoje; }).sort().map(function (data) {
+      const v = juntar(dados.dias[data].filter(function (r) { return dados.zonas[r.zona]; }));
+      return { data: data, max: v.max, min: v.min, aceso: data === hoje };
+    }).filter(function (x) { return numero(x.max) && numero(x.min); });
+    if (lista.length && !lista.some(function (x) { return x.aceso; })) lista[0].aceso = true;
+    return lista;
+  }
+
   /* Muda quando passa das 19:00 — é o que a app vigia para repintar. */
   function momento() {
     return Estado.agora().getHours() >= HORA_AMANHA ? 'noite' : 'dia';
@@ -199,6 +214,7 @@ window.Tempo = (function () {
     atualizar: atualizar,
     dias: dias,
     todos: todos,
+    curva: curva,
     momento: momento,
     atualizado: atualizado,
     fonte: function () { return dados ? dados.fonte || '' : ''; }
