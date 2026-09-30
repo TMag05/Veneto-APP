@@ -3,11 +3,18 @@
 # a chave JSON de uma conta de serviço do projeto dolomitesgt.
 # Só publica o hosting. As regras do Firestore publicam-se em
 # regras.yml; as do Storage, à mão.
+#
+# Antes de publicar, pede a previsão do tempo ao MET Norway e grava-a
+# em app/tempo.json (ferramentas/tempo.js). Durante o passeio publica
+# também de hora a hora, só para a previsão se renovar: o main que sai
+# é o mesmo (30.09.2026). Fora do passeio, a hora passa sem publicar.
 name: Publicar
 
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: '7 * * * *'
   workflow_dispatch:
 
 concurrency:
@@ -19,7 +26,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Previsão do tempo
+        id: tempo
+        run: node ferramentas/tempo.js
       - uses: FirebaseExtended/action-hosting-deploy@v0
+        if: github.event_name != 'schedule' || steps.tempo.outputs.publicar == 'true'
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DOLOMITESGT }}

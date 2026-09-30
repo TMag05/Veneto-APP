@@ -18,6 +18,8 @@
     ['hoje', 'hoje'],
     ['dia/:id', 'dia'],
     ['preparacao', 'preparacao'],
+    /* O tempo de hoje e, a partir das 19:00, de amanhã. */
+    ['tempo', 'tempo'],
     ['roadbook', 'roadbook'],
     ['roadbook/:id', 'roadbookDia'],
     ['roadbook/:id/:momento', 'roadbookDia'],
@@ -444,11 +446,13 @@
   }
 
   /* O relógio do programa: um dia revela-se depois do jantar da
-     véspera, e o Hoje passa a Amanhã até à meia-noite. Com a app
-     aberta, repinta-se quando isso muda — não a cada minuto. */
+     véspera, e o Hoje passa a Amanhã até à meia-noite; às 19:00, o
+     tempo passa a mostrar também amanhã. Com a app aberta, repinta-se
+     quando isso muda — não a cada minuto. */
   function momentoDoPrograma() {
     const amanha = Estado.amanha();
-    return (amanha ? amanha.id : '') + '|' + DADOS.dias.filter(Estado.diaVisivel).length + '|' + Estado.chave(Estado.agora());
+    return (amanha ? amanha.id : '') + '|' + DADOS.dias.filter(Estado.diaVisivel).length + '|' +
+      Estado.chave(Estado.agora()) + '|' + Tempo.momento();
   }
   let ultimoMomento = null;
   function verificarRelogio() {
@@ -519,6 +523,7 @@
   verificarRelogio();
   Estado.sincronizar();
   Estado.verificarSessao();
+  Tempo.atualizar(true);
 
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     /* Quando um service worker novo toma conta da página, ela ainda

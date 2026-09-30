@@ -338,10 +338,39 @@ window.SEMENTE = (function () {
     ]
   };
 
+  /* ---------------------------------------------------------
+     O tempo, por zonas
+     As zonas por onde cada dia passa, cada uma num ponto do
+     percurso e com a altitude oficial dele: é ela que acerta a
+     temperatura de uma montanha que o modelo, de 9 km, alisa. A
+     previsão é do MET Norway, pedida de hora a hora na publicação
+     (ferramentas/tempo.js), e sai com a app em tempo.json. O Hoje
+     junta as zonas de um dia quando a diferença entre elas não
+     conta (30.09.2026).
+     --------------------------------------------------------- */
+  const tempo = {
+    zonas: [
+      { id: 'prosecco', nome: 'Colinas do Prosecco', curto: 'Prosecco', lat: 45.9116, lng: 12.1566, altitude: 150 },
+      { id: 'grappa', nome: 'Cima Grappa', curto: 'Grappa', lat: 45.8721, lng: 11.7993, altitude: 1776 },
+      { id: 'rolle', nome: 'Passo Rolle', curto: 'Rolle', lat: 46.2975, lng: 11.7869, altitude: 1984 },
+      { id: 'pizzoc', nome: 'Monte Pizzoc', curto: 'Pizzoc', lat: 46.0412, lng: 12.3444, altitude: 1547 },
+      { id: 'veneza', nome: 'Veneza', curto: 'Veneza', lat: 45.4343, lng: 12.3387, altitude: 2 }
+    ],
+    /* Pela ordem em que o dia passa por elas. */
+    dias: {
+      '2026-10-01': ['veneza', 'prosecco'],
+      '2026-10-02': ['prosecco', 'grappa'],
+      '2026-10-03': ['prosecco', 'rolle'],
+      '2026-10-04': ['prosecco', 'pizzoc', 'veneza'],
+      '2026-10-05': ['veneza']
+    }
+  };
+
   return {
     evento: evento,
     contactos: contactos,
     biblioteca: biblioteca,
-    roteiro: roteiro
+    roteiro: roteiro,
+    tempo: tempo
   };
 })();
