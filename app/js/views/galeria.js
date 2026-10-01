@@ -2,7 +2,8 @@
    Galeria — sem likes, sem comentários, sem contagens
    A captura abre a câmara nativa para não perder HDR nem
    modo noturno. O ficheiro fica inteiro no telemóvel, tal como
-   saiu da câmara, e o envio fica em fila.
+   saiu da câmara, e o envio fica em fila. Os vídeos entram pelo
+   mesmo caminho, até um minuto (02.10.2026).
    ========================================================= */
 
 (function () {
@@ -38,11 +39,32 @@
   }
 
   function celula(f) {
-    const dentro = imagemDe(f);
+    const video = Fotos.ehVideo(f);
+    const dentro = imagemDe(f) + (video ? UI.marcaVideo(f) : '');
     const estilo = fundoDe(f).replace(/^;/, '');
     if (!f.id) return '<div class="grelha-fotos__celula" style="' + estilo + '">' + dentro + '</div>';
+    const rotulo = video
+      ? 'Vídeo de ' + autorDe(f) + (f.duracao ? ', ' + UI.tempoVideo(f.duracao) : '')
+      : 'Fotografia de ' + autorDe(f);
     return '<a class="grelha-fotos__celula" href="#/foto/' + encodeURIComponent(f.id) + '" ' +
-      'style="' + estilo + '" aria-label="Fotografia de ' + UI.h(autorDe(f)) + '">' + dentro + '</a>';
+      'style="' + estilo + '" aria-label="' + UI.h(rotulo) + '">' + dentro + '</a>';
+  }
+
+  /* O que não entrou, numa folha só, pela ordem do que mais importa. */
+  function avisar(m, falhouVideo) {
+    function folha(titulo, texto) { UI.abrirFolha(titulo, '<p class="corpo-ui silencioso">' + texto + '</p>'); }
+    if (m.limite) folha('Cem fotografias neste dia', 'É o máximo por dia. Amanhã recomeça.');
+    else if (m['limite-videos']) folha('Dez vídeos neste dia', 'É o máximo por dia. Amanhã recomeça.');
+    else if (m.longo) folha('Vídeo longo demais', 'Os vídeos vão até um minuto. Pode encurtá-lo na galeria do telemóvel e voltar a juntá-lo.');
+    else if (m.video) folha('Não foi possível abrir o vídeo', 'Este telemóvel não consegue ler o ficheiro.');
+    else {
+      const falhou = (m.espaco || 0) + (m.leitura || 0);
+      if (!falhou) return;
+      const nome = falhouVideo === falhou
+        ? (falhou === 1 ? 'Um vídeo não coube' : 'Alguns vídeos não couberam')
+        : (falhou === 1 ? 'Uma fotografia não coube' : 'Algumas fotografias não couberam');
+      folha('Não foi possível guardar', nome + ' no telemóvel. Liberte espaço e tente de novo.');
+    }
   }
 
   function lista() {
@@ -67,7 +89,7 @@
           UI.foto({ semente: 'galeria', variante: 'paisagem' }, 'foto--32 capa__imagem') +
           '<div class="capa__texto">' +
             '<h1 class="capa-titulo">Galeria</h1>' +
-            '<p class="subtitulo" style="margin-top:8px">' + UI.plural(Estado.fotos().length, 'fotografia', 'fotografias') + ' do grupo.</p>' +
+            '<p class="subtitulo" style="margin-top:8px">' + UI.contagemGaleria(Estado.fotos()) + ' do grupo.</p>' +
           '</div>' +
         '</div>' +
 
@@ -81,7 +103,7 @@
         '<div class="faixa" style="margin-top:16px">' +
           (fotos.length
             ? '<div class="grelha-fotos">' + fotos.map(celula).join('') + '</div>'
-            : '<p class="corpo-editorial silencioso">Ainda não há fotografias nesta seleção.</p>') +
+            : '<p class="corpo-editorial silencioso">Ainda não há fotografias nem vídeos nesta seleção.</p>') +
         '</div>' +
 
         (fase === 'pos' ? '<div class="faixa">' +
@@ -91,10 +113,15 @@
         '<div class="captura barra-inferior">' +
           '<button class="botao botao--principal" type="button" data-acao="camara">' +
             Icone('camara', 20) + 'Fotografar</button>' +
+          /* Filmar tem botão próprio: com a fotografia e o vídeo no mesmo
+             campo, o Android abre a câmara só para fotografar. */
+          '<button class="botao botao--secundario botao--fixo-estreito" type="button" data-acao="filmar" aria-label="Filmar">' +
+            Icone('video', 20) + '</button>' +
           '<button class="botao botao--secundario botao--fixo-estreito" type="button" data-acao="ficheiro" aria-label="Escolher da galeria do telemóvel">' +
             Icone('juntar', 20) + '</button>' +
           '<input type="file" id="ent-camara" accept="image/*" capture="environment">' +
-          '<input type="file" id="ent-ficheiro" accept="image/*" multiple>' +
+          '<input type="file" id="ent-filmar" accept="video/*" capture="environment">' +
+          '<input type="file" id="ent-ficheiro" accept="image/*,video/*" multiple>' +
         '</div>';
     },
 
@@ -116,7 +143,7 @@
         if (!vigia) vigia = setInterval(function () { Estado.sincronizarGrupo(); }, 5 * 1000);
       }
 
-      ['ent-camara', 'ent-ficheiro'].forEach(function (id) {
+      ['ent-camara', 'ent-filmar', 'ent-ficheiro'].forEach(function (id) {
         const ent = el.querySelector('#' + id);
         if (!ent) return;
         ent.addEventListener('change', function () {
@@ -127,17 +154,17 @@
              marcação de chegada: numa caravana o dia já diz onde foi. */
           const poi = '';
           let porFazer = ficheiros.length;
-          let falhou = 0, noLimite = 0;
+          const motivos = {};
+          let falhouVideo = 0;
           ficheiros.forEach(function (f) {
             Estado.juntarFoto(f, dia, poi, function (novoId, motivo) {
-              if (!novoId) { if (motivo === 'limite') noLimite++; else falhou++; }
+              if (!novoId) {
+                motivos[motivo] = (motivos[motivo] || 0) + 1;
+                if (motivo === 'espaco' && /^video\//.test(f.type || '')) falhouVideo++;
+              }
               if (--porFazer === 0) {
                 App.repintar();
-                if (noLimite) UI.abrirFolha('Cem fotografias neste dia',
-                  '<p class="corpo-ui silencioso">É o máximo por dia. Amanhã recomeça.</p>');
-                else if (falhou) UI.abrirFolha('Não foi possível guardar',
-                  '<p class="corpo-ui silencioso">' + (falhou === 1 ? 'Uma fotografia não coube' : 'Algumas fotografias não couberam') +
-                  ' no telemóvel. Liberte espaço e tente de novo.</p>');
+                avisar(motivos, falhouVideo);
               }
             });
           });
@@ -160,6 +187,7 @@
     acoes: {
       filtrar: function (id) { filtro = id; App.repintar(); },
       camara: function () { document.getElementById('ent-camara').click(); },
+      filmar: function () { document.getElementById('ent-filmar').click(); },
       ficheiro: function () { document.getElementById('ent-ficheiro').click(); }
     }
   };

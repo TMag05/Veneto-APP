@@ -991,6 +991,25 @@ a { color: var(--verde); text-decoration: none; }
   background: var(--intonaco);
 }
 .grelha-fotos__celula img { width: 100%; height: 100%; object-fit: cover; }
+/* Um vídeo: o sinal de tocar e a duração, numa pastilha no canto. O
+   véu forte, e não a pastilha leve, para a duração se ler sobre
+   qualquer fotografia. */
+.grelha-fotos__video {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px 4px 6px;
+  border-radius: var(--raio-pill);
+  background: var(--veu-forte);
+  color: var(--sobre-foto);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  pointer-events: none;
+}
 .grelha-fotos__tirar {
   position: absolute;
   top: 4px;
@@ -1046,6 +1065,28 @@ a { color: var(--verde); text-decoration: none; }
 .visor__img--vista { opacity: 0; transition: opacity var(--transicao); }
 .visor__img--vista[data-pronta="sim"] { opacity: 1; }
 
+/* Um vídeo: entra por cima da imagem quando começa a tocar, e o
+   botão do meio sai. O botão assenta na imagem: véu, não chapa. */
+.visor__video { opacity: 0; transition: opacity var(--transicao); }
+.visor__video[data-pronto="sim"] { opacity: 1; }
+.visor__tocar {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--raio-pill);
+  background: var(--veu-forte);
+  color: var(--sobre-foto);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  transition: opacity var(--transicao);
+}
+.visor__folha[data-tocando="sim"] .visor__tocar { opacity: 0; pointer-events: none; }
+
 .visor__topo, .visor__base {
   position: absolute;
   left: 0;
@@ -1065,8 +1106,48 @@ a { color: var(--verde); text-decoration: none; }
 }
 .visor__base {
   bottom: 0;
+  flex-wrap: wrap;
   justify-content: space-around;
   padding: 6px var(--esp-1) calc(env(safe-area-inset-bottom) + 6px);
+}
+
+/* Os controlos de um vídeo: uma linha inteira por cima dos botões. */
+.visor__controlos {
+  flex: 0 0 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--esp-1);
+}
+.visor__tempo { min-width: 36px; text-align: center; }
+.visor__barra {
+  position: relative;
+  flex: 1;
+  height: 44px;
+  cursor: pointer;
+  touch-action: none;
+}
+.visor__barra::before,
+.visor__barra-cheia {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 4px;
+  margin-top: -2px;
+  border-radius: var(--raio-pill);
+}
+.visor__barra::before { right: 0; background: var(--pietra-forte); }
+.visor__barra-cheia { width: 0; background: var(--inchiostro); }
+.visor__barra-cheia::after {
+  content: "";
+  position: absolute;
+  right: -7px;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin-top: -7px;
+  border-radius: var(--raio-pill);
+  background: var(--inchiostro);
 }
 .visor__titulo {
   flex: 1;

@@ -277,7 +277,7 @@
           return;
         }
         UI.abrirFolha('Apagar as fotografias',
-          '<p class="corpo-ui silencioso">Saem ' + UI.plural(n, 'fotografia', 'fotografias') +
+          '<p class="corpo-ui silencioso">Saem ' + UI.contagemGaleria(Estado.fotos()) +
             ' deste telemóvel, as do grupo e as de abertura. Não se recuperam.</p>' +
           '<p class="meta" style="margin-top:16px">Descarregue o álbum antes, se ainda não o fez.</p>' +
           '<button class="botao botao--rosso botao--largo" style="margin-top:24px" type="button" id="btn-apagar-arquivo">Apagar tudo</button>');

@@ -51,7 +51,9 @@ window.Fotos = (function () {
      Ficheiros
      --------------------------------------------------------- */
 
-  /* registo: { id, original, mini, vista, tipo, largura, altura, criado } */
+  /* registo: { id, original, mini, vista, tipo, largura, altura, criado }
+     Num vídeo, o original é o vídeo e a miniatura e a vista são uma
+     imagem de perto do início; o registo leva também a duração. */
   function guardar(registo) { return com('readwrite', function (l) { return l.put(registo); }); }
   function ler(id) { return com('readonly', function (l) { return l.get(id); }); }
   function apagar(id) { libertar(id); return com('readwrite', function (l) { return l.delete(id); }); }
@@ -87,6 +89,19 @@ window.Fotos = (function () {
          só é feita aqui. */
       return sha256(buf);
     });
+  }
+
+  /* Num vídeo, a impressão é do tamanho, do tipo e dos primeiros e
+     últimos quatro megabytes, não do ficheiro inteiro: um minuto em 4K
+     passa dos quatrocentos megabytes, e lê-lo todo para a memória de
+     uma vez fechava a app no iPhone. Para o que a impressão serve — o
+     mesmo ficheiro dar sempre o mesmo caminho — chega. */
+  const PEDACO = 4 * 1024 * 1024;
+  function impressaoVideo(blob) {
+    const partes = [blob.size + ':' + (blob.type || '') + ':'];
+    if (blob.size <= PEDACO * 2) partes.push(blob);
+    else partes.push(blob.slice(0, PEDACO), blob.slice(blob.size - PEDACO));
+    return impressao(new Blob(partes));
   }
 
   function hex(buf) {
@@ -150,9 +165,24 @@ window.Fotos = (function () {
   }
 
   /* O caminho de um objeto no Storage. Função pura: o mesmo ficheiro,
-     no mesmo dia e da mesma pessoa, dá sempre o mesmo caminho. */
-  function caminho(dia, autorId, sha, tamanho) {
-    return 'fotos/' + (dia || 'sem-dia') + '/' + (autorId || 'sem-autor') + '/' + sha + '-' + tamanho + '.jpg';
+     no mesmo dia e da mesma pessoa, dá sempre o mesmo caminho. O
+     original de um vídeo leva a extensão do vídeo; tudo o resto, .jpg. */
+  function caminho(dia, autorId, sha, tamanho, ext) {
+    return 'fotos/' + (dia || 'sem-dia') + '/' + (autorId || 'sem-autor') + '/' + sha + '-' + tamanho + '.' + (ext || 'jpg');
+  }
+
+  /* Um vídeo diz-se pelo tipo do ficheiro de origem. */
+  function ehVideo(f) {
+    return !!f && /^video\//.test(f.tipo || '');
+  }
+
+  /* A extensão de um tipo: image/jpeg dá jpg, video/quicktime — o
+     vídeo do iPhone — dá mov. */
+  function extensao(tipo) {
+    const t = String(tipo || '');
+    if (t === 'video/quicktime') return 'mov';
+    if (t.indexOf('/') < 0) return 'jpg';
+    return t.split('/')[1].split(';')[0].replace('jpeg', 'jpg').replace('x-matroska', 'mkv') || 'jpg';
   }
 
   /* ---------------------------------------------------------
@@ -214,6 +244,20 @@ window.Fotos = (function () {
     }).catch(function () { return endereco(id, t) || null; });
   }
 
+  /* O endereço de um vídeo para tocar. O deste telemóvel vem do
+     arquivo; o do grupo toca do Storage, aos bocados, à medida que se
+     vê — descarregá-lo inteiro antes de começar era esperar um minuto
+     por um minuto de vídeo. */
+  function urlVideo(id) {
+    const chave = id + '/original';
+    if (enderecos[chave]) return Promise.resolve(enderecos[chave]);
+    return ler(id).catch(function () { return null; }).then(function (r) {
+      if (!r || !r.original) return endereco(id, 'original') || null;
+      if (!enderecos[chave]) enderecos[chave] = URL.createObjectURL(r.original);
+      return enderecos[chave];
+    });
+  }
+
   function libertar(id) {
     Object.keys(enderecos).forEach(function (k) {
       if (k.indexOf(id + '/') === 0) { URL.revokeObjectURL(enderecos[k]); delete enderecos[k]; }
@@ -266,7 +310,11 @@ window.Fotos = (function () {
 
   return {
     impressao: impressao,
+    impressaoVideo: impressaoVideo,
     caminho: caminho,
+    ehVideo: ehVideo,
+    extensao: extensao,
+    urlVideo: urlVideo,
     guardar: guardar,
     ler: ler,
     apagar: apagar,

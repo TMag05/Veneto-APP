@@ -438,7 +438,9 @@
         '<p class="corpo-editorial">' +
         UI.plural(DADOS.dias.length, 'dia', 'dias') + ', ' +
         DADOS.dias.reduce(function (t, d) { return t + (d.distancia || 0); }, 0) +
-        ' quilómetros e ' + UI.plural(Estado.fotos().length, 'fotografia', 'fotografias') + '. O álbum está pronto.</p>' +
+        /* Com vídeos, a contagem já traz o seu «e». */
+        (Estado.fotos().some(function (f) { return Fotos.ehVideo(f); }) ? ' quilómetros, ' : ' quilómetros e ') +
+        UI.contagemGaleria(Estado.fotos()) + '. O álbum está pronto.</p>' +
         '<a class="botao botao--radicchio botao--largo" style="margin-top:24px" href="#/album">Abrir o álbum</a>' +
       '</div>' +
 
@@ -446,7 +448,7 @@
         '<div class="seccao-cabecalho"><h2 class="etiqueta">Arquivo</h2></div>' +
         '<div class="lista">' +
           UI.linhaLista({ titulo: 'Roadbook completo', nota: UI.plural(DADOS.dias.length, 'percurso', 'percursos'), icone: 'roadbook', href: '#/roadbook' }) +
-          UI.linhaLista({ titulo: 'Galeria', nota: UI.plural(Estado.fotos().length, 'fotografia', 'fotografias'), icone: 'galeria', href: '#/galeria' }) +
+          UI.linhaLista({ titulo: 'Galeria', nota: UI.contagemGaleria(Estado.fotos()), icone: 'galeria', href: '#/galeria' }) +
           (ultimo ? UI.linhaLista({ titulo: 'Último dia', nota: ultimo.titulo, icone: 'hoje', href: '#/dia/' + ultimo.id }) : '') +
         '</div>' +
       '</div>';

@@ -486,7 +486,10 @@ window.Estado = (function () {
   function enviarFotos() {
     if (aEnviarFotos || !Nuvem.ligada()) return;
     if (!navigator.onLine) { if (fotosPorEnviar()) tentarDeNovo(); return; }
-    const meta = estado.fotos.find(function (f) { return f.estadoEnvio !== 'enviado'; });
+    /* As fotografias passam à frente dos vídeos: um vídeo de sessenta
+       megabytes numa rede fraca não pode prender as que vêm atrás. */
+    const porEnviar = estado.fotos.filter(function (f) { return f.estadoEnvio !== 'enviado'; });
+    const meta = porEnviar.find(function (f) { return !Fotos.ehVideo(f); }) || porEnviar[0];
     if (!meta) return;
     aEnviarFotos = true;
     Fotos.ler(meta.id).then(function (registo) {
@@ -672,16 +675,34 @@ window.Estado = (function () {
      num dia já é muito para trinta pessoas verem. */
   const LIMITE_DIARIO = 100;
 
-  function contarDoDia(dia) {
-    return estado.fotos.filter(function (f) { return f.dia === dia; }).length;
+  function contarDoDia(dia, soVideos) {
+    return estado.fotos.filter(function (f) { return f.dia === dia && (!soVideos || Fotos.ehVideo(f)); }).length;
+  }
+
+  /* Os vídeos sobem tal como saíram da câmara, sem reduzir — no
+     browser não há como o fazer sem uma biblioteca de fora. Um minuto
+     já são sessenta megabytes no iPhone, e trinta pessoas a vê-los
+     pela rede da montanha: daí o minuto, e dez por dia. */
+  const DURACAO_MAXIMA = 60;      /* segundos */
+  const LIMITE_VIDEOS = 10;       /* por pessoa e por dia */
+
+  /* O tipo de um ficheiro. Há telemóveis que não o dizem de um vídeo
+     escolhido da galeria: a extensão chega. */
+  function tipoDe(ficheiro) {
+    if (ficheiro.type) return ficheiro.type;
+    const ext = String(ficheiro.name || '').split('.').pop().toLowerCase();
+    return ext === 'mov' ? 'video/quicktime' : (ext === 'mp4' || ext === 'm4v') ? 'video/mp4' : 'image/jpeg';
   }
 
   /* Recebe o ficheiro tal como saiu da câmara. O original vai inteiro
      para o arquivo do telemóvel, sem passar por tela nem por
-     compressão; ao lado ficam os dois tamanhos que se mostram. Aqui
-     só ficam os metadados. */
+     compressão; ao lado ficam os dois tamanhos que se mostram — num
+     vídeo, uma imagem de perto do início. Aqui só ficam os metadados. */
   function juntarFoto(ficheiro, dia, poi, feito) {
+    const tipo = tipoDe(ficheiro);
+    const video = /^video\//.test(tipo);
     if (contarDoDia(dia) >= LIMITE_DIARIO) { if (feito) feito(null, 'limite'); return; }
+    if (video && contarDoDia(dia, true) >= LIMITE_VIDEOS) { if (feito) feito(null, 'limite-videos'); return; }
 
     const id = 'm' + Date.now() + Math.floor(Math.random() * 1000);
     const tamanhos = [
@@ -689,18 +710,21 @@ window.Estado = (function () {
       { nome: 'vista', lado: 1600, qualidade: 0.85 }
     ];
 
-    UI.derivadas(ficheiro, tamanhos, function (d) {
-      if (!d) { if (feito) feito(null, 'leitura'); return; }
-      Fotos.impressao(ficheiro).then(function (sha) {
+    (video ? UI.derivadasVideo : UI.derivadas)(ficheiro, tamanhos, function (d) {
+      if (!d) { if (feito) feito(null, video ? 'video' : 'leitura'); return; }
+      /* Meio segundo de folga: o telemóvel arredonda o que mostra. */
+      if (video && d.duracao > DURACAO_MAXIMA + 0.5) { if (feito) feito(null, 'longo'); return; }
+      (video ? Fotos.impressaoVideo : Fotos.impressao)(ficheiro).then(function (sha) {
         return Fotos.guardar({
           id: id,
           original: ficheiro,
           mini: d.mini,
           vista: d.vista,
           sha: sha,
-          tipo: ficheiro.type || 'image/jpeg',
+          tipo: tipo,
           largura: d.largura,
           altura: d.altura,
+          duracao: d.duracao || 0,
           criado: Date.now()
         }).then(function () { return sha; });
       }).then(function (sha) {
@@ -711,6 +735,8 @@ window.Estado = (function () {
           dia: dia,
           poi: poi,
           sha: sha,
+          tipo: tipo,
+          duracao: video ? Math.round(d.duracao * 10) / 10 : 0,
           criado: Date.now(),
           largura: d.largura,
           altura: d.altura,
@@ -718,7 +744,7 @@ window.Estado = (function () {
           nome: ficheiro.name || '',
           estadoEnvio: 'pendente'
         });
-        enfileirar('foto', 'Fotografia' + (poi && POIS[poi] ? ' — ' + POIS[poi].nome : ''), id);
+        enfileirar('foto', (video ? 'Vídeo' : 'Fotografia') + (poi && POIS[poi] ? ' — ' + POIS[poi].nome : ''), id);
         if (feito) feito(id);
       }).catch(function () {
         if (feito) feito(null, 'espaco');

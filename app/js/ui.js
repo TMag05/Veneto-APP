@@ -318,8 +318,30 @@ window.UI = (function () {
     const d = new Date(f.criado);
     const hora = String(d.getHours()).padStart(2, '0') + 'h' + String(d.getMinutes()).padStart(2, '0');
     const partes = [pastaDia(dia), talho(poi), hora].filter(Boolean);
-    const ext = String(tipo || '').indexOf('/') > 0 ? tipo.split('/')[1].replace('jpeg', 'jpg') : 'jpg';
-    return partes.join('-') + '.' + ext;
+    return partes.join('-') + '.' + Fotos.extensao(tipo);
+  }
+
+  /* O que há na galeria, em palavras: «12 fotografias», ou «12
+     fotografias e 2 vídeos» quando os há. */
+  function contagemGaleria(lista) {
+    const videos = lista.filter(function (f) { return Fotos.ehVideo(f); }).length;
+    const fotos = lista.length - videos;
+    const nVideos = plural(videos, 'vídeo', 'vídeos');
+    if (!videos) return plural(fotos, 'fotografia', 'fotografias');
+    return fotos ? plural(fotos, 'fotografia', 'fotografias') + ' e ' + nVideos : nVideos;
+  }
+
+  /* A duração de um vídeo como se lê num relógio: 0:42, 1:05. */
+  function tempoVideo(segundos) {
+    const s = Math.max(0, Math.round(segundos || 0));
+    return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  }
+
+  /* Na grelha, um vídeo distingue-se pelo sinal de tocar e pela
+     duração, numa pastilha no canto — não só por um ícone. */
+  function marcaVideo(f) {
+    return '<span class="grelha-fotos__video num" aria-hidden="true">' + Icone('tocar', 14) +
+      (f.duracao ? tempoVideo(f.duracao) : '') + '</span>';
   }
 
   /* ---------------------------------------------------------
@@ -386,6 +408,113 @@ window.UI = (function () {
         });
       });
     });
+  }
+
+  /* ---------------------------------------------------------
+     Vídeos: a duração, o tamanho e uma imagem para a grelha
+     --------------------------------------------------------- */
+
+  /* Abre o vídeo sem o mostrar, lê a duração e o tamanho, e tira uma
+     imagem de meio segundo depois do início — a primeira costuma sair
+     escura, com a câmara ainda a acertar a luz. É essa imagem que a
+     grelha e o visor mostram enquanto o vídeo não toca.
+     O iPhone nem sempre desenha uma imagem só por se pedir aquele
+     ponto do vídeo: se a tela ficar vazia, toca-o sem som, dentro da
+     página, e tira-a do primeiro instante a tocar. Se nem assim, a
+     imagem é uma superfície lisa, na cor das células da grelha.
+     Devolve null só se o vídeo nem abrir. */
+  function derivadasVideo(ficheiro, pedidos, feito) {
+    const endereco = URL.createObjectURL(ficheiro);
+    const v = document.createElement('video');
+    v.muted = true;
+    v.playsInline = true;
+    v.preload = 'auto';
+    v.setAttribute('muted', '');
+    v.setAttribute('playsinline', '');
+
+    let acabou = false;
+    let meta = null;
+    let aTocar = false;
+    const limite = setTimeout(function () { meta ? lisa() : terminar(null); }, 15000);
+
+    function terminar(saida) {
+      if (acabou) return;
+      acabou = true;
+      clearTimeout(limite);
+      v.pause();
+      v.removeAttribute('src');
+      v.load();
+      URL.revokeObjectURL(endereco);
+      feito(saida);
+    }
+
+    /* Uma tela de 8 por 8 diz se o vídeo já tem imagem: sem ela, o que
+       se desenha é transparente. */
+    function temImagem() {
+      try {
+        const t = document.createElement('canvas');
+        t.width = 8; t.height = 8;
+        const c = t.getContext('2d');
+        c.drawImage(v, 0, 0, 8, 8);
+        const px = c.getImageData(0, 0, 8, 8).data;
+        for (let i = 3; i < px.length; i += 4) if (px[i] > 0) return true;
+      } catch (e) { /* sem tela */ }
+      return false;
+    }
+
+    function desenhar(fonte) {
+      const saida = Object.assign({}, meta);
+      let porFazer = pedidos.length;
+      if (!porFazer) { terminar(saida); return; }
+      pedidos.forEach(function (p) {
+        escalar(fonte, meta.largura, meta.altura, p.lado, p.qualidade || 0.82, true, function (r) {
+          saida[p.nome] = r;
+          if (--porFazer === 0) terminar(saida);
+        });
+      });
+    }
+
+    function lisa() {
+      if (acabou) return;
+      const t = document.createElement('canvas');
+      t.width = meta.largura; t.height = meta.altura;
+      const c = t.getContext('2d');
+      c.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--intonaco').trim();
+      c.fillRect(0, 0, t.width, t.height);
+      desenhar(t);
+    }
+
+    function tocar() {
+      if (aTocar) { lisa(); return; }
+      aTocar = true;
+      v.addEventListener('timeupdate', function quando() {
+        if (v.currentTime <= 0) return;
+        v.removeEventListener('timeupdate', quando);
+        v.pause();
+        if (temImagem()) desenhar(v); else lisa();
+      });
+      const p = v.play();
+      if (p && p.catch) p.catch(lisa);
+    }
+
+    v.addEventListener('loadedmetadata', function () {
+      const largura = v.videoWidth || 1600, altura = v.videoHeight || 900;
+      meta = { largura: largura, altura: altura, duracao: isFinite(v.duration) ? v.duration : 0 };
+      v.currentTime = meta.duracao ? Math.min(0.5, meta.duracao / 3) : 0;
+    });
+    v.addEventListener('seeked', function () {
+      if (acabou || aTocar) return;
+      if (temImagem()) desenhar(v); else tocar();
+    });
+    v.addEventListener('error', function () { meta ? lisa() : terminar(null); });
+    v.src = endereco;
+    /* Há Safaris que nem a duração leem de um vídeo que não está a
+       tocar: ao fim de três segundos sem ela, toca-se sem som. */
+    setTimeout(function () {
+      if (meta || acabou) return;
+      const p = v.play();
+      if (p && p.catch) p.catch(function () { /* fica para o limite */ });
+    }, 3000);
   }
 
   /* Reduz uma fotografia a uma dataUrl. É o que os campos de
@@ -464,7 +593,8 @@ window.UI = (function () {
     descarregar: descarregar,
     foto: foto, imagemDe: imagemDe, logo: logo, horario: horario, distintivo: distintivo, linhaLista: linhaLista,
     campo: campo, ligarCampos: ligarCampos, coordenadas: coordenadas, escolhaCarro: escolhaCarro, escolhaFuncao: escolhaFuncao,
-    reduzirImagem: reduzirImagem, derivadas: derivadas, campoFoto: campoFoto, talho: talho, nomeDeFoto: nomeDeFoto,
+    reduzirImagem: reduzirImagem, derivadas: derivadas, derivadasVideo: derivadasVideo, campoFoto: campoFoto, talho: talho, nomeDeFoto: nomeDeFoto,
+    contagemGaleria: contagemGaleria, tempoVideo: tempoVideo, marcaVideo: marcaVideo,
     abrirFolha: abrirFolha, fecharFolha: fecharFolha,
     MESES: MESES
   };
