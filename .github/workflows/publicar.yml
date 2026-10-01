@@ -7,25 +7,38 @@
 # Antes de publicar, pede a previsão do tempo ao MET Norway e grava-a
 # em app/tempo.json (ferramentas/tempo.js). Durante o passeio publica
 # também de hora a hora, só para a previsão se renovar: o main que sai
-# é o mesmo (30.09.2026). Fora do passeio, a hora passa sem publicar.
+# é o mesmo (30.09.2026). Fora do passeio, não volta a publicar.
+#
+# De hora a hora, em cadeia: o GitHub não cumpre um cron de hora a
+# hora — no 1 de outubro lançou quatro em vinte e duas horas, com
+# buracos de sete. Por isso cada publicação fora de um push espera
+# 55 minutos e lança a seguinte (workflow_dispatch, que o GITHUB_TOKEN
+# pode lançar). O cron, de três em três horas, só volta a pôr a cadeia
+# a andar se ela parar; a espera mais recente cancela a anterior, e
+# nunca há duas cadeias (01.10.2026).
 name: Publicar
 
 on:
   push:
     branches: [main]
   schedule:
-    - cron: '7 * * * *'
+    - cron: '23 */3 * * *'
   workflow_dispatch:
-
-concurrency:
-  group: publicar
-  cancel-in-progress: false
 
 jobs:
   hosting:
     runs-on: ubuntu-latest
+    # A publicação é uma de cada vez, venha de um push ou da cadeia: a
+    # que entra tira o main de agora, e nenhuma repõe um main antigo.
+    concurrency:
+      group: publicar
+      cancel-in-progress: false
+    outputs:
+      publicar: ${{ steps.tempo.outputs.publicar }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -39,3 +52,22 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DOLOMITESGT }}
           projectId: dolomitesgt
           channelId: live
+
+  seguinte:
+    needs: hosting
+    # Um push não começa cadeia nenhuma. Fora do passeio, a cadeia para.
+    if: always() && github.event_name != 'push' && needs.hosting.outputs.publicar != 'false'
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    concurrency:
+      group: tempo-cadeia
+      cancel-in-progress: true
+    permissions:
+      actions: write
+    steps:
+      - name: Daqui a uma hora, outra vez
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sleep 3300
+          gh workflow run publicar.yml --repo "$GITHUB_REPOSITORY" --ref main
