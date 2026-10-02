@@ -95,10 +95,13 @@
 
       (x.seguinte || '') +
 
-      /* A localização, no Google Maps ou no Waze. Não é o CTA do
-         ecrã — o grupo segue os batedores —, por isso vive no fim,
-         em linha, e não numa barra por cima do texto. */
-      '<div class="faixa" style="margin-top:32px">' + UI.atalhosLocal(p.id) + '</div>' +
+      /* A localização, no Google Maps, com a nota que o pede em vez
+         do Waze. Não é o CTA do ecrã — o grupo segue os batedores —,
+         por isso vive no fim, em linha, e não numa barra por cima do
+         texto. */
+      (UI.temLocal(p.id)
+        ? '<div class="faixa" style="margin-top:32px">' + UI.atalhosLocal(p.id) + UI.notaMaps() + '</div>'
+        : '') +
 
       (x.editar || editar('#/org/paragem/' + p.id, 'Editar esta paragem'));
   }
