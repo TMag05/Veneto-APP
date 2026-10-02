@@ -11,7 +11,9 @@
 
    O ficheiro nunca se monta todo em memória: cada fotografia entra
    na lista como o Blob que já é, e o navegador só o lê quando
-   escrever o ficheiro final em disco.
+   escrever o ficheiro final em disco. O CRC lê-se aos bocados de
+   oito megabytes: um vídeo de alguns minutos, inteiro na memória,
+   fechava a app no iPhone.
 
    Formato: APPNOTE 6.3.3, método 0 (store), nomes em UTF-8.
    ========================================================= */
@@ -32,10 +34,28 @@ window.Zip = (function () {
     return t;
   })();
 
-  function crc32(u8) {
-    let c = 0xFFFFFFFF;
+  function acumular(c, u8) {
     for (let i = 0; i < u8.length; i++) c = TABELA[(c ^ u8[i]) & 0xFF] ^ (c >>> 8);
-    return (c ^ 0xFFFFFFFF) >>> 0;
+    return c;
+  }
+
+  function crc32(u8) {
+    return (acumular(0xFFFFFFFF, u8) ^ 0xFFFFFFFF) >>> 0;
+  }
+
+  const BOCADO = 8 * 1024 * 1024;
+
+  /* O CRC de um Blob, lido aos bocados. */
+  function crcDe(blob) {
+    let c = 0xFFFFFFFF;
+    function seguinte(pos) {
+      if (pos >= blob.size) return Promise.resolve((c ^ 0xFFFFFFFF) >>> 0);
+      return blob.slice(pos, pos + BOCADO).arrayBuffer().then(function (buf) {
+        c = acumular(c, new Uint8Array(buf));
+        return seguinte(pos + BOCADO);
+      });
+    }
+    return seguinte(0);
   }
 
   /* ---------------------------------------------------------
@@ -118,12 +138,11 @@ window.Zip = (function () {
     function seguinte(i) {
       if (i >= ficheiros.length) return Promise.resolve();
       const f = ficheiros[i];
-      return f.blob.arrayBuffer().then(function (buf) {
-        const u8 = new Uint8Array(buf);
+      return crcDe(f.blob).then(function (crc) {
         const e = {
           nome: texto(f.nome),
-          crc: crc32(u8),
-          tamanho: u8.length,
+          crc: crc,
+          tamanho: f.blob.size,
           relogio: relogio(f.data),
           posicao: posicao
         };

@@ -10,8 +10,10 @@
      deixa a etiqueta pronta e Fotos.pintar dá-lhe o endereço. */
   function celula(x) {
     if (x.id) {
-      return '<a class="grelha-fotos__celula" href="#/foto/' + encodeURIComponent(x.id) + '" aria-label="Fotografia">' +
+      const video = Fotos.ehVideo(x);
+      return '<a class="grelha-fotos__celula" href="#/foto/' + encodeURIComponent(x.id) + '" aria-label="' + (video ? 'Vídeo' : 'Fotografia') + '">' +
         '<img data-foto="' + UI.h(x.id) + '" data-tamanho="mini" loading="lazy" decoding="async" alt="">' +
+        (video ? UI.marcaVideo(x) : '') +
       '</a>';
     }
     return '<div class="grelha-fotos__celula" style="background-image:' +
@@ -67,7 +69,7 @@
     }
 
     UI.abrirFolha('A preparar o ficheiro',
-      '<p class="corpo-ui silencioso">' + UI.plural(comFicheiro.length, 'fotografia', 'fotografias') +
+      '<p class="corpo-ui silencioso">' + UI.contagemGaleria(comFicheiro) +
         ', em qualidade original.</p>' +
       '<p class="meta num" style="margin-top:16px" id="zip-conta">0 de ' + comFicheiro.length + '</p>');
 
@@ -81,7 +83,7 @@
       UI.descarregar(nomeZip, blob, 'application/zip');
     }).catch(function (e) {
       UI.abrirFolha('Ficheiro grande demais',
-        '<p class="corpo-ui silencioso">São fotografias a mais para um ficheiro só. ' +
+        '<p class="corpo-ui silencioso">O álbum não cabe num ficheiro só. ' +
         'Descarregue dia a dia.</p>');
     });
   }
@@ -102,7 +104,7 @@
           '<div class="selado">' +
             '<div class="selado__icone">' + Icone('selado', 24) + '</div>' +
             '<p class="corpo-editorial">O álbum abre-se no último dia, ao fim do jantar.</p>' +
-            '<p class="meta" style="margin-top:12px">' + UI.plural(fotos.length, 'fotografia guardada', 'fotografias guardadas') + ' até agora.</p>' +
+            '<p class="meta" style="margin-top:12px">' + UI.contagemGaleria(fotos) + ' até agora.</p>' +
           '</div>' +
         '</div>';
       }
@@ -177,7 +179,8 @@
         certidao +
 
         '<div class="faixa">' +
-          '<div class="seccao-cabecalho"><h2 class="etiqueta">Fotografias</h2>' +
+          '<div class="seccao-cabecalho"><h2 class="etiqueta">' +
+            (fotos.some(function (f) { return Fotos.ehVideo(f); }) ? 'Fotografias e vídeos' : 'Fotografias') + '</h2>' +
             '<span class="meta num">' + fotos.length + '</span></div>' +
           '<button class="botao botao--radicchio botao--largo" type="button" data-acao="descarregar">' +
             Icone('descarregar', 20) + 'Descarregar o álbum</button>' +
@@ -212,7 +215,7 @@
         '<h1 class="titulo-editorial">Arquivo</h1>' +
         '<p class="corpo-ui silencioso" style="margin-top:8px">Fica no telemóvel depois do passeio.</p>' +
         '<div class="lista" style="margin-top:24px">' +
-          UI.linhaLista({ titulo: 'Álbum do passeio', nota: UI.plural(Estado.fotos().length, 'fotografia', 'fotografias'), icone: 'galeria', href: '#/album' }) +
+          UI.linhaLista({ titulo: 'Álbum do passeio', nota: UI.contagemGaleria(Estado.fotos()), icone: 'galeria', href: '#/album' }) +
           UI.linhaLista({ titulo: 'Roadbook completo', nota: UI.plural(DADOS.dias.length, 'percurso', 'percursos'), icone: 'roadbook', href: '#/roadbook' }) +
           UI.linhaLista({ titulo: 'O que levar', nota: 'A lista da bagagem', icone: 'documento', href: '#/preparacao' }) +
         '</div>' +

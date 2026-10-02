@@ -334,9 +334,14 @@
   function quemJuntou(fotos) {
     const nomes = [];
     fotos.forEach(function (f) { if (f.autorNome && nomes.indexOf(f.autorNome) < 0) nomes.push(f.autorNome); });
-    const quantas = UI.plural(fotos.length, 'fotografia', 'fotografias');
-    if (!nomes.length) return (fotos.length === 1 ? 'Uma fotografia nova' : quantas + ' novas') + ' na galeria.';
-    const n = fotos.length === 1 ? 'uma fotografia' : quantas;
+    const quantas = UI.contagemGaleria(fotos);
+    const videos = fotos.filter(function (f) { return Fotos.ehVideo(f); }).length;
+    const uma = fotos.length === 1;
+    if (!nomes.length) {
+      if (uma) return (videos ? 'Um vídeo novo' : 'Uma fotografia nova') + ' na galeria.';
+      return quantas + (videos ? ' novos' : ' novas') + ' na galeria.';
+    }
+    const n = uma ? (videos ? 'um vídeo' : 'uma fotografia') : quantas;
     if (nomes.length === 1) return nomes[0] + ' juntou ' + n + '.';
     if (nomes.length === 2) return nomes[0] + ' e ' + nomes[1] + ' juntaram ' + n + '.';
     return nomes[0] + ' e mais ' + (nomes.length - 1) + ' juntaram ' + n + '.';

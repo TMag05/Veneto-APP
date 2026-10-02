@@ -8,6 +8,9 @@
    fundo fica negro. O endereço acompanha a fotografia à vista,
    sem encher o histórico: voltar leva sempre à grelha.
    O que se descarrega é o ficheiro de origem, nunca a redução.
+   Um vídeo abre no mesmo visor e desliza com as fotografias: a
+   imagem de perto do início, um botão de tocar ao centro e, na barra
+   de baixo, tocar e parar, o tempo, a posição e o som (02.10.2026).
    ========================================================= */
 
 (function () {
@@ -95,6 +98,7 @@
     const f = lista[i];
     if (!f || !raiz) return;
     const a = autorDe(f);
+    raiz.setAttribute('aria-label', Fotos.ehVideo(f) ? 'Vídeo' : 'Fotografia');
     raiz.querySelector('.visor__quando').textContent = quando(f);
     raiz.querySelector('.visor__autor').textContent = a.nome;
     raiz.querySelector('.visor__contador').textContent = lista.length > 1 ? (i + 1) + ' de ' + lista.length : '';
@@ -103,14 +107,19 @@
     raiz.querySelectorAll('.visor__seta').forEach(function (b) {
       b.hidden = b.dataset.valor === '-1' ? i === 0 : i === lista.length - 1;
     });
+    controlos();
   }
 
   /* Cada folha tem a miniatura, que já está no telemóvel e aparece
-     logo, e a vista nítida por cima quando chegar. */
+     logo, e a vista nítida por cima quando chegar. Num vídeo, as duas
+     são a imagem de perto do início, e por cima fica o botão de tocar. */
   function preencher(folha, f) {
+    largarVideo(folha);
     folha.dataset.id = f ? f.id : '';
+    folha.dataset.tocando = 'nao';
     folha.innerHTML = '';
     if (!f) return;
+    const video = Fotos.ehVideo(f);
     const zoom = document.createElement('div');
     zoom.className = 'visor__zoom';
     const base = document.createElement('img');
@@ -119,12 +128,24 @@
     base.setAttribute('aria-hidden', 'true');
     const vista = document.createElement('img');
     vista.className = 'visor__img visor__img--vista';
-    vista.alt = 'Fotografia de ' + autorDe(f).nome;
+    vista.alt = (video ? 'Vídeo de ' : 'Fotografia de ') + autorDe(f).nome;
     vista.decoding = 'async';
     vista.addEventListener('load', function () { vista.dataset.pronta = 'sim'; });
     zoom.appendChild(base);
     zoom.appendChild(vista);
     folha.appendChild(zoom);
+    if (video) {
+      const tocar = document.createElement('button');
+      tocar.type = 'button';
+      tocar.className = 'visor__tocar';
+      tocar.setAttribute('aria-label', 'Tocar o vídeo');
+      tocar.innerHTML = Icone('tocar', 24);
+      tocar.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (folha === folhaAtual()) tocarOuParar();
+      });
+      folha.appendChild(tocar);
+    }
     Fotos.url(f.id, 'mini').then(function (u) { if (u && base.isConnected) base.src = u; });
     Fotos.url(f.id, 'vista').then(function (u) { if (u && vista.isConnected) vista.src = u; });
   }
@@ -142,7 +163,209 @@
     zoom = { s: 1, x: 0, y: 0 };
     aplicarZoom(false);
     posicionar(0, false);
+    prepararVideo();
     textos();
+  }
+
+  /* ---------------------------------------------------------
+     Vídeos
+     O vídeo só se monta na folha do meio e sai dela quando se passa
+     para o lado: três vídeos a carregar ao mesmo tempo eram três
+     descargas. Começa sempre com um toque — o iPhone não deixa um
+     vídeo com som arrancar sozinho, nem a app o quer.
+     --------------------------------------------------------- */
+
+  let somLigado = true;   /* fica como se deixou, até se fechar a app */
+  let pediuTocar = false;
+  let animacao = 0;
+  let aArrastar = false;
+
+  function folhaAtual() { return raiz ? raiz.querySelectorAll('.visor__folha')[1] : null; }
+  function videoAtual() { const f = folhaAtual(); return f ? f.querySelector('video') : null; }
+
+  function duracaoDe(v) {
+    const f = lista[i] || {};
+    return v && isFinite(v.duration) && v.duration > 0 ? v.duration : (f.duracao || 0);
+  }
+
+  function largarVideo(folha) {
+    const v = folha && folha.querySelector('video');
+    if (!v) return;
+    v.pause();
+    v.removeAttribute('src');
+    v.load();
+    v.remove();
+    folha.dataset.tocando = 'nao';
+  }
+
+  /* A folha do meio, se for de um vídeo, fica com ele pronto: quando
+     o dedo carrega em tocar, o endereço já está posto e o play() sai
+     dentro do toque, que é o que o iPhone pede para dar som. */
+  function prepararVideo() {
+    const folhas = raiz.querySelectorAll('.visor__folha');
+    largarVideo(folhas[0]);
+    largarVideo(folhas[2]);
+    const folha = folhas[1];
+    const f = lista[i];
+    if (!f || !Fotos.ehVideo(f) || folha.querySelector('video')) return;
+    pediuTocar = false;
+    const v = document.createElement('video');
+    v.className = 'visor__img visor__video';
+    v.playsInline = true;
+    v.setAttribute('playsinline', '');
+    v.preload = 'metadata';
+    v.muted = !somLigado;
+    ['play', 'pause', 'ended', 'loadedmetadata', 'durationchange', 'timeupdate', 'seeked', 'volumechange'].forEach(function (ev) {
+      v.addEventListener(ev, function () { if (v.isConnected) controlos(); });
+    });
+    v.addEventListener('playing', function () { v.dataset.pronto = 'sim'; });
+    v.addEventListener('error', function () { if (v.isConnected && v.getAttribute('src')) falhouVideo(v, f); });
+    folha.querySelector('.visor__zoom').appendChild(v);
+    Fotos.urlVideo(f.id).then(function (u) {
+      if (!u || !v.isConnected) return;
+      v.src = u;
+      if (pediuTocar) arrancar(v);
+    });
+  }
+
+  function arrancar(v) {
+    const p = v.play();
+    if (!p || !p.catch) return;
+    p.catch(function (e) {
+      /* Sem som deixa sempre; o som liga-se depois, com um toque. */
+      if (e && e.name === 'NotAllowedError' && !v.muted) {
+        v.muted = true;
+        somLigado = false;
+        v.play().catch(function () { /* fica parado, com o botão à vista */ });
+      }
+    });
+  }
+
+  function tocarOuParar() {
+    const v = videoAtual();
+    if (!v) return;
+    if (v.paused || v.ended) {
+      pediuTocar = true;
+      if (v.getAttribute('src')) arrancar(v);
+    } else {
+      v.pause();
+    }
+  }
+
+  /* Um vídeo deste telemóvel que o arquivo não consegue dar — houve
+     Safaris assim — toca do Storage, se já lá estiver. */
+  function falhouVideo(v, f) {
+    const remoto = navigator.onLine ? Fotos.endereco(f.id, 'original') : '';
+    if (/^blob:/.test(v.src) && remoto) {
+      v.src = remoto;
+      if (pediuTocar) arrancar(v);
+      return;
+    }
+    if (!pediuTocar) return;
+    pediuTocar = false;
+    if (!f.propria && !navigator.onLine) {
+      UI.abrirFolha('Sem ligação', '<p class="corpo-ui silencioso">Os vídeos do grupo veem-se com rede.</p>');
+    } else {
+      UI.abrirFolha('Não foi possível tocar o vídeo',
+        '<p class="corpo-ui silencioso">Este telemóvel não consegue ler o ficheiro. Pode descarregá-lo e vê-lo noutro.</p>');
+    }
+  }
+
+  /* Os controlos da barra de baixo e o botão do meio seguem o vídeo à
+     vista. Só se redesenha o que mudou. */
+  function controlos() {
+    if (!raiz) return;
+    const f = lista[i];
+    const caixa = raiz.querySelector('.visor__controlos');
+    if (!caixa) return;
+    const video = !!f && Fotos.ehVideo(f);
+    caixa.hidden = !video;
+    if (!video) { pararAnimacao(); return; }
+    const v = videoAtual();
+    const tocando = !!v && !v.paused && !v.ended;
+    folhaAtual().dataset.tocando = tocando ? 'sim' : 'nao';
+
+    const botao = caixa.querySelector('[data-acao="tocarPausa"]');
+    if (botao.dataset.estado !== String(tocando)) {
+      botao.dataset.estado = String(tocando);
+      botao.innerHTML = Icone(tocando ? 'pausa' : 'tocar', 24);
+      botao.setAttribute('aria-label', tocando ? 'Parar' : 'Tocar');
+    }
+    const som = caixa.querySelector('[data-acao="som"]');
+    const mudo = v ? v.muted : !somLigado;
+    if (som.dataset.estado !== String(mudo)) {
+      som.dataset.estado = String(mudo);
+      som.innerHTML = Icone(mudo ? 'semsom' : 'som', 24);
+      som.setAttribute('aria-label', mudo ? 'Pôr o som' : 'Tirar o som');
+    }
+    if (!aArrastar) posicao(v ? v.currentTime : 0, duracaoDe(v));
+    if (tocando) animar(); else pararAnimacao();
+  }
+
+  function posicao(t, d) {
+    const caixa = raiz && raiz.querySelector('.visor__controlos');
+    if (!caixa) return;
+    const frac = d ? Math.min(1, Math.max(0, t / d)) : 0;
+    caixa.querySelector('.visor__barra-cheia').style.width = (frac * 100) + '%';
+    const tempos = caixa.querySelectorAll('.visor__tempo');
+    const decorrido = UI.tempoVideo(Math.floor(t));
+    tempos[0].textContent = decorrido;
+    tempos[1].textContent = UI.tempoVideo(d);
+    const barra = caixa.querySelector('.visor__barra');
+    barra.setAttribute('aria-valuemax', String(Math.round(d)));
+    barra.setAttribute('aria-valuenow', String(Math.floor(t)));
+    barra.setAttribute('aria-valuetext', decorrido + ' de ' + UI.tempoVideo(d));
+  }
+
+  /* A barra anda a cada imagem, não aos solavancos do timeupdate. */
+  function animar() {
+    if (animacao) return;
+    (function passo() {
+      const v = videoAtual();
+      if (!v || v.paused || v.ended) { animacao = 0; return; }
+      if (!aArrastar) posicao(v.currentTime, duracaoDe(v));
+      animacao = requestAnimationFrame(passo);
+    })();
+  }
+
+  function pararAnimacao() {
+    if (animacao) cancelAnimationFrame(animacao);
+    animacao = 0;
+  }
+
+  /* A posição: arrasta-se com o dedo, ou com as setas do teclado,
+     de cinco em cinco segundos. */
+  function ligarBarra(barra) {
+    function ir(e) {
+      const v = videoAtual();
+      const d = duracaoDe(v);
+      if (!v || !d) return;
+      const r = barra.getBoundingClientRect();
+      const t = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * d;
+      v.currentTime = t;
+      posicao(t, d);
+    }
+    function largar(e) {
+      if (!aArrastar) return;
+      aArrastar = false;
+      try { barra.releasePointerCapture(e.pointerId); } catch (x) { /* já largado */ }
+    }
+    barra.addEventListener('pointerdown', function (e) {
+      aArrastar = true;
+      try { barra.setPointerCapture(e.pointerId); } catch (x) { /* sem captura */ }
+      ir(e);
+    });
+    barra.addEventListener('pointermove', function (e) { if (aArrastar) ir(e); });
+    barra.addEventListener('pointerup', largar);
+    barra.addEventListener('pointercancel', largar);
+    barra.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      e.preventDefault();
+      e.stopPropagation();
+      const v = videoAtual();
+      if (!v) return;
+      v.currentTime = Math.max(0, Math.min(duracaoDe(v), v.currentTime + (e.key === 'ArrowRight' ? 5 : -5)));
+    });
   }
 
   /* ---------------------------------------------------------
@@ -262,8 +485,9 @@
   function info() {
     const f = lista[i];
     if (!f) return;
-    UI.abrirFolha('Fotografia',
-      autorHtml(autorDe(f), quando(f)) +
+    const video = Fotos.ehVideo(f);
+    UI.abrirFolha(video ? 'Vídeo' : 'Fotografia',
+      autorHtml(autorDe(f), quando(f) + (video && f.duracao ? ' · ' + UI.tempoVideo(f.duracao) : '')) +
       '<p class="meta" style="margin-top:16px">O ficheiro de origem, como saiu da câmara, é o que se descarrega.' +
         (f.estadoEnvio === 'enviado' ? '' : ' Ainda só existe neste telemóvel.') + '</p>');
   }
@@ -312,6 +536,8 @@
 
     function inicio(e) {
       if (aMudar) return;
+      /* O botão de tocar é do vídeo, não do visor. */
+      if (e.target.closest && e.target.closest('.visor__tocar')) { modo = 'botao'; ini = null; return; }
       const t = e.touches;
       if (t.length === 2) {
         const a = ponto(t[0]), b = ponto(t[1]);
@@ -329,7 +555,7 @@
 
     function movimento(e) {
       e.preventDefault();
-      if (aMudar) return;
+      if (aMudar || modo === 'botao') return;
       const t = e.touches;
       if (modo === 'pinca' && t.length === 2) {
         const a = ponto(t[0]), b = ponto(t[1]);
@@ -372,6 +598,7 @@
 
     function fim(e) {
       if (aMudar) return;
+      if (modo === 'botao') { modo = ''; deToque = Date.now(); return; }
       if (modo === 'pinca') {
         if (e.touches.length) return;   /* ainda há um dedo: espera-se */
         if (zoom.s < 1.01) zoom = { s: 1, x: 0, y: 0 };
@@ -413,6 +640,11 @@
       if (e.key === 'ArrowRight') mudar(1);
       else if (e.key === 'ArrowLeft') mudar(-1);
       else if (e.key === 'Escape') fechar();
+      else if (e.key === ' ' && Fotos.ehVideo(lista[i]) && !(e.target.closest && e.target.closest('button'))) {
+        /* Num botão, o espaço já é o clique dele. */
+        e.preventDefault();
+        tocarOuParar();
+      }
     }
 
     function redimensionar() {
@@ -476,6 +708,15 @@
             '<span class="visor__contador meta num"></span>' +
           '</div>' +
           '<div class="visor__base">' +
+            /* Só num vídeo: tocar e parar, o tempo, a posição e o som. */
+            '<div class="visor__controlos" hidden>' +
+              '<button class="botao-icone" type="button" data-acao="tocarPausa" aria-label="Tocar">' + Icone('tocar', 24) + '</button>' +
+              '<span class="visor__tempo meta num">0:00</span>' +
+              '<div class="visor__barra" role="slider" tabindex="0" aria-label="Posição no vídeo" ' +
+                'aria-valuemin="0" aria-valuemax="0" aria-valuenow="0"><div class="visor__barra-cheia"></div></div>' +
+              '<span class="visor__tempo meta num">0:00</span>' +
+              '<button class="botao-icone" type="button" data-acao="som" aria-label="Tirar o som">' + Icone('som', 24) + '</button>' +
+            '</div>' +
             '<button class="botao-icone" type="button" data-acao="descarregar" aria-label="Descarregar o original">' + Icone('descarregar', 24) + '</button>' +
             '<button class="botao-icone" type="button" data-acao="info" aria-label="Quem a tirou">' + Icone('info', 24) + '</button>' +
             '<button class="botao-icone" type="button" data-acao="apagar" aria-label="Apagar">' + Icone('apagar', 24) + '</button>' +
@@ -492,6 +733,7 @@
       montarFolhas();
       if (desligar) desligar();
       desligar = ligarGestos(raiz.querySelector('.visor__palco'));
+      ligarBarra(raiz.querySelector('.visor__barra'));
     },
 
     /* Chegam fotografias novas do grupo, ou sai uma: o visor fica
@@ -514,6 +756,9 @@
     desmontar: function () {
       if (desligar) { desligar(); desligar = null; }
       if (document.fullscreenElement) document.exitFullscreen().catch(function () {});
+      pararAnimacao();
+      aArrastar = false;
+      if (raiz) raiz.querySelectorAll('.visor__folha').forEach(largarVideo);
       raiz = null;
       idBase = '';
       Fotos.libertarTodos();
@@ -523,6 +768,14 @@
       fechar: fechar,
       info: info,
       passar: function (v) { mudar(parseInt(v, 10) || 0); },
+      tocarPausa: tocarOuParar,
+
+      som: function () {
+        const v = videoAtual();
+        somLigado = v ? v.muted : !somLigado;
+        if (v) v.muted = !somLigado;
+        controlos();
+      },
 
       descarregar: function () {
         const f = lista[i];
@@ -538,7 +791,8 @@
                o telemóvel guarda-o a partir daí. */
             const direto = navigator.onLine ? Fotos.endereco(id, 'original') : '';
             if (direto) { window.open(direto, '_blank', 'noopener'); return; }
-            UI.abrirFolha('Sem ligação', '<p class="corpo-ui silencioso">O original desta fotografia está no servidor. Tente de novo com rede.</p>');
+            UI.abrirFolha('Sem ligação', '<p class="corpo-ui silencioso">O original ' + (Fotos.ehVideo(f) ? 'deste vídeo' : 'desta fotografia') +
+              ' está no servidor. Tente de novo com rede.</p>');
             return;
           }
           UI.descarregar(UI.nomeDeFoto(f, tipo), blob, tipo);
@@ -549,7 +803,7 @@
       apagar: function () {
         const f = lista[i];
         if (!f || !podeApagar(f)) return;
-        UI.abrirFolha('Apagar a fotografia',
+        UI.abrirFolha(Fotos.ehVideo(f) ? 'Apagar o vídeo' : 'Apagar a fotografia',
           '<p class="corpo-ui silencioso">' +
             (f.propria ? 'Sai do álbum do grupo e do seu telemóvel.' : 'Sai do álbum do grupo, para toda a gente.') +
           ' Não se recupera.</p>' +

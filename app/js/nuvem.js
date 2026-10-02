@@ -703,7 +703,9 @@ window.Nuvem = (function () {
        navigator.connection. Os caminhos são os de
        Fotos.caminho(dia, autorId, sha, tamanho), com 'mini',
        'vista' e 'original'; o original sobe tal como veio da
-       câmara, sem reprocessar, mesmo que seja HEIC.
+       câmara, sem reprocessar, mesmo que seja HEIC. Num vídeo, o
+       original é o vídeo, com a extensão dele, e a miniatura e a
+       vista são uma imagem de perto do início.
 
        Metadados de cada objeto:
          Cache-Control: public, max-age=31536000, immutable
@@ -799,13 +801,19 @@ window.Nuvem = (function () {
     }).catch(function () { /* ignora se já não existe */ });
   }
 
+  /* O original de um vídeo leva a extensão dele; o de uma fotografia
+     fica .jpg, como sempre foi, mesmo quando é HEIC. */
+  function extOriginal(f) {
+    return Fotos.ehVideo(f) ? Fotos.extensao(f.tipo) : 'jpg';
+  }
+
   function enviarFoto(registo, meta) {
     if (simulada()) return Promise.reject(erro('sem-servidor'));
     return obterSessao().then(function (sessao) {
       const autorId = meta.autorId || sessao.uid;
       const cMini = Fotos.caminho(meta.dia, autorId, meta.sha, 'mini');
       const cVista = Fotos.caminho(meta.dia, autorId, meta.sha, 'vista');
-      const cOrig = Fotos.caminho(meta.dia, autorId, meta.sha, 'original');
+      const cOrig = Fotos.caminho(meta.dia, autorId, meta.sha, 'original', extOriginal(registo));
 
       const pMini = subirObjeto(cMini, registo.mini, 'image/jpeg', sessao);
       const pVista = subirObjeto(cVista, registo.vista || registo.mini, 'image/jpeg', sessao);
@@ -834,6 +842,8 @@ window.Nuvem = (function () {
           tipo: registo.tipo || 'image/jpeg',
           largura: registo.largura || 0,
           altura: registo.altura || 0,
+          /* Num vídeo, os segundos; numa fotografia, zero. */
+          duracao: Fotos.ehVideo(registo) ? Math.round((registo.duracao || 0) * 10) / 10 : 0,
           caminhoMini: cMini,
           caminhoVista: cVista,
           caminhoOriginal: cOrig
@@ -865,7 +875,7 @@ window.Nuvem = (function () {
       const autorId = meta.autorId || sessao.uid;
       const cMini = meta.caminhoMini || Fotos.caminho(meta.dia, autorId, meta.sha, 'mini');
       const cVista = meta.caminhoVista || Fotos.caminho(meta.dia, autorId, meta.sha, 'vista');
-      const cOrig = meta.caminhoOriginal || Fotos.caminho(meta.dia, autorId, meta.sha, 'original');
+      const cOrig = meta.caminhoOriginal || Fotos.caminho(meta.dia, autorId, meta.sha, 'original', extOriginal(meta));
 
       const p1 = apagarObjeto(cMini, sessao);
       const p2 = apagarObjeto(cVista, sessao);

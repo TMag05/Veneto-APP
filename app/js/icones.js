@@ -45,6 +45,12 @@ window.Icone = (function () {
     bussola: '<path d="M12 21a9 9 0 100-18 9 9 0 000 18z"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
     partilhar: '<path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 13v7h14v-7"/>',
     camara: '<path d="M3 7h4l1.5-2h7L17 7h4v13H3z"/><path d="M12 17a4 4 0 100-8 4 4 0 000 8z"/>',
+    /* Os vídeos da galeria: filmar, tocar, parar e o som. */
+    video: '<path d="M3 7h12v10H3z"/><path d="M15 10.5L21 7v10l-6-3.5"/>',
+    tocar: '<path d="M7 4.5l12 7.5-12 7.5z"/>',
+    pausa: '<path d="M8 5v14M16 5v14"/>',
+    som: '<path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 9a4.5 4.5 0 010 6M19 6.5a8 8 0 010 11"/>',
+    semsom: '<path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/>',
     oficina: '<path d="M3 20V9l9-5 9 5v11"/><path d="M9 20v-6h6v6"/>',
     caixa: '<path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/>'
   };
