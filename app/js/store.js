@@ -675,16 +675,16 @@ window.Estado = (function () {
      num dia já é muito para trinta pessoas verem. */
   const LIMITE_DIARIO = 100;
 
-  function contarDoDia(dia, soVideos) {
-    return estado.fotos.filter(function (f) { return f.dia === dia && (!soVideos || Fotos.ehVideo(f)); }).length;
+  function contarDoDia(dia) {
+    return estado.fotos.filter(function (f) { return f.dia === dia; }).length;
   }
 
   /* Os vídeos sobem tal como saíram da câmara, sem reduzir — no
-     browser não há como o fazer sem uma biblioteca de fora. Um minuto
-     já são sessenta megabytes no iPhone, e trinta pessoas a vê-los
-     pela rede da montanha: daí o minuto, e dez por dia. */
-  const DURACAO_MAXIMA = 60;      /* segundos */
-  const LIMITE_VIDEOS = 10;       /* por pessoa e por dia */
+     browser não há como o fazer sem uma biblioteca de fora. O teto
+     não é para medir o que cada um filma: é para apanhar o vídeo que
+     ficou a gravar no bolso, que nunca acabaria de subir. Decisão da
+     organização, 02.10.2026, que tirou o minuto e os dez por dia. */
+  const DURACAO_MAXIMA = 5 * 60;  /* segundos */
 
   /* O tipo de um ficheiro. Há telemóveis que não o dizem de um vídeo
      escolhido da galeria: a extensão chega. */
@@ -702,7 +702,6 @@ window.Estado = (function () {
     const tipo = tipoDe(ficheiro);
     const video = /^video\//.test(tipo);
     if (contarDoDia(dia) >= LIMITE_DIARIO) { if (feito) feito(null, 'limite'); return; }
-    if (video && contarDoDia(dia, true) >= LIMITE_VIDEOS) { if (feito) feito(null, 'limite-videos'); return; }
 
     const id = 'm' + Date.now() + Math.floor(Math.random() * 1000);
     const tamanhos = [

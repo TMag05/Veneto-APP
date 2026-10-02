@@ -3,7 +3,7 @@
    A captura abre a câmara nativa para não perder HDR nem
    modo noturno. O ficheiro fica inteiro no telemóvel, tal como
    saiu da câmara, e o envio fica em fila. Os vídeos entram pelo
-   mesmo caminho, até um minuto (02.10.2026).
+   mesmo caminho, até cinco minutos (02.10.2026).
    ========================================================= */
 
 (function () {
@@ -54,8 +54,7 @@
   function avisar(m, falhouVideo) {
     function folha(titulo, texto) { UI.abrirFolha(titulo, '<p class="corpo-ui silencioso">' + texto + '</p>'); }
     if (m.limite) folha('Cem fotografias neste dia', 'É o máximo por dia. Amanhã recomeça.');
-    else if (m['limite-videos']) folha('Dez vídeos neste dia', 'É o máximo por dia. Amanhã recomeça.');
-    else if (m.longo) folha('Vídeo longo demais', 'Os vídeos vão até um minuto. Pode encurtá-lo na galeria do telemóvel e voltar a juntá-lo.');
+    else if (m.longo) folha('Vídeo longo demais', 'Os vídeos vão até cinco minutos. Pode encurtá-lo na galeria do telemóvel e voltar a juntá-lo.');
     else if (m.video) folha('Não foi possível abrir o vídeo', 'Este telemóvel não consegue ler o ficheiro.');
     else {
       const falhou = (m.espaco || 0) + (m.leitura || 0);

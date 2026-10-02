@@ -83,7 +83,7 @@
       UI.descarregar(nomeZip, blob, 'application/zip');
     }).catch(function (e) {
       UI.abrirFolha('Ficheiro grande demais',
-        '<p class="corpo-ui silencioso">São fotografias a mais para um ficheiro só. ' +
+        '<p class="corpo-ui silencioso">O álbum não cabe num ficheiro só. ' +
         'Descarregue dia a dia.</p>');
     });
   }
