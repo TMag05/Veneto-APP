@@ -95,9 +95,10 @@ window.UI = (function () {
   /* ---------------------------------------------------------
      A localização de cada paragem
      O grupo segue os batedores; a app não traça percurso. Cada
-     paragem abre-se no Google Maps ou no Waze, só o sítio — quem
-     conduz escolhe a aplicação. Decisão de 27.09.2026, que tirou os
-     links por troço e o GPX.
+     paragem abre-se no Google Maps, só o sítio. Decisão de
+     27.09.2026, que tirou os links por troço e o GPX. O Waze saiu a
+     02.10.2026: os caminhos que propunha não eram os melhores, e
+     uma nota pede o Google Maps a quem o usaria por hábito.
      --------------------------------------------------------- */
 
   /* Com «pesquisa», procura-se pelo nome: é o que vale enquanto as
@@ -109,24 +110,25 @@ window.UI = (function () {
     return 'https://www.google.com/maps/search/?api=1&query=' + p.lat + ',' + p.lng;
   }
 
-  function linkWaze(poiId) {
+  function temLocal(poiId) {
     const p = POIS[poiId];
-    if (!p) return '#';
-    if (p.pesquisa) return 'https://waze.com/ul?q=' + encodeURIComponent(p.pesquisa) + '&navigate=yes';
-    return 'https://waze.com/ul?ll=' + p.lat + ',' + p.lng + '&navigate=yes';
+    return !!p && (!!p.pesquisa || (!!p.lat && !!p.lng));
   }
 
-  /* Os dois atalhos, lado a lado. Sem coordenadas nem nome, nada. */
+  /* O atalho para o Google Maps. Sem coordenadas nem nome, nada. */
   function atalhosLocal(poiId) {
-    const p = POIS[poiId];
-    if (!p || (!p.pesquisa && (!p.lat || !p.lng))) return '';
-    const link = function (href, rotulo) {
-      return '<a class="botao botao--texto" href="' + href + '" target="_blank" rel="noopener">' +
-        Icone('externo', 20) + rotulo + '</a>';
-    };
+    if (!temLocal(poiId)) return '';
     return '<div class="atalhos-local">' +
-      link(linkLocal(poiId), 'Google Maps') + link(linkWaze(poiId), 'Waze') +
+      '<a class="botao botao--texto" href="' + linkLocal(poiId) + '" target="_blank" rel="noopener">' +
+        Icone('externo', 20) + 'Google Maps</a>' +
     '</div>';
+  }
+
+  /* Uma vez por ecrã, e não ao lado de cada atalho: no roadbook
+     repetir-se-ia em cada momento do dia. */
+  function notaMaps() {
+    return '<p class="corpo-ui silencioso nota-maps">' +
+      'Para ir até uma paragem, use o Google Maps. O Waze propõe caminhos que não são os melhores.</p>';
   }
 
   function descarregar(nome, conteudo, tipo) {
@@ -589,7 +591,7 @@ window.UI = (function () {
   return {
     h: h, dataLonga: dataLonga, dataCurta: dataCurta, intervaloEvento: intervaloEvento,
     minutos: minutos, horaAgora: horaAgora, plural: plural, duracao: duracao,
-    rotuloDia: rotuloDia, pastaDia: pastaDia, troco: troco, haversine: haversine, linkLocal: linkLocal, linkWaze: linkWaze, atalhosLocal: atalhosLocal,
+    rotuloDia: rotuloDia, pastaDia: pastaDia, troco: troco, haversine: haversine, linkLocal: linkLocal, temLocal: temLocal, atalhosLocal: atalhosLocal, notaMaps: notaMaps,
     descarregar: descarregar,
     foto: foto, imagemDe: imagemDe, logo: logo, horario: horario, distintivo: distintivo, linhaLista: linhaLista,
     campo: campo, ligarCampos: ligarCampos, coordenadas: coordenadas, escolhaCarro: escolhaCarro, escolhaFuncao: escolhaFuncao,

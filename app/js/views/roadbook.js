@@ -6,9 +6,9 @@
    endereço próprio (#/roadbook/dia/n) — a paragem e a nota.
 
    Há batedores e o grupo segue em caravana: a app não traça
-   percurso. Cada paragem leva a sua localização, no Google Maps
-   ou no Waze. Decisão de 27.09.2026, que tirou a distância entre
-   paragens, os links por troço e o GPX.
+   percurso. Cada paragem leva a sua localização, no Google Maps.
+   Decisão de 27.09.2026, que tirou a distância entre paragens, os
+   links por troço e o GPX; o Waze saiu a 02.10.2026.
    ========================================================= */
 
 (function () {
@@ -170,6 +170,7 @@
       const atual = eHoje ? Programa.indiceAtual(dia) : -1;
       return '<div class="faixa">' +
         '<div class="seccao-cabecalho"><h2 class="etiqueta">O dia</h2></div>' +
+        (dia.momentos.some(function (m) { return m.poi && UI.temLocal(m.poi); }) ? UI.notaMaps() : '') +
         dia.momentos.map(function (m, i) {
           let est = 'futuro';
           if (eHoje) {
@@ -184,6 +185,7 @@
     if (dia.etapas.length) {
       return '<div class="faixa">' +
         '<div class="seccao-cabecalho"><h2 class="etiqueta">As paragens</h2></div>' +
+        (dia.etapas.some(UI.temLocal) ? UI.notaMaps() : '') +
         dia.etapas.map(function (id) {
           const poi = POIS[id];
           if (!poi) return '';

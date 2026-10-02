@@ -692,10 +692,13 @@ a { color: var(--verde); text-decoration: none; }
 .etapa__titulo { font-family: var(--font-editorial); font-size: 22px; line-height: 1.25; margin: 0; }
 .etapa__meta { margin-top: 4px; display: flex; gap: var(--esp-2); flex-wrap: wrap; }
 
-/* A localização de uma paragem: Google Maps e Waze, lado a lado,
-   em texto. Não é o CTA de nenhum ecrã. */
+/* A localização de uma paragem: o Google Maps, em texto. Não é o
+   CTA de nenhum ecrã. A nota que o pede em vez do Waze diz-se uma
+   vez por ecrã — por baixo do atalho na paragem, por cima da lista
+   no roadbook. */
 .atalhos-local { display: flex; flex-wrap: wrap; column-gap: var(--esp-3); }
 .capitulo .atalhos-local { margin-top: var(--esp-1); }
+.atalhos-local + .nota-maps { margin-top: var(--esp-1); }
 
 /* Cada momento do dia, no roadbook, com o que o bloco do Hoje não
    diz. Tem endereço próprio: é o destino dos blocos do Hoje. */
