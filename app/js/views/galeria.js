@@ -4,6 +4,8 @@
    modo noturno. O ficheiro fica inteiro no telemóvel, tal como
    saiu da câmara, e o envio fica em fila. Os vídeos entram pelo
    mesmo caminho, até cinco minutos (02.10.2026).
+   «Selecionar» escolhe várias para as guardar na galeria do
+   telemóvel, como nas Fotografias do iPhone (03.10.2026).
    ========================================================= */
 
 (function () {
@@ -12,6 +14,7 @@
   let vigia = null;
   /* A última fotografia vista no visor: a grelha volta a ela. */
   let focar = '';
+  const selecao = Guardar.selecao();
 
   /* O nome de quem a tirou, para quem lê o ecrã. A grelha é só das
      fotografias: o carro e o lugar estão na página de cada uma. */
@@ -46,6 +49,8 @@
     const rotulo = video
       ? 'Vídeo de ' + autorDe(f) + (f.duracao ? ', ' + UI.tempoVideo(f.duracao) : '')
       : 'Fotografia de ' + autorDe(f);
+    /* A escolher, um toque escolhe em vez de abrir. */
+    if (selecao.ativa()) return selecao.celula(f, dentro, rotulo);
     return '<a class="grelha-fotos__celula" href="#/foto/' + encodeURIComponent(f.id) + '" ' +
       'style="' + estilo + '" aria-label="' + UI.h(rotulo) + '">' + dentro + '</a>';
   }
@@ -100,6 +105,7 @@
         '</div>' +
 
         '<div class="faixa" style="margin-top:16px">' +
+          (fotos.some(function (f) { return !!f.id; }) ? selecao.topo('') : '') +
           (fotos.length
             ? '<div class="grelha-fotos">' + fotos.map(celula).join('') + '</div>'
             : '<p class="corpo-editorial silencioso">Ainda não há fotografias nem vídeos nesta seleção.</p>') +
@@ -109,6 +115,7 @@
           '<a class="botao botao--radicchio botao--largo" href="#/album">Abrir o álbum completo</a>' +
         '</div>' : '') +
 
+        (selecao.ativa() ? selecao.barra() :
         '<div class="captura barra-inferior">' +
           '<button class="botao botao--principal" type="button" data-acao="camara">' +
             Icone('camara', 20) + 'Fotografar</button>' +
@@ -121,7 +128,7 @@
           '<input type="file" id="ent-camara" accept="image/*" capture="environment">' +
           '<input type="file" id="ent-filmar" accept="video/*" capture="environment">' +
           '<input type="file" id="ent-ficheiro" accept="image/*,video/*" multiple>' +
-        '</div>';
+        '</div>');
     },
 
     montar: function (el, p, chegada) {
@@ -175,6 +182,7 @@
     /* Os endereços temporários das imagens devolvem-se ao sair. */
     desmontar: function () {
       Fotos.libertarTodos();
+      selecao.limpar();
       if (vigia) { clearInterval(vigia); vigia = null; }
     },
 
@@ -183,11 +191,11 @@
     lista: lista,
     focar: function (id) { focar = id; },
 
-    acoes: {
+    acoes: Object.assign({
       filtrar: function (id) { filtro = id; App.repintar(); },
       camara: function () { document.getElementById('ent-camara').click(); },
       filmar: function () { document.getElementById('ent-filmar').click(); },
       ficheiro: function () { document.getElementById('ent-ficheiro').click(); }
-    }
+    }, selecao.acoes)
   };
 })();

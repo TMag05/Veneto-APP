@@ -493,88 +493,12 @@
         (f.estadoEnvio === 'enviado' ? '' : ' Ainda só existe neste telemóvel.') + '</p>');
   }
 
-  /* ---------------------------------------------------------
-     Guardar na galeria do telemóvel
-     O original, como saiu da câmara: o do arquivo, ou, se for de
-     outra pessoa, o do servidor. No iPhone guarda-se pela folha de
-     Partilhar, que só abre dentro do toque: se o original demorar a
-     chegar, a folha da app diz quanto já veio e, se o toque tiver
-     passado, fica com um botão para o segundo.
-     --------------------------------------------------------- */
-
-  let aGuardar = 0;          /* o pedido em curso; um toque novo esquece o anterior */
-  const ESPERA_GUARDAR = 400; /* ms até a folha dizer que está a trazer o original */
-
-  function folhaGuardar(f, corpo) {
-    UI.abrirFolha(Fotos.ehVideo(f) ? 'Guardar o vídeo' : 'Guardar a fotografia', corpo);
-  }
-
-  function megas(bytes) {
-    return (bytes / 1048576).toLocaleString('pt-PT', { maximumFractionDigits: bytes < 10485760 ? 1 : 0 });
-  }
-
-  /* O toque já passou: o original fica pronto, à espera de outro. */
-  function guardarPronto(f, nome, blob, tipo) {
-    const video = Fotos.ehVideo(f);
-    folhaGuardar(f,
-      '<p class="corpo-ui silencioso">' + (video ? 'O vídeo está pronto.' : 'A fotografia está pronta.') +
-        ' No ecrã seguinte, escolha «' + (video ? 'Guardar vídeo' : 'Guardar imagem') + '».</p>' +
-      '<button class="botao botao--principal botao--largo" style="margin-top:24px" type="button" id="btn-guardar-foto">' +
-        Icone('descarregar', 20) + 'Guardar nas Fotografias</button>');
-    document.getElementById('btn-guardar-foto').addEventListener('click', function () {
-      UI.guardarNaGaleria(nome, blob, tipo).then(function (r) {
-        /* Se fechou a folha de Partilhar sem guardar, o botão fica. */
-        if (r === 'galeria' || r === 'descarregado') UI.fecharFolha();
-      });
-    });
-  }
-
-  /* Sem o original: sem rede, ou a ligação não chegou para o trazer. */
-  function guardarSemOriginal(f) {
-    const coisa = Fotos.ehVideo(f) ? 'deste vídeo' : 'desta fotografia';
-    if (!navigator.onLine) {
-      folhaGuardar(f, '<p class="corpo-ui silencioso">O original ' + coisa + ' está no servidor. Tente de novo com rede.</p>');
-      return;
-    }
-    folhaGuardar(f,
-      '<p class="corpo-ui silencioso">A ligação não chegou para trazer o original ' + coisa + '.</p>' +
-      '<button class="botao botao--secundario botao--largo" style="margin-top:24px" type="button" id="btn-guardar-outra">Tentar de novo</button>');
-    document.getElementById('btn-guardar-outra').addEventListener('click', function () {
-      UI.fecharFolha();
-      guardar();
-    });
-  }
-
+  /* Guardar na galeria do telemóvel: o original, como saiu da
+     câmara, pelo mesmo caminho da escolha de várias na grelha
+     (js/guardar.js). */
   function guardar() {
     const f = lista[i];
-    if (!f) return;
-    const pedido = ++aGuardar;
-    let aEsperar = false;
-    const temporizador = setTimeout(function () {
-      aEsperar = true;
-      folhaGuardar(f, '<p class="corpo-ui silencioso">A trazer o original, como saiu da câmara.</p>' +
-        '<p class="meta num" style="margin-top:16px" id="guardar-conta"></p>');
-    }, ESPERA_GUARDAR);
-    function progresso(lidos, total) {
-      const conta = document.getElementById('guardar-conta');
-      if (conta) conta.textContent = total ? megas(lidos) + ' de ' + megas(total) + ' MB' : megas(lidos) + ' MB';
-    }
-    Promise.all([
-      Fotos.obter(f.id, 'original', progresso).catch(function () { return null; }),
-      Fotos.ler(f.id).catch(function () { return null; })
-    ]).then(function (x) {
-      clearTimeout(temporizador);
-      /* Outro toque tomou o lugar deste, ou fechou-se a folha de espera. */
-      if (pedido !== aGuardar || (aEsperar && document.getElementById('folha').hidden)) return;
-      const blob = x[0];
-      if (!blob) { guardarSemOriginal(f); return; }
-      const tipo = (x[1] && x[1].tipo) || f.tipo || blob.type || 'image/jpeg';
-      const nome = UI.nomeDeFoto(f, tipo);
-      UI.guardarNaGaleria(nome, blob, tipo).then(function (r) {
-        if (r === 'sem-toque') guardarPronto(f, nome, blob, tipo);
-        else if (aEsperar) UI.fecharFolha();
-      });
-    });
+    if (f) Guardar.fotos([f]);
   }
 
   /* ---------------------------------------------------------

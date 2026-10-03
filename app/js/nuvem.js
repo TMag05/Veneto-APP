@@ -1039,7 +1039,7 @@ window.Nuvem = (function () {
   /* O corpo da resposta aos bocados, para se dizer quanto falta: o
      original de um vídeo são dezenas de megabytes. Cada 8 MB passam a
      Blob, para o telemóvel não juntar o ficheiro inteiro em memória
-     antes de o entregar — como o .zip do álbum. */
+     antes de o entregar. */
   const BOCADO = 8 * 1024 * 1024;
   function lerAosBocados(r, progresso) {
     if (!r.body || !r.body.getReader) return r.blob();

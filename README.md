@@ -43,7 +43,7 @@ A app existe para o passeio e só para o passeio. Os convidados recebem acesso p
 
 **Toda a app é fotográfica, e escura de origem.** Em **Mais › Aspeto** troca-se para claro — a paleta de pedra de Istria dos guidelines —, e a escolha fica no telemóvel de quem a fez. O que assenta sobre fotografia não muda com o tema; tudo o resto passa AA nos dois. Cada separador abre com uma **capa** — um cartão de fotografia inserido das margens, de cantos redondos, com o título assente no fundo dela — e os separadores de topo não têm cabeçalho: a capa é o cabeçalho. Por baixo dela o conteúdo vive em cartões: os dias do roadbook, os grupos de linhas do Mais, a moldura do percurso, a chapa escura de cada traçado. Os filtros e os dias são cápsulas numa fila que corre na horizontal. A barra de navegação é uma só, flutuante, igual em toda a app. A navegação principal usa um sinal próprio — cinco punções desenhados na mesma gramática, grelha de 48 e traço único de 3 com pontas redondas: os picos com o sol a nascer (Hoje), a tulipa de roadbook de rally (Roadbook), o mapa dobrado (Etapas), a moldura com paisagem (Galeria) e três estratos de dolomia (Mais). A cor vem de fora: o separador aberto a cobre, os outros no cinzento da barra. É a única navegação da app que não usa o conjunto geral de ícones. A exceção deliberada é o SOS, que continua o único ecrã inteiramente vermelho — sem fotografia, para não distrair de uma emergência.
 
-**Depois** — o álbum abre com uma **certidão do percurso**: quilómetros, etapas, paragens visitadas, ponto mais alto com altitude, viatura, matrícula e número de edição, seguida dos passos ordenados por altitude e das fotografias.
+**Depois** — o álbum abre com uma **certidão do percurso**: quilómetros, etapas, paragens visitadas, ponto mais alto com altitude, viatura, matrícula e número de edição, seguida dos passos ordenados por altitude e das fotografias. Na Galeria e no Álbum, «Selecionar» escolhe várias e guarda-as na galeria do telemóvel, em qualidade original; não há .zip, que num telemóvel não se abre.
 
 Não há checkup, não há transporte de viatura e não há inscrições — essas fases não fazem parte do âmbito.
 
@@ -104,7 +104,7 @@ app/
     imagens.js          imagens de reserva, a substituir por fotografia
     fotos.js            arquivo das fotografias do grupo, em IndexedDB
     nuvem.js            a fronteira com o servidor: contas (REST do Firebase, simulado até haver projeto) e fotografias
-    lib/zip.js          junta ficheiros num .zip, sem os comprimir
+    guardar.js          guardar na galeria do telemóvel, uma ou várias escolhidas
     app.js              encaminhamento, histórico e chrome
     views/              ecrãs do convidado; org*.js são a área da organização
   exemplos/veneto/      conteúdo da edição do Veneto, guardado para referência
@@ -139,7 +139,7 @@ servidor.js             servidor estático de desenvolvimento
 | Contas dos convidados | `js/nuvem.js` › `CONFIG` | Sem projeto Firebase, as contas vivem num servidor simulado em cada browser: a organização só vê as criadas no seu, e a recuperação da palavra-passe não envia email. Com o projeto, faltam as regras de `contas/{uid}` e a Cloud Function que apaga do Auth a conta que a organização apagou |
 | Envio das fotografias | `js/nuvem.js` | Ligado ao Firebase: o original, a miniatura e a vista sobem para o Storage logo a seguir a tirar a fotografia, e o registo vai para o Firestore. Sem rede, fica guardada no telemóvel e sobe no primeiro momento em que a ligação voltar. Na Galeria, é de todos em poucos segundos |
 | Vídeos | `js/store.js` | Entram pela Galeria, pelo botão Filmar ou da galeria do telemóvel, até cinco minutos, sem limite por dia — o teto só apanha o vídeo que ficou a gravar no bolso. Sobem tal como saíram da câmara, pelo mesmo caminho das fotografias, com uma imagem do início como miniatura. Cada minuto do iPhone são cerca de 60 MB no Storage, e cada vez que alguém o vê é descarga paga. Os do grupo veem-se com rede |
-| CORS do bucket | `docs/firebase/cors.json` | Aplicado a 03.10.2026. Sem ele, nenhum original do grupo se conseguia guardar na galeria, e o .zip do álbum levava só as fotografias do próprio telemóvel. Só leitura, e só para os domínios da app: se um mudar, acrescenta-se a esse ficheiro e volta-se a aplicar — na [Cloud Shell](https://console.cloud.google.com/?cloudshell=true&project=dolomitesgt), criar `cors.json` com o conteúdo dele e correr `gcloud storage buckets update gs://dolomitesgt.firebasestorage.app --cors-file=cors.json` |
+| CORS do bucket | `docs/firebase/cors.json` | Aplicado a 03.10.2026. Sem ele, nenhum original do grupo se conseguia guardar na galeria. Só leitura, e só para os domínios da app: se um mudar, acrescenta-se a esse ficheiro e volta-se a aplicar — na [Cloud Shell](https://console.cloud.google.com/?cloudshell=true&project=dolomitesgt), criar `cors.json` com o conteúdo dele e correr `gcloud storage buckets update gs://dolomitesgt.firebasestorage.app --cors-file=cors.json` |
 
 ---
 
