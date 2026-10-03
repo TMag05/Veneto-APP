@@ -7,7 +7,8 @@
    tirou. Um toque esconde ou mostra as barras — escondidas, o
    fundo fica negro. O endereço acompanha a fotografia à vista,
    sem encher o histórico: voltar leva sempre à grelha.
-   O que se descarrega é o ficheiro de origem, nunca a redução.
+   O que se guarda é o ficheiro de origem, nunca a redução, e vai
+   para a galeria do telemóvel, não para um ficheiro (03.10.2026).
    Um vídeo abre no mesmo visor e desliza com as fotografias: a
    imagem de perto do início, um botão de tocar ao centro e, na barra
    de baixo, tocar e parar, o tempo, a posição e o som (02.10.2026).
@@ -461,7 +462,7 @@
      As barras, e o fundo negro quando se escondem
      --------------------------------------------------------- */
 
-  const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+  const ios = UI.iphone;
 
   function mostrarBarras(sim) {
     if (!raiz) return;
@@ -488,8 +489,92 @@
     const video = Fotos.ehVideo(f);
     UI.abrirFolha(video ? 'Vídeo' : 'Fotografia',
       autorHtml(autorDe(f), quando(f) + (video && f.duracao ? ' · ' + UI.tempoVideo(f.duracao) : '')) +
-      '<p class="meta" style="margin-top:16px">O ficheiro de origem, como saiu da câmara, é o que se descarrega.' +
+      '<p class="meta" style="margin-top:16px">O ficheiro de origem, como saiu da câmara, é o que se guarda.' +
         (f.estadoEnvio === 'enviado' ? '' : ' Ainda só existe neste telemóvel.') + '</p>');
+  }
+
+  /* ---------------------------------------------------------
+     Guardar na galeria do telemóvel
+     O original, como saiu da câmara: o do arquivo, ou, se for de
+     outra pessoa, o do servidor. No iPhone guarda-se pela folha de
+     Partilhar, que só abre dentro do toque: se o original demorar a
+     chegar, a folha da app diz quanto já veio e, se o toque tiver
+     passado, fica com um botão para o segundo.
+     --------------------------------------------------------- */
+
+  let aGuardar = 0;          /* o pedido em curso; um toque novo esquece o anterior */
+  const ESPERA_GUARDAR = 400; /* ms até a folha dizer que está a trazer o original */
+
+  function folhaGuardar(f, corpo) {
+    UI.abrirFolha(Fotos.ehVideo(f) ? 'Guardar o vídeo' : 'Guardar a fotografia', corpo);
+  }
+
+  function megas(bytes) {
+    return (bytes / 1048576).toLocaleString('pt-PT', { maximumFractionDigits: bytes < 10485760 ? 1 : 0 });
+  }
+
+  /* O toque já passou: o original fica pronto, à espera de outro. */
+  function guardarPronto(f, nome, blob, tipo) {
+    const video = Fotos.ehVideo(f);
+    folhaGuardar(f,
+      '<p class="corpo-ui silencioso">' + (video ? 'O vídeo está pronto.' : 'A fotografia está pronta.') +
+        ' No ecrã seguinte, escolha «' + (video ? 'Guardar vídeo' : 'Guardar imagem') + '».</p>' +
+      '<button class="botao botao--principal botao--largo" style="margin-top:24px" type="button" id="btn-guardar-foto">' +
+        Icone('descarregar', 20) + 'Guardar nas Fotografias</button>');
+    document.getElementById('btn-guardar-foto').addEventListener('click', function () {
+      UI.guardarNaGaleria(nome, blob, tipo).then(function (r) {
+        /* Se fechou a folha de Partilhar sem guardar, o botão fica. */
+        if (r === 'galeria' || r === 'descarregado') UI.fecharFolha();
+      });
+    });
+  }
+
+  /* Sem o original: sem rede, ou a ligação não chegou para o trazer. */
+  function guardarSemOriginal(f) {
+    const coisa = Fotos.ehVideo(f) ? 'deste vídeo' : 'desta fotografia';
+    if (!navigator.onLine) {
+      folhaGuardar(f, '<p class="corpo-ui silencioso">O original ' + coisa + ' está no servidor. Tente de novo com rede.</p>');
+      return;
+    }
+    folhaGuardar(f,
+      '<p class="corpo-ui silencioso">A ligação não chegou para trazer o original ' + coisa + '.</p>' +
+      '<button class="botao botao--secundario botao--largo" style="margin-top:24px" type="button" id="btn-guardar-outra">Tentar de novo</button>');
+    document.getElementById('btn-guardar-outra').addEventListener('click', function () {
+      UI.fecharFolha();
+      guardar();
+    });
+  }
+
+  function guardar() {
+    const f = lista[i];
+    if (!f) return;
+    const pedido = ++aGuardar;
+    let aEsperar = false;
+    const temporizador = setTimeout(function () {
+      aEsperar = true;
+      folhaGuardar(f, '<p class="corpo-ui silencioso">A trazer o original, como saiu da câmara.</p>' +
+        '<p class="meta num" style="margin-top:16px" id="guardar-conta"></p>');
+    }, ESPERA_GUARDAR);
+    function progresso(lidos, total) {
+      const conta = document.getElementById('guardar-conta');
+      if (conta) conta.textContent = total ? megas(lidos) + ' de ' + megas(total) + ' MB' : megas(lidos) + ' MB';
+    }
+    Promise.all([
+      Fotos.obter(f.id, 'original', progresso).catch(function () { return null; }),
+      Fotos.ler(f.id).catch(function () { return null; })
+    ]).then(function (x) {
+      clearTimeout(temporizador);
+      /* Outro toque tomou o lugar deste, ou fechou-se a folha de espera. */
+      if (pedido !== aGuardar || (aEsperar && document.getElementById('folha').hidden)) return;
+      const blob = x[0];
+      if (!blob) { guardarSemOriginal(f); return; }
+      const tipo = (x[1] && x[1].tipo) || f.tipo || blob.type || 'image/jpeg';
+      const nome = UI.nomeDeFoto(f, tipo);
+      UI.guardarNaGaleria(nome, blob, tipo).then(function (r) {
+        if (r === 'sem-toque') guardarPronto(f, nome, blob, tipo);
+        else if (aEsperar) UI.fecharFolha();
+      });
+    });
   }
 
   /* ---------------------------------------------------------
@@ -717,7 +802,7 @@
               '<span class="visor__tempo meta num">0:00</span>' +
               '<button class="botao-icone" type="button" data-acao="som" aria-label="Tirar o som">' + Icone('som', 24) + '</button>' +
             '</div>' +
-            '<button class="botao-icone" type="button" data-acao="descarregar" aria-label="Descarregar o original">' + Icone('descarregar', 24) + '</button>' +
+            '<button class="botao-icone" type="button" data-acao="guardar" aria-label="Guardar na galeria">' + Icone('descarregar', 24) + '</button>' +
             '<button class="botao-icone" type="button" data-acao="info" aria-label="Quem a tirou">' + Icone('info', 24) + '</button>' +
             '<button class="botao-icone" type="button" data-acao="apagar" aria-label="Apagar">' + Icone('apagar', 24) + '</button>' +
           '</div>' +
@@ -777,27 +862,7 @@
         controlos();
       },
 
-      descarregar: function () {
-        const f = lista[i];
-        if (!f) return;
-        const id = f.id;
-        /* O original: o do arquivo, ou, se for de outra pessoa, o do
-           servidor. */
-        Promise.all([Fotos.obter(id, 'original'), Fotos.ler(id).catch(function () { return null; })]).then(function (x) {
-          const blob = x[0];
-          const tipo = (x[1] && x[1].tipo) || f.tipo || (blob && blob.type) || 'image/jpeg';
-          if (!blob) {
-            /* Sem poder trazê-lo para aqui, abre-se o original onde está;
-               o telemóvel guarda-o a partir daí. */
-            const direto = navigator.onLine ? Fotos.endereco(id, 'original') : '';
-            if (direto) { window.open(direto, '_blank', 'noopener'); return; }
-            UI.abrirFolha('Sem ligação', '<p class="corpo-ui silencioso">O original ' + (Fotos.ehVideo(f) ? 'deste vídeo' : 'desta fotografia') +
-              ' está no servidor. Tente de novo com rede.</p>');
-            return;
-          }
-          UI.descarregar(UI.nomeDeFoto(f, tipo), blob, tipo);
-        });
-      },
+      guardar: guardar,
 
       /* Nunca ao primeiro toque. */
       apagar: function () {

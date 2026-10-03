@@ -630,9 +630,9 @@ window.Estado = (function () {
     return tamanho === 'mini' ? f.caminhoMini : tamanho === 'vista' ? f.caminhoVista : f.caminhoOriginal;
   }
   Fotos.definirFonte({
-    descarregar: function (id, tamanho) {
+    descarregar: function (id, tamanho, progresso) {
       const f = doGrupo(id);
-      return f ? Nuvem.descarregarFoto(caminhoDe(f, tamanho)) : null;
+      return f ? Nuvem.descarregarFoto(caminhoDe(f, tamanho), { original: tamanho === 'original', progresso: progresso }) : null;
     },
     endereco: function (id, tamanho) {
       const f = doGrupo(id);
