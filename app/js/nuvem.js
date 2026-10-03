@@ -1008,27 +1008,64 @@ window.Nuvem = (function () {
   }
 
   /* Um dos três tamanhos de uma fotografia do grupo, do Storage, para
-     guardar no telemóvel. Só funciona com o CORS do bucket configurado
-     para o domínio da app (ver README); sem ele, o browser recusa a
-     resposta, e a partir daí, nesta sessão, nem se tenta — as vistas
-     mostram a imagem pelo endereço direto, que não precisa de CORS. */
-  let semCors = false;
-  function descarregarFoto(caminho) {
+     guardar no telemóvel. Precisa do CORS do bucket para o domínio da
+     app (docs/firebase/cors.json, aplicado a 03.10.2026); sem ele, o
+     browser recusa a resposta. A leitura é pública, e o pedido vai sem
+     sessão nem cabeçalhos: é um pedido simples, sem a pergunta prévia
+     do CORS, que na montanha era mais uma ida e volta por imagem.
+     Uma falha com rede pode ser o CORS ou a rede: durante uns minutos
+     não se pedem miniaturas nem vistas — mostram-se pelo endereço
+     direto. O original pede-se sempre, porque é quem o guarda que o
+     pede, e uma falha da rede não o pode deixar sem ele.
+       opcoes.original            — o pedido é de quem o guarda
+       opcoes.progresso(lidos, total), em bytes */
+  const PAUSA_SEM_CORS = 5 * 60 * 1000;
+  let semCorsAte = 0;
+  function descarregarFoto(caminho, opcoes) {
+    const o = opcoes || {};
     if (simulada() || !caminho) return Promise.reject(erro('sem-servidor'));
     if (!navigator.onLine) return Promise.reject(erro('sem-rede'));
-    if (semCors) return Promise.reject(erro('sem-cors'));
-    return obterSessao().then(function (sessao) {
-      return fetch(enderecoFoto(caminho), { headers: { Authorization: 'Bearer ' + sessao.idToken } })
-        .catch(function () {
-          /* Com rede e sem resposta legível: é o CORS. */
-          if (navigator.onLine) semCors = true;
-          throw erro(navigator.onLine ? 'sem-cors' : 'sem-rede');
-        });
+    if (!o.original && Date.now() < semCorsAte) return Promise.reject(erro('sem-cors'));
+    return fetch(enderecoFoto(caminho)).catch(function () {
+      if (navigator.onLine) semCorsAte = Date.now() + PAUSA_SEM_CORS;
+      throw erro(navigator.onLine ? 'sem-cors' : 'sem-rede');
     }).then(function (r) {
       if (r.status === 404) throw erro('nao-existe');
       if (!r.ok) throw erro('servidor');
-      return r.blob();
+      return o.progresso ? lerAosBocados(r, o.progresso) : r.blob();
     });
+  }
+
+  /* O corpo da resposta aos bocados, para se dizer quanto falta: o
+     original de um vídeo são dezenas de megabytes. Cada 8 MB passam a
+     Blob, para o telemóvel não juntar o ficheiro inteiro em memória
+     antes de o entregar — como o .zip do álbum. */
+  const BOCADO = 8 * 1024 * 1024;
+  function lerAosBocados(r, progresso) {
+    if (!r.body || !r.body.getReader) return r.blob();
+    const total = parseInt(r.headers.get('Content-Length'), 10) || 0;
+    const tipo = r.headers.get('Content-Type') || '';
+    const leitor = r.body.getReader();
+    const blobs = [];
+    let pedaco = [];
+    let noPedaco = 0;
+    let lidos = 0;
+    function fecharPedaco() {
+      if (pedaco.length) blobs.push(new Blob(pedaco));
+      pedaco = [];
+      noPedaco = 0;
+    }
+    return (function passo() {
+      return leitor.read().then(function (x) {
+        if (x.done) { fecharPedaco(); return new Blob(blobs, { type: tipo }); }
+        pedaco.push(x.value);
+        noPedaco += x.value.length;
+        lidos += x.value.length;
+        if (noPedaco >= BOCADO) fecharPedaco();
+        progresso(lidos, total);
+        return passo();
+      });
+    })();
   }
 
   function ligada() {

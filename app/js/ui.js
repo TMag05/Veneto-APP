@@ -143,6 +143,38 @@ window.UI = (function () {
     setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
   }
 
+  /* Uma fotografia ou um vídeo vão para a galeria do telemóvel, não
+     para um ficheiro que ninguém volta a encontrar (03.10.2026). No
+     iPhone, a única porta de um site para as Fotografias é a folha de
+     Partilhar, com «Guardar imagem» e «Guardar vídeo»: o que se
+     descarrega acaba na app Ficheiros. No Android, o que se descarrega
+     vai para Transferências, que a galeria mostra, e a folha de
+     Partilhar de lá não tem onde guardar. A folha só abre dentro de um
+     toque; fora dele responde 'sem-toque', e quem chamou pede outro.
+       → 'galeria' | 'cancelado' | 'sem-toque' | 'descarregado' */
+  const iphone = /iPhone|iPad|iPod/.test(navigator.userAgent) ||
+    (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+
+  function guardarNaGaleria(nome, blob, tipo) {
+    const t = tipo || blob.type || 'application/octet-stream';
+    let ficheiro = null;
+    try { ficheiro = new File([blob], nome, { type: t }); } catch (e) { /* sem File: descarrega-se */ }
+    if (!iphone || !ficheiro || !navigator.share || !navigator.canShare || !navigator.canShare({ files: [ficheiro] })) {
+      descarregar(nome, blob, t);
+      return Promise.resolve('descarregado');
+    }
+    /* Só o ficheiro: a folha é para o guardar, não para o mandar com
+       uma mensagem. */
+    return navigator.share({ files: [ficheiro] }).then(function () { return 'galeria'; }, function (e) {
+      const erro = e && e.name;
+      if (erro === 'NotAllowedError') return 'sem-toque';
+      /* Fechou-se a folha, ou já havia uma aberta (dois toques). */
+      if (erro === 'AbortError' || erro === 'InvalidStateError') return 'cancelado';
+      descarregar(nome, blob, t);
+      return 'descarregado';
+    });
+  }
+
   /* ---------------------------------------------------------
      Blocos
      --------------------------------------------------------- */
@@ -592,7 +624,7 @@ window.UI = (function () {
     h: h, dataLonga: dataLonga, dataCurta: dataCurta, intervaloEvento: intervaloEvento,
     minutos: minutos, horaAgora: horaAgora, plural: plural, duracao: duracao,
     rotuloDia: rotuloDia, pastaDia: pastaDia, troco: troco, haversine: haversine, linkLocal: linkLocal, temLocal: temLocal, atalhosLocal: atalhosLocal, notaMaps: notaMaps,
-    descarregar: descarregar,
+    descarregar: descarregar, guardarNaGaleria: guardarNaGaleria, iphone: iphone,
     foto: foto, imagemDe: imagemDe, logo: logo, horario: horario, distintivo: distintivo, linhaLista: linhaLista,
     campo: campo, ligarCampos: ligarCampos, coordenadas: coordenadas, escolhaCarro: escolhaCarro, escolhaFuncao: escolhaFuncao,
     reduzirImagem: reduzirImagem, derivadas: derivadas, derivadasVideo: derivadasVideo, campoFoto: campoFoto, talho: talho, nomeDeFoto: nomeDeFoto,

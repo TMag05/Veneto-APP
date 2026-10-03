@@ -198,7 +198,7 @@ window.Fotos = (function () {
      que falta vem de fora, por esta fonte (Estado liga-a ao Storage),
      e fica guardado aqui para a próxima vez — e para funcionar sem
      rede. Se não se puder guardar, mostra-se pelo endereço.
-       fonte.descarregar(id, tamanho) → Promise<Blob> | null
+       fonte.descarregar(id, tamanho, progresso) → Promise<Blob> | null
        fonte.endereco(id, tamanho)    → endereço http | ''
        fonte.falhou(id)               → a imagem não carregou */
   let fonte = null;
@@ -208,12 +208,13 @@ window.Fotos = (function () {
     return fonte && fonte.endereco ? fonte.endereco(id, tamanho || 'mini') : '';
   }
 
-  /* O ficheiro de um tamanho: o do arquivo, ou o que a fonte trouxer. */
-  function obter(id, tamanho) {
+  /* O ficheiro de um tamanho: o do arquivo, ou o que a fonte trouxer.
+     O progresso, em bytes, só vem quando é a fonte que o traz. */
+  function obter(id, tamanho, progresso) {
     const t = tamanho || 'mini';
     return ler(id).catch(function () { return null; }).then(function (r) {
       if (r && r[t]) return r[t];
-      const remoto = fonte ? fonte.descarregar(id, t) : null;
+      const remoto = fonte ? fonte.descarregar(id, t, progresso) : null;
       if (!remoto) return r ? (r.original || r.vista || r.mini || null) : null;
       return remoto.then(function (b) {
         if (!b) return null;
@@ -227,7 +228,10 @@ window.Fotos = (function () {
           return guardar(registo).catch(function () { /* sem espaço: mostra-se na mesma */ }).then(function () { return b; });
         });
       }, function () {
-        /* Sem rede: o que houver guardado de outro tamanho serve. */
+        /* Sem rede: o que houver guardado de outro tamanho serve para
+           ver — mas quem pede o original quer o original, nunca a
+           redução no lugar dele. */
+        if (t === 'original') return null;
         return r ? (r.vista || r.mini || r.original || null) : null;
       });
     });
