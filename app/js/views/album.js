@@ -6,90 +6,27 @@
 
 (function () {
 
+  /* Guardar na galeria do telemóvel as que se escolherem, a radicchio,
+     que é a cor do álbum. O .zip saiu a 03.10.2026: num telemóvel não
+     se abre em lado nenhum. */
+  const selecao = Guardar.selecao({ botao: 'botao--radicchio' });
+
   /* A imagem vem do arquivo do telemóvel, que é assíncrono: o HTML
      deixa a etiqueta pronta e Fotos.pintar dá-lhe o endereço. */
   function celula(x) {
     if (x.id) {
       const video = Fotos.ehVideo(x);
-      return '<a class="grelha-fotos__celula" href="#/foto/' + encodeURIComponent(x.id) + '" aria-label="' + (video ? 'Vídeo' : 'Fotografia') + '">' +
-        '<img data-foto="' + UI.h(x.id) + '" data-tamanho="mini" loading="lazy" decoding="async" alt="">' +
-        (video ? UI.marcaVideo(x) : '') +
-      '</a>';
+      const rotulo = video ? 'Vídeo' : 'Fotografia';
+      const dentro = '<img data-foto="' + UI.h(x.id) + '" data-tamanho="mini" loading="lazy" decoding="async" alt="">' +
+        (video ? UI.marcaVideo(x) : '');
+      /* A escolher, um toque escolhe em vez de abrir. */
+      if (selecao.ativa()) return selecao.celula(x, dentro, rotulo);
+      return '<a class="grelha-fotos__celula" href="#/foto/' + encodeURIComponent(x.id) + '" aria-label="' + rotulo + '">' +
+        dentro + '</a>';
     }
     return '<div class="grelha-fotos__celula" style="background-image:' +
       Imagens.fundo(x.semente, x.variante, 1) +
       ';background-size:cover;background-position:center"></div>';
-  }
-
-  /* ---------------------------------------------------------
-     Descarregar em ficheiro único
-     Os originais, sem passar por servidor nenhum: o telemóvel já
-     os tem. Num computador, depois do passeio, isto é leve.
-     --------------------------------------------------------- */
-
-  function semRepetir(usados, nome) {
-    if (!usados[nome]) { usados[nome] = 1; return nome; }
-    const ponto = nome.lastIndexOf('.');
-    const raiz = ponto > 0 ? nome.slice(0, ponto) : nome;
-    const ext = ponto > 0 ? nome.slice(ponto) : '';
-    usados[nome] += 1;
-    return raiz + '-' + usados[nome] + ext;
-  }
-
-  function reunir(fotos, porPasta) {
-    const usados = {};
-    return fotos.reduce(function (corrente, f) {
-      return corrente.then(function (lista) {
-        /* O original: o do arquivo, ou o do servidor, para as do grupo. */
-        return Promise.all([Fotos.obter(f.id, 'original'), Fotos.ler(f.id).catch(function () { return null; })]).then(function (x) {
-          const original = x[0];
-          if (!original) return lista;
-          const tipo = (x[1] && x[1].tipo) || f.tipo || original.type || 'image/jpeg';
-          const dia = DADOS.dia(f.dia);
-          const pasta = porPasta && dia ? UI.pastaDia(dia) + '/' : '';
-          /* Dentro da pasta do dia, o nome não repete o dia. */
-          const nome = pasta ? UI.nomeDeFoto(f, tipo).replace(/^dia-\d+-?/, '') : UI.nomeDeFoto(f, tipo);
-          lista.push({
-            nome: semRepetir(usados, pasta + nome),
-            blob: original,
-            data: new Date(f.criado)
-          });
-          return lista;
-        }).catch(function () { return lista; });
-      });
-    }, Promise.resolve([]));
-  }
-
-  function descarregarZip(fotos, nomeZip, porPasta) {
-    const comFicheiro = fotos.filter(function (f) { return !!f.id; });
-    if (!comFicheiro.length) {
-      UI.abrirFolha('Nada para descarregar',
-        '<p class="corpo-ui silencioso">Ainda não há fotografias guardadas neste telemóvel.</p>');
-      return;
-    }
-
-    UI.abrirFolha('A preparar o ficheiro',
-      '<p class="corpo-ui silencioso">' + UI.contagemGaleria(comFicheiro) +
-        ', em qualidade original.</p>' +
-      '<p class="meta num" style="margin-top:16px" id="zip-conta">0 de ' + comFicheiro.length + '</p>');
-
-    const conta = document.getElementById('zip-conta');
-    reunir(comFicheiro, porPasta).then(function (lista) {
-      return Zip.criar(lista, function (feitos, total) {
-        if (conta) conta.textContent = feitos + ' de ' + total;
-      });
-    }).then(function (blob) {
-      UI.fecharFolha();
-      UI.descarregar(nomeZip, blob, 'application/zip');
-    }).catch(function (e) {
-      UI.abrirFolha('Ficheiro grande demais',
-        '<p class="corpo-ui silencioso">O álbum não cabe num ficheiro só. ' +
-        'Descarregue dia a dia.</p>');
-    });
-  }
-
-  function nomeDoPasseio() {
-    return UI.talho(DADOS.evento.nome || 'passeio') || 'passeio';
   }
 
   Vistas.album = {
@@ -118,12 +55,7 @@
             '<span class="meta num">' + f.length + '</span>' +
           '</div>' +
           (d.data ? '<p class="meta" style="margin-bottom:16px">' + UI.dataLonga(d.data) + '</p>' : '') +
-          '<div class="grelha-fotos">' + f.map(celula).join('') + '</div>' +
-          (f.some(function (x) { return !!x.id; })
-            ? '<button class="botao botao--texto" style="margin-top:12px" type="button" ' +
-              'data-acao="descarregarDia" data-valor="' + d.id + '">' +
-              Icone('descarregar', 20) + 'Descarregar o dia</button>'
-            : '') +
+          '<div class="grelha-fotos grelha-fotos--radicchio">' + f.map(celula).join('') + '</div>' +
         '</div>';
       }).join('');
 
@@ -182,29 +114,22 @@
           '<div class="seccao-cabecalho"><h2 class="etiqueta">' +
             (fotos.some(function (f) { return Fotos.ehVideo(f); }) ? 'Fotografias e vídeos' : 'Fotografias') + '</h2>' +
             '<span class="meta num">' + fotos.length + '</span></div>' +
-          '<button class="botao botao--radicchio botao--largo" type="button" data-acao="descarregar">' +
-            Icone('descarregar', 20) + 'Descarregar o álbum</button>' +
-          '<p class="meta" style="margin-top:12px">Em qualidade original. Recomenda-se rede sem fios.</p>' +
+          (fotos.some(function (f) { return !!f.id; })
+            ? selecao.topo('Para guardar na galeria do telemóvel, em qualidade original.')
+            : '') +
         '</div>' +
 
         porDia +
 
         '<div class="faixa">' +
           '<p class="corpo-editorial italico silencioso">Até para o ano.</p>' +
-        '</div>';
+        '</div>' +
+
+        (selecao.ativa() ? selecao.barra() : '');
     },
     montar: function (el) { Fotos.pintar(el); },
-    desmontar: function () { Fotos.libertarTodos(); },
-    acoes: {
-      descarregar: function () {
-        descarregarZip(Estado.fotos(), nomeDoPasseio() + '-album.zip', true);
-      },
-      descarregarDia: function (diaId) {
-        const d = DADOS.dia(diaId);
-        const fotos = Estado.fotos().filter(function (f) { return f.dia === diaId; });
-        descarregarZip(fotos, nomeDoPasseio() + '-' + (d ? UI.pastaDia(d) : 'dia') + '.zip', false);
-      }
-    }
+    desmontar: function () { Fotos.libertarTodos(); selecao.limpar(); },
+    acoes: selecao.acoes
   };
 
   Vistas.arquivo = {

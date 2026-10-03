@@ -1025,6 +1025,54 @@ a { color: var(--verde); text-decoration: none; }
   background: var(--pastilha-foto);
   color: var(--sobre-foto);
 }
+
+/* Escolher várias (03.10.2026). Por cima da grelha, «Selecionar»; a
+   escolher, cada fotografia leva um círculo no canto, vazio até se
+   tocar. Escolhida, o círculo enche-se na cor de acento do ecrã — o
+   cobre na Galeria, o radicchio no Álbum —, com o visto, e a
+   fotografia fica sob um véu. É o visto que o diz, não só a cor. */
+.grelha-fotos { --acento-escolha: var(--ottone); }
+.grelha-fotos--radicchio { --acento-escolha: var(--radicchio); }
+.selecao-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-2);
+  margin-bottom: var(--esp-2);
+}
+.selecao-topo .escolha { min-height: 44px; }
+button.grelha-fotos__celula { display: block; width: 100%; }
+.grelha-fotos__escolha {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 1;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--sobre-foto);
+  border-radius: var(--raio-pill);
+  background: var(--pastilha-foto);
+  color: transparent;
+  pointer-events: none;
+  transition: background var(--transicao), color var(--transicao);
+}
+.grelha-fotos__celula[aria-pressed="true"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--veu-leve);
+  pointer-events: none;
+}
+.grelha-fotos__celula[aria-pressed="true"] .grelha-fotos__escolha {
+  background: var(--acento-escolha);
+  color: var(--sobre-acento);
+}
+/* A barra de baixo, enquanto se escolhe: quantas, e guardar. */
+.selecao { align-items: center; }
+.selecao__conta { flex: 1; color: var(--inchiostro-medio); }
+.selecao .botao { flex: 0 0 auto; }
 /* ---------------------------------------------------------
    Uma fotografia, em ecrã próprio
    A miniatura já carregada segura o lugar e a vista entra por
